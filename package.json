@@ -1,0 +1,16 @@
+{
+  "name": "mi-trading-suite",
+  "version": "4.0.0",
+  "description": "MI - Master Intelligence | Advanced Trading AI Suite (live market data + OpenRouter AI assistant)",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "license": "UNLICENSED",
+  "private": true
+}
