@@ -137,7 +137,12 @@
     src.addEventListener('market', (e) => {
       try {
         const d = JSON.parse(e.data);
-        state.lastMarket = { prices: d.prices || {}, stats24h: d.stats24h || {} };
+        state.lastMarket = {
+          prices: d.prices || {},
+          stats24h: d.stats24h || {},
+          global: d.global || null,
+          listings: d.listings || [],
+        };
         emit('market', state.lastMarket);
       } catch { /* ignore */ }
     });
@@ -288,6 +293,8 @@
     isGranted: () => state.permission === 'granted',
     getPrices: () => state.lastMarket.prices,
     getStats: () => state.lastMarket.stats24h,
+    getGlobal: () => state.lastMarket.global,
+    getListings: () => state.lastMarket.listings,
     getSignals: () => state.lastSignals.signals,
     getSummary: () => state.lastSignals.summary,
   };

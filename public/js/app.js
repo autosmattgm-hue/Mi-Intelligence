@@ -56,12 +56,13 @@
   async function checkHealth() {
     try {
       const h = await MI.api.get('/api/health');
-      if (h.market && h.market.dataSource === 'online') {
-        setStatus(true);
+      const ds = h.market && h.market.dataSource;
+      if (ds && ds !== 'error' && ds !== 'starting') {
+        setStatus(true, ds === 'coinmarketcap' ? 'Live · CoinMarketCap' : 'Live · market data');
         $id('banner').classList.add('hidden');
       } else {
         setStatus(false, 'Live data provider unreachable');
-        if (h && h.market && h.market.dataSource === 'error') showBanner('The market data provider is temporarily unreachable. MI is retrying automatically…');
+        if (ds === 'error') showBanner('The market data provider is temporarily unreachable. MI is retrying automatically…');
       }
     } catch {
       setStatus(false, 'Server offline');
@@ -90,11 +91,12 @@
     // init modules in dependency order
     if (window.MINotify) MINotify.init();
     if (window.MINotify) MINotify.onEvent('connection', (online) => {
-      if (online) setStatus(true, 'Live · Binance + OpenRouter');
+      if (online) setStatus(true, 'Live · CoinMarketCap + OpenRouter');
       else setStatus(false, 'Live feed reconnecting…');
     });
     if (window.MIChart) MIChart.init();
     if (window.MISignals) MISignals.init();
+    if (window.MIMarket) MIMarket.init();
     if (window.MIPortfolio) MIPortfolio.init();
     if (window.MIChat) MIChat.init();
 

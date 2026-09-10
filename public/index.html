@@ -36,6 +36,7 @@
   <!-- ============================ NAV ============================ -->
   <nav class="nav" id="nav">
     <button class="nav-tab active" data-view="overview">📊 Overview</button>
+    <button class="nav-tab" data-view="market">🌐 Market</button>
     <button class="nav-tab" data-view="signals">🎯 Signals</button>
     <button class="nav-tab" data-view="portfolio">💰 Portfolio</button>
     <button class="nav-tab" data-view="risk">🛡️ Risk Manager</button>
@@ -59,7 +60,7 @@
           <div class="panel-head wrap">
             <div>
               <strong>MI Live Chart</strong>
-              <span class="sub">Real OHLCV · Binance spot · updated in real time</span>
+              <span class="sub">Real OHLCV · Binance + CoinMarketCap · live</span>
             </div>
             <div class="chart-opts">
               <select id="chartSymbol" class="input select" title="Trading pair"></select>
@@ -74,16 +75,32 @@
               <div class="seg" id="chartIndicators">
                 <button data-ind="ema" class="active" title="EMA 9/21/50">📐 EMA</button>
                 <button data-ind="bb" class="active" title="Bollinger Bands">📊 BB</button>
+                <button data-ind="vwap" title="Volume-Weighted Average Price">🎯 VWAP</button>
                 <button data-ind="vol" class="active" title="Volume">📈 Vol</button>
                 <button data-ind="rsi" class="active" title="RSI panel">💫 RSI</button>
                 <button data-ind="macd" class="active" title="MACD panel">🌀 MACD</button>
+                <button data-ind="stoch" class="active" title="Stochastic panel">⚡ Stoch</button>
               </div>
             </div>
+          </div>
+          <div class="chart-info-row" id="chartInfoRow">
+            <span class="ci-price" id="ciPrice">—</span>
+            <span class="ci-item">O <b id="ciO">–</b></span>
+            <span class="ci-item">H <b id="ciH">–</b></span>
+            <span class="ci-item">L <b id="ciL">–</b></span>
+            <span class="ci-item">C <b id="ciC">–</b></span>
+            <span class="ci-item" id="ciChg">–</span>
+            <span class="ci-sep">·</span>
+            <span class="ci-item muted">Rng <b id="ciRngH">–</b> / <b id="ciRngL">–</b></span>
+            <span class="ci-item muted">Vol(24h) <b id="ciVol">–</b></span>
+            <span class="ci-item muted">MktCap <b id="ciMc">–</b></span>
+            <span class="ci-src" id="ciSrc">…</span>
           </div>
           <div class="chart-wrap">
             <canvas id="chart"></canvas>
             <div class="chart-tooltip hidden" id="chartTooltip"></div>
           </div>
+          <div class="chart-hint">🖱️ Scroll to zoom · Drag to pan · Hover for OHLCV &amp; indicators</div>
         </div>
 
         <!-- Signal -->
@@ -103,9 +120,10 @@
         <div class="info-card">
           <div class="info-card-head">🤖 How MI works</div>
           <div class="info-card-body">
-            The MI engine pulls <strong>real OHLCV data</strong> from Binance's public market API and computes EMA, RSI, MACD,
-            Bollinger Bands, ATR and volume confluence on every cycle. Signals, confidence, take-profit and stop-loss levels are
-            derived from those calculations — then cross-checked by the OpenRouter AI assistant.
+            The MI engine pulls <strong>real market data</strong> — prices, market cap &amp; rankings from <strong>CoinMarketCap</strong>
+            and <strong>OHLCV candles</strong> from Binance — then computes EMA, RSI, MACD, Bollinger Bands, ATR and volume
+            confluence on every cycle. Signals, confidence, take-profit and stop-loss levels are derived from those
+            calculations, then cross-checked by the OpenRouter AI assistant.
           </div>
         </div>
         <div class="info-card">
@@ -118,10 +136,35 @@
         <div class="info-card">
           <div class="info-card-head">🗂️ Data sources</div>
           <div class="info-card-body">
-            Prices &amp; candles — <strong>Binance public market data</strong> (spot). Signals &amp; analysis — <strong>MI engine</strong>
-            (on-server). AI answers — <strong>OpenRouter</strong>. Notifications are delivered <strong>inside the app</strong> via
-            your own MI permission — no browser notification spam.
+            Prices, market cap &amp; rankings — <strong>CoinMarketCap</strong>. Chart candles — <strong>Binance public market data</strong>
+            (spot). Signals &amp; analysis — <strong>MI engine</strong> (on-server). AI answers — <strong>OpenRouter</strong>.
+            Notifications are delivered <strong>inside the app</strong> via your own MI permission.
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ MARKET (CoinMarketCap) ============================ -->
+    <section class="view" data-view="market">
+      <div class="stats-bar" id="marketStats"></div>
+      <div class="panel">
+        <div class="panel-head wrap">
+          <div>
+            <strong>CoinMarketCap — Cryptocurrency Rankings</strong>
+            <span class="sub" id="marketUpdated">Top 100 coins ranked by market cap · live from CoinMarketCap</span>
+          </div>
+          <button class="btn ghost sm" id="marketRefresh">↻ Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th><th>Coin</th><th>Price</th><th>1h %</th><th>24h %</th><th>7d %</th><th>30d %</th>
+                <th>Market Cap</th><th>Volume (24h)</th><th>MCap Dominance</th><th>Circulating</th>
+              </tr>
+            </thead>
+            <tbody id="marketBody"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -272,7 +315,7 @@
   </main>
 
   <footer class="footer">
-    <span class="mi-name">MI — Master Intelligence</span> · Real data + OpenRouter AI · v4.0 · Data: Binance public API ·
+    <span class="mi-name">MI — Master Intelligence</span> · Real data + OpenRouter AI · v5.0 · Market data: CoinMarketCap + Binance public API ·
     Not financial advice · <span id="footerTime"></span>
   </footer>
 </div>
@@ -311,6 +354,7 @@
 <script src="/js/notifications.js"></script>
 <script src="/js/chart.js"></script>
 <script src="/js/signals.js"></script>
+<script src="/js/market.js"></script>
 <script src="/js/portfolio.js"></script>
 <script src="/js/chat.js"></script>
 <script src="/js/app.js"></script>

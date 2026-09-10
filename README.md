@@ -2,9 +2,11 @@
 
 A **professional, real-data trading dashboard** with a built-in **AI market analyst**.
 
-**No simulated data.** Prices and candles come from the **Binance public market API** (live).
-Signals are computed on-server from real technical indicators. The bundled AI assistant
-(OpenRouter) answers with **real-time market context** injected into every message.
+**No simulated data.** Prices, market capitalizations, rankings and global metrics come
+from the **CoinMarketCap** API (live). Chart candles come from the **Binance public market
+API** (live exchange data). Signals are computed on-server from real technical indicators.
+The bundled AI assistant (OpenRouter) answers with **real-time market context** injected
+into every message.
 
 ---
 
@@ -13,12 +15,13 @@ Signals are computed on-server from real technical indicators. The bundled AI as
 | Area | What it does |
 | --- | --- |
 | **Live charts** | Real OHLCV candlesticks · 1m–1D · EMA 9/21/50, Bollinger Bands, Volume, RSI, MACD · hover tooltip |
+| **Market rankings** | Live **CoinMarketCap** top-100 table — price, 1h/24h/7d/30d change, market cap, volume, dominance, circulating supply + global metrics (total market cap, 24h volume, BTC dominance) |
 | **Signal engine** | Computes EMA trend, EMA crossovers, RSI, MACD, Bollinger, ATR and volume confluence → BUY / SELL / HOLD with confidence %, entry / take-profit / stop-loss / risk-reward on every symbol |
 | **Portfolio** | Track your holdings (stored in your browser) valued at **live** prices, with PnL and 24h change |
 | **Risk Manager** | Position-size calculator + live **paper trading** (real signals + real prices → measured win rate & PnL) |
 | **Price Alerts** | Create "above / below target" alerts. MI watches the market and pops up an **in-app notification** |
 | **Notifications** | Fully in-app permission system (no browser spam). Toast pop-ups, sound toggle, notification center, badge |
-| **MI Assistant** | Real streaming AI chat powered by OpenRouter. Grounded in live prices + signals + paper stats |
+| **MI Assistant** | Real streaming AI chat powered by OpenRouter. Grounded in live prices + signals + CoinMarketCap market data |
 | **Real-time push** | Server-Sent Events push live prices, fresh signals, alerts and paper trades to the open page |
 
 ---
@@ -49,11 +52,12 @@ Then open **http://localhost:3009** in your browser.
 | `PORT` | `3009` | HTTP port |
 | `OPENROUTER_API_KEY` | *(empty)* | AI assistant key (get one at https://openrouter.ai/keys) |
 | `AI_MODEL` | `openai/gpt-4o-mini` | Which OpenRouter model powers MI |
+| `CMC_API_KEY` | *(empty)* | Optional CoinMarketCap Pro key (https://coinmarketcap.com/api/). Leave empty for the keyless public API. When set, authenticated quotes/ohlcv endpoints are enabled. |
 | `SIGNAL_INTERVAL_MS` | `60000` | Signal engine refresh rate |
 | `TICKER_INTERVAL_MS` | `5000` | Live price refresh rate |
 
 > ⚠️ **Security:** `.env` is git-ignored and must never be committed or shared.
-> Your API key stays on the server — the browser never sees it.
+> Your API keys stay on the server — the browser never sees them.
 
 ---
 
@@ -63,8 +67,9 @@ Then open **http://localhost:3009** in your browser.
 | --- | --- | --- |
 | GET | `/api/health` | Service + data-source status |
 | GET | `/api/config` | Symbols, intervals, AI model |
-| GET | `/api/market` | Latest prices + 24h stats |
-| GET | `/api/market/klines?symbol=BTCUSDT&interval=15m&limit=300` | OHLCV candles |
+| GET | `/api/market` | Latest prices + 24h stats + global metrics + top-100 listings |
+| GET | `/api/market/ranking?limit=100` | CoinMarketCap-style ranked market overview |
+| GET | `/api/market/klines?symbol=BTCUSDT&interval=15m&limit=300` | OHLCV candles (Binance; CMC when keyed) |
 | GET | `/api/signals` | All signals + market summary |
 | GET | `/api/signals/:symbol` | Single signal |
 | GET | `/api/paper` | Paper-trading stats, open positions, history |
@@ -114,7 +119,8 @@ f:\Mi Trading
 │   ├── index.js             # HTTP server + routes
 │   ├── httpkit.js           # Minimal zero-dep HTTP/router/static toolkit
 │   ├── config.js            # Tiny .env loader
-│   ├── binance.js           # Real market-data layer (Binance public API)
+│   ├── coinmarketcap.js     # Real market-data layer (CoinMarketCap prices/rankings/global metrics)
+│   ├── binance.js           # OHLCV candle layer (Binance public API)
 │   ├── indicators.js        # EMA, RSI, MACD, Bollinger, ATR, SMA
 │   ├── signalEngine.js      # MI confluence signal engine
 │   ├── paper.js             # Paper-trading engine (real prices)
@@ -124,7 +130,7 @@ f:\Mi Trading
 ├── public/                  # Frontend (vanilla JS, no build step)
 │   ├── index.html
 │   ├── css/style.css
-│   └── js/ (api, app, chart, chat, notifications, portfolio, signals)
+│   └── js/ (api, app, chart, chat, market, notifications, portfolio, signals)
 ├── data/db.json             # Runtime state (auto-created)
 ├── .env                     # Secrets (git-ignored)
 └── package.json

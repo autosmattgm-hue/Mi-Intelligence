@@ -8,6 +8,7 @@ const { createServer, Router, readJsonBody, sendJson, decorateRes, serveStatic }
 
 const Store = require('./store');
 const binance = require('./binance');
+const cmc = require('./coinmarketcap');
 const signalEngine = require('./signalEngine');
 const PaperEngine = require('./paper');
 const Alerts = require('./alerts');
@@ -36,9 +37,16 @@ function broadcast(event, data) {
 const market = {
   prices: {},
   stats24h: {},
+  global: null,
+  listings: [],
   signals: [],
   summary: null,
-  health: { dataSource: 'starting', lastTicker: 0, lastSignals: 0 },
+  health: {
+    dataSource: 'starting',
+    lastTicker: 0,
+    lastSignals: 0,
+    providers: { coinmarketcap: false, binance: false },
+  },
 };
 
 const paper = new PaperEngine(store, broadcast);
@@ -47,15 +55,36 @@ const alerts = new Alerts(store, broadcast);
 // ---------------------------------------------------------------- data loops
 async function refreshMarket() {
   try {
-    const [prices, stats24h] = await Promise.all([
-      binance.getTickerPrices(binance.DEFAULT_SYMBOLS),
-      binance.get24hStats(binance.DEFAULT_SYMBOLS),
-    ]);
+    // Primary source: CoinMarketCap. Fallback: Binance ticker if CMC fails.
+    let prices, stats24h, global, listings;
+    try {
+      const overview = await cmc.getMarketOverview(100);
+      prices = overview.prices;
+      stats24h = overview.stats24h;
+      global = overview.global;
+      listings = overview.listings;
+      market.health.providers.coinmarketcap = true;
+    } catch (cmcErr) {
+      console.error('[ticker][cmc]', cmcErr.message);
+      market.health.providers.coinmarketcap = false;
+      const fallback = await Promise.all([
+        binance.getTickerPrices(binance.DEFAULT_SYMBOLS),
+        binance.get24hStats(binance.DEFAULT_SYMBOLS),
+      ]);
+      prices = fallback[0];
+      stats24h = fallback[1];
+      global = null;
+      listings = [];
+    }
+
     market.prices = Object.assign({}, prices);
     market.stats24h = Object.assign({}, stats24h);
+    market.global = global;
+    market.listings = listings;
+    market.health.providers.binance = true;
     market.health.lastTicker = Date.now();
-    market.health.dataSource = 'online';
-    broadcast('market', { prices, stats24h, ts: Date.now() });
+    market.health.dataSource = market.health.providers.coinmarketcap ? 'coinmarketcap' : 'binance-fallback';
+    broadcast('market', { prices, stats24h, global, listings, ts: Date.now() });
     paper.integrate(market.signals, market.prices);
   } catch (err) {
     market.health.dataSource = 'error';
@@ -95,10 +124,13 @@ const router = new Router();
 router.get('/api/health', (ctx) => {
   ctx.res.sendJson(200, {
     status: 'ok',
-    version: '4.0.0',
-    source: 'Binance public market data',
+    version: '5.0.0',
+    source: 'CoinMarketCap + Binance public market data',
+    marketSource: market.health.dataSource,
+    providers: market.health.providers,
     aiModel: AI_MODEL,
     aiEnabled: !!API_KEY,
+    cmcKeyConfigured: !!process.env.CMC_API_KEY,
     market: market.health,
     ts: Date.now(),
   });
@@ -106,16 +138,34 @@ router.get('/api/health', (ctx) => {
 
 router.get('/api/config', (ctx) => {
   ctx.res.sendJson(200, {
-    symbols: binance.DEFAULT_SYMBOLS,
+    symbols: cmc.TRACKED,
     intervals: Object.keys(binance.INTERVALS),
     aiModel: AI_MODEL,
     aiEnabled: !!API_KEY,
-    dataSource: 'Binance public market data',
+    dataSource: 'CoinMarketCap (prices + market data) + Binance (chart candles)',
+    cmcKeyConfigured: !!process.env.CMC_API_KEY,
   });
 });
 
 router.get('/api/market', (ctx) => {
-  ctx.res.sendJson(200, { prices: market.prices, stats24h: market.stats24h, ts: Date.now() });
+  ctx.res.sendJson(200, {
+    prices: market.prices,
+    stats24h: market.stats24h,
+    global: market.global,
+    listings: market.listings,
+    ts: Date.now(),
+  });
+});
+
+// CoinMarketCap-style ranked market overview (top 100 coins).
+router.get('/api/market/ranking', (ctx) => {
+  const limit = Math.min(Number(ctx.query.limit) || 100, 200);
+  ctx.res.sendJson(200, {
+    global: market.global,
+    listings: market.listings.slice(0, limit),
+    source: 'coinmarketcap',
+    ts: Date.now(),
+  });
 });
 
 router.get('/api/market/klines', async (ctx) => {
@@ -123,8 +173,13 @@ router.get('/api/market/klines', async (ctx) => {
   const interval = ctx.query.interval || '15m';
   const limit = Number(ctx.query.limit) || 300;
   try {
-    const candles = await binance.getKlines(symbol, interval, limit);
-    ctx.res.sendJson(200, { symbol, interval, candles });
+    const result = await cmc.getKlines(symbol, interval);
+    ctx.res.sendJson(200, {
+      symbol,
+      interval,
+      candles: result.candles.slice(-limit),
+      source: result.source,
+    });
   } catch (err) {
     ctx.res.sendJson(502, { error: err.message });
   }
@@ -196,6 +251,11 @@ router.post('/api/chat', async (ctx) => {
     prices: market.prices,
     stats24h: market.stats24h,
     summary: market.summary,
+    globalMetrics: market.global,
+    marketRanking: market.listings.slice(0, 25).map(l => ({
+      rank: l.rank, symbol: l.symbol, name: l.name, price: l.price,
+      marketCap: l.marketCap, percentChange24h: l.percentChange24h,
+    })),
     signals: market.signals.map(s => ({
       symbol: s.symbol, asset: s.asset, action: s.action, confidence: s.confidence,
       price: s.price, entry: s.entry, takeProfit: s.takeProfit, stopLoss: s.stopLoss,
@@ -291,7 +351,8 @@ const server = createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log('\n\ud83c\udfe6  MI — Master Intelligence Trading Suite');
   console.log('   ➜ Local:   http://localhost:' + PORT);
-  console.log('   ➜ Source:  ' + binance.DEFAULT_SYMBOLS.length + ' assets via Binance public market data');
+  console.log('   ➜ Source:  ' + cmc.TRACKED.length + ' assets via CoinMarketCap (prices/market) + Binance (chart candles)');
+  console.log('   ➜ CMC key: ' + (process.env.CMC_API_KEY ? 'configured (authenticated endpoints enabled)' : 'keyless public API (free tier)'));
   console.log('   ➜ AI:      ' + AI_MODEL + ' ' + (API_KEY ? '(enabled)' : '(NOT CONFIGURED — add OPENROUTER_API_KEY to .env)'));
   refreshMarket();
   setTimeout(refreshSignals, 1000);

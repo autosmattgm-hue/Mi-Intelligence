@@ -198,14 +198,43 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: .74rem; colo
 }
 .seg button:hover { color: var(--text); }
 .seg button.active { background: var(--blue); color: #fff; }
-.chart-wrap { position: relative; }
+.chart-wrap { position: relative; cursor: crosshair; }
 #chart { width: 100%; height: 460px; display: block; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; }
-.chart-tooltip {
-  position: absolute; pointer-events: none; z-index: 10; padding: 8px 10px;
-  background: rgba(10,15,26,.95); border: 1px solid var(--line2); border-radius: 8px;
-  font-family: var(--mono); font-size: .68rem; color: var(--text); box-shadow: 0 6px 22px rgba(0,0,0,.5);
-  min-width: 150px; max-width: 260px; word-break: break-word;
+.chart-info-row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
+  padding: 7px 12px; margin-bottom: 8px; font-size: .72rem;
+  background: var(--bg2); border: 1px solid var(--line); border-radius: 9px;
+  font-family: var(--mono);
 }
+.chart-info-row .ci-price { font-size: 1rem; font-weight: 800; color: var(--cyan); }
+.chart-info-row .ci-item { color: var(--text2); white-space: nowrap; }
+.chart-info-row .ci-item b { color: var(--text); font-weight: 700; }
+.chart-info-row .ci-item.muted { color: var(--muted); }
+.chart-info-row .ci-item.muted b { color: var(--text2); font-weight: 600; }
+.chart-info-row .ci-sep { color: var(--muted); }
+.chart-info-row .ci-src {
+  margin-left: auto; padding: 2px 8px; border-radius: 20px;
+  font-size: .62rem; font-weight: 700; letter-spacing: .4px;
+  background: rgba(6,182,212,.12); color: var(--cyan); border: 1px solid rgba(6,182,212,.35);
+  text-transform: uppercase;
+}
+.chart-info-row .ci-src.binance { background: rgba(245,158,11,.12); color: var(--gold); border-color: rgba(245,158,11,.35); }
+.chart-hint { font-size: .66rem; color: var(--muted); margin-top: 6px; letter-spacing: .2px; }
+.chart-tooltip {
+  position: absolute; pointer-events: none; z-index: 10; padding: 9px 12px;
+  background: rgba(10,15,26,.95); border: 1px solid var(--line2); border-radius: 10px;
+  font-family: var(--mono); font-size: .7rem; color: var(--text); box-shadow: 0 8px 28px rgba(0,0,0,.55);
+  min-width: 170px; max-width: 290px; word-break: break-word; line-height: 1.55;
+}
+.chart-tooltip .tt-title { font-weight: 800; margin-bottom: 4px; font-family: var(--font); }
+.chart-tooltip .tt-row { display: flex; justify-content: space-between; gap: 14px; }
+.chart-tooltip .tt-k { color: var(--muted); }
+.chart-tooltip .tt-v { color: var(--text); font-weight: 700; }
+.chart-tooltip .tt-v.green { color: var(--green); }
+.chart-tooltip .tt-v.red { color: var(--red); }
+.chart-tooltip .tt-v.cyan { color: var(--cyan); }
+.chart-tooltip .tt-v.gold { color: var(--gold); }
+.chart-tooltip .tt-v.purple { color: #a78bfa; }
 /* ============ signal panel ============ */
 .signal { display: flex; flex-direction: column; gap: 14px; }
 .signal-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
