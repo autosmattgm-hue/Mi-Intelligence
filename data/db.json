@@ -1404,43 +1404,250 @@
       },
       "ts": 1789110648437,
       "read": false
+    },
+    {
+      "id": "c3e1db3d855b",
+      "type": "signal",
+      "title": "New BUY signal — BTC/USDT (97%)",
+      "body": "Buy entry near $77,382, TP $77,729, SL $77,168, R/R 1.62",
+      "meta": {
+        "symbol": "BTCUSDT",
+        "action": "BUY",
+        "confidence": 97
+      },
+      "ts": 1789110721488,
+      "read": false
+    },
+    {
+      "id": "8a0fc9ee0475",
+      "type": "signal",
+      "title": "New BUY signal — XRP/USDT (86%)",
+      "body": "Buy entry near $1.36, TP $1.37, SL $1.35, R/R 1.62",
+      "meta": {
+        "symbol": "XRPUSDT",
+        "action": "BUY",
+        "confidence": 86
+      },
+      "ts": 1789110948148,
+      "read": false
+    },
+    {
+      "id": "39f47aea80fb",
+      "type": "signal",
+      "title": "New SELL signal — DOT/USDT (91%)",
+      "body": "Sell entry near $1.03, TP $1.01, SL $1.05, R/R 1.62",
+      "meta": {
+        "symbol": "DOTUSDT",
+        "action": "SELL",
+        "confidence": 91
+      },
+      "ts": 1789163483572,
+      "read": false
+    },
+    {
+      "id": "0aeb592423c3",
+      "type": "signal",
+      "title": "New SELL signal — LTC/USDT (97%)",
+      "body": "Sell entry near $53.22, TP $52.41, SL $53.72, R/R 1.62",
+      "meta": {
+        "symbol": "LTCUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789163483572,
+      "read": false
+    },
+    {
+      "id": "98467fa7bdb5",
+      "type": "signal",
+      "title": "New SELL signal — BTC/USDT (97%)",
+      "body": "Sell entry near $77,128, TP $76,561, SL $77,477, R/R 1.63",
+      "meta": {
+        "symbol": "BTCUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026762,
+      "read": false
+    },
+    {
+      "id": "ef4e4664d105",
+      "type": "signal",
+      "title": "New SELL signal — XRP/USDT (97%)",
+      "body": "Sell entry near $1.35, TP $1.33, SL $1.36, R/R 1.63",
+      "meta": {
+        "symbol": "XRPUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026762,
+      "read": false
+    },
+    {
+      "id": "be363cc64092",
+      "type": "signal",
+      "title": "New SELL signal — ADA/USDT (97%)",
+      "body": "Sell entry near $0.2000, TP $0.2000, SL $0.2100, R/R 1.63",
+      "meta": {
+        "symbol": "ADAUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026762,
+      "read": false
+    },
+    {
+      "id": "34089757ab03",
+      "type": "signal",
+      "title": "New SELL signal — DOGE/USDT (97%)",
+      "body": "Sell entry near $0.0800, TP $0.0800, SL $0.0800, R/R 1.63",
+      "meta": {
+        "symbol": "DOGEUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026762,
+      "read": false
+    },
+    {
+      "id": "a6b016df3b86",
+      "type": "signal",
+      "title": "New SELL signal — AVAX/USDT (97%)",
+      "body": "Sell entry near $7.42, TP $7.30, SL $7.49, R/R 1.63",
+      "meta": {
+        "symbol": "AVAXUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026762,
+      "read": false
+    },
+    {
+      "id": "e52017fe4ed7",
+      "type": "signal",
+      "title": "New SELL signal — LINK/USDT (97%)",
+      "body": "Sell entry near $11.50, TP $11.31, SL $11.61, R/R 1.62",
+      "meta": {
+        "symbol": "LINKUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026763,
+      "read": false
+    },
+    {
+      "id": "e36ef624c199",
+      "type": "signal",
+      "title": "New SELL signal — DOT/USDT (97%)",
+      "body": "Sell entry near $1.03, TP $1.01, SL $1.05, R/R 1.62",
+      "meta": {
+        "symbol": "DOTUSDT",
+        "action": "SELL",
+        "confidence": 97
+      },
+      "ts": 1789166026763,
+      "read": false
+    },
+    {
+      "id": "e262fbba6b8a",
+      "type": "signal",
+      "title": "New SELL signal — LTC/USDT (86%)",
+      "body": "Sell entry near $53.03, TP $52.24, SL $53.52, R/R 1.63",
+      "meta": {
+        "symbol": "LTCUSDT",
+        "action": "SELL",
+        "confidence": 86
+      },
+      "ts": 1789166026763,
+      "read": false
+    },
+    {
+      "id": "937f0847b249",
+      "type": "signal",
+      "title": "New BUY signal — POL/USDT (97%)",
+      "body": "Buy entry near $0.1000, TP $0.1000, SL $0.1000, R/R 1.63",
+      "meta": {
+        "symbol": "POLUSDT",
+        "action": "BUY",
+        "confidence": 97
+      },
+      "ts": 1789166026763,
+      "read": false
+    },
+    {
+      "id": "825fed46d5c2",
+      "type": "signal",
+      "title": "New SELL signal — BNB/USDT (86%)",
+      "body": "Sell entry near $723.43, TP $716.17, SL $727.89, R/R 1.62",
+      "meta": {
+        "symbol": "BNBUSDT",
+        "action": "SELL",
+        "confidence": 86
+      },
+      "ts": 1789166089163,
+      "read": false
+    },
+    {
+      "id": "3259bcff3986",
+      "type": "signal",
+      "title": "New SELL signal — SOL/USDT (86%)",
+      "body": "Sell entry near $101.85, TP $100.38, SL $102.76, R/R 1.63",
+      "meta": {
+        "symbol": "SOLUSDT",
+        "action": "SELL",
+        "confidence": 86
+      },
+      "ts": 1789167699948,
+      "read": false
     }
   ],
   "paperPositions": [
     {
-      "id": "4hro70mtw8g69z",
-      "symbol": "ADAUSDT",
+      "id": "934tiamtxhqrat",
+      "symbol": "BTCUSDT",
       "side": "SELL",
-      "entry": 0.21,
-      "takeProfit": 0.2,
-      "stopLoss": 0.21,
-      "qty": 4761.904761904762,
-      "openedAt": 1789087401197,
-      "confidence": 97,
+      "entry": 77248.03,
+      "takeProfit": 76654.93,
+      "stopLoss": 77613.01,
+      "qty": 0.01294531394522294,
+      "openedAt": 1789163483572,
+      "confidence": 91,
       "rr": 1.62
     },
     {
-      "id": "2nto5pmtwmabg5",
-      "symbol": "ETHUSDT",
-      "side": "BUY",
-      "entry": 2470.83,
-      "takeProfit": 2485.46,
-      "stopLoss": 2461.82,
-      "qty": 0.4047222997939964,
-      "openedAt": 1789110648437,
-      "confidence": 97,
-      "rr": 1.63
-    },
-    {
-      "id": "eic9lpmtwmabg5",
+      "id": "wjd0cfmtxhqrat",
       "symbol": "SOLUSDT",
       "side": "BUY",
-      "entry": 99.99,
-      "takeProfit": 100.75,
-      "stopLoss": 99.52,
-      "qty": 10.001000100010002,
-      "openedAt": 1789110648437,
+      "entry": 102.47,
+      "takeProfit": 104.06,
+      "stopLoss": 101.49,
+      "qty": 9.758953840148337,
+      "openedAt": 1789163483572,
+      "confidence": 91,
+      "rr": 1.62
+    },
+    {
+      "id": "tglveumtxhqrat",
+      "symbol": "XRPUSDT",
+      "side": "SELL",
+      "entry": 1.36,
+      "takeProfit": 1.33,
+      "stopLoss": 1.37,
+      "qty": 735.2941176470588,
+      "openedAt": 1789163483572,
       "confidence": 86,
+      "rr": 1.62
+    },
+    {
+      "id": "nmv4uvmtxhqrat",
+      "symbol": "DOGEUSDT",
+      "side": "SELL",
+      "entry": 0.08,
+      "takeProfit": 0.08,
+      "stopLoss": 0.09,
+      "qty": 12500,
+      "openedAt": 1789163483572,
+      "confidence": 97,
       "rr": 1.62
     }
   ],
@@ -1990,6 +2197,62 @@
       "rr": 1.63,
       "openedAt": 1789110648437,
       "closedAt": 1789110650906
+    },
+    {
+      "id": "4hro70mtw8g69z",
+      "symbol": "ADAUSDT",
+      "side": "SELL",
+      "entry": 0.21,
+      "exit": 0.21,
+      "qty": 4761.904762,
+      "pnl": 4.21,
+      "pnlPct": 0.42,
+      "reason": "TIME",
+      "rr": 1.62,
+      "openedAt": 1789087401197,
+      "closedAt": 1789163139954
+    },
+    {
+      "id": "2nto5pmtwmabg5",
+      "symbol": "ETHUSDT",
+      "side": "BUY",
+      "entry": 2470.83,
+      "exit": 2466.85,
+      "qty": 0.404722,
+      "pnl": -3.61,
+      "pnlPct": -0.36,
+      "reason": "TIME",
+      "rr": 1.63,
+      "openedAt": 1789110648437,
+      "closedAt": 1789163139954
+    },
+    {
+      "id": "eic9lpmtwmabg5",
+      "symbol": "SOLUSDT",
+      "side": "BUY",
+      "entry": 99.99,
+      "exit": 99.87,
+      "qty": 10.001,
+      "pnl": -3.23,
+      "pnlPct": -0.32,
+      "reason": "TIME",
+      "rr": 1.62,
+      "openedAt": 1789110648437,
+      "closedAt": 1789163139954
+    },
+    {
+      "id": "1yx9rxmtwmbvtc",
+      "symbol": "BTCUSDT",
+      "side": "BUY",
+      "entry": 77381.58,
+      "exit": 77238.71,
+      "qty": 0.012923,
+      "pnl": -3.84,
+      "pnlPct": -0.38,
+      "reason": "TIME",
+      "rr": 1.62,
+      "openedAt": 1789110721488,
+      "closedAt": 1789163139954
     }
   ],
   "settings": {}

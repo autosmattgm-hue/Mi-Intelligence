@@ -88,6 +88,15 @@
     const hist = line.map((x, i) => (x === null || sig[i] === null) ? null : x - sig[i]);
     return { line, sig, hist };
   }
+  function macdScale(closes, macdVals) {
+    let mx = 0.0001;
+    for (let i = 0; i < closes.length; i++) {
+      if (macdVals.hist[i] !== null) {
+        mx = Math.max(mx, Math.abs(macdVals.hist[i]), Math.abs(macdVals.line[i] || 0), Math.abs(macdVals.sig[i] || 0));
+      }
+    }
+    return mx;
+  }
 
   // Daily-anchored VWAP (resets at each UTC day boundary).
   function vwapArr(candles) {
