@@ -1,21 +1,21 @@
 'use strict';
 // ============================================================================
-// MI — Master Intelligence · Vercel serverless adapter
+// MI - Master Intelligence - Vercel serverless adapter
 // ----------------------------------------------------------------------------
 // Vercel runs this file as a serverless function (Node 18+). It mirrors the
 // full REST API of server/index.js in a STATELESS way:
-//   • Every request fetches fresh live data (CoinMarketCap + Binance).
-//   • /api/chat streams the OpenRouter response.
-//   • /api/events emits a full snapshot once with `retry:` — the frontend uses
-//     the EventSource reconnect as lightweight polling, plus a manual polling
-//     fallback when SSE is unavailable.
-//   • Alerts & notifications live in instance memory (serverless has no shared
-//     filesystem). Persist them in Vercel KV / Postgres for production scale.
+//   - Every request fetches fresh live data (CoinMarketCap + Binance).
+//   - /api/chat streams the OpenRouter response.
+//   - /api/events emits a full snapshot once with a retry: hint - the frontend
+//     uses the EventSource reconnect as lightweight polling, plus a manual
+//     polling fallback when SSE is unavailable.
+//   - Alerts and notifications live in instance memory (serverless has no
+//     shared filesystem). Persist them in Vercel KV / Postgres for scale.
 //
-// Env vars (Vercel dashboard → Project → Settings → Environment Variables):
-//   OPENROUTER_API_KEY   — OpenRouter key for the AI assistant
-//   AI_MODEL             — model name (default openai/gpt-4o-mini)
-//   CMC_API_KEY          — optional CoinMarketCap Pro key
+// Env vars (Vercel dashboard -> Project -> Settings -> Environment Variables):
+//   OPENROUTER_API_KEY   - OpenRouter key for the AI assistant
+//   AI_MODEL             - model name (default openai/gpt-4o-mini)
+//   CMC_API_KEY          - optional CoinMarketCap Pro key
 // ============================================================================
 
 require('../server/config').loadEnv();
@@ -102,6 +102,16 @@ function sendSse(res, status) {
     'Content-Type': 'text/event-stream; charset=utf-8',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+  });
+  res.write('retry: 10000\n\n');
+  return res;
+}
+
+function sendEvent(res, event, data) {
+  const payload = 'event: ' + event + '\ndata: ' + JSON.stringify(data) + '\n\n';
+  try { res.write(payload); } catch { /* closed */ }
+}
 // ------------------------------------------------------------------ router
 const router = new Router();
 
@@ -185,8 +195,17 @@ router.get('/api/signals/:symbol', async (ctx) => {
 
 router.get('/api/paper', async (ctx) => {
   const market = await loadMarket();
+  void market;
   sendJson(ctx.res, 200, {
     stats: {
+      openPositions: 0, closedTrades: 0, wins: 0, losses: 0, winRate: 0,
+      realizedPnl: 0, floatingPnl: 0, totalPnl: 0, direction: 'positive', lastTrade: null,
+    },
+    positions: [],
+    history: [],
+    note: 'Paper trading is fully persistent on the local server. On Vercel it resets per instance.',
+  });
+});
 // ---- alerts & notifications (in-memory per instance) ----
 let alertsStore = [];
 let notifStore = [];
@@ -218,6 +237,24 @@ router.post('/api/alerts', async (ctx) => {
     sendJson(ctx.res, 200, { alert });
   } catch (err) {
     sendJson(ctx.res, 400, { error: err.message });
+  }
+});
+
+router.delete('/api/alerts/:id', (ctx) => {
+  const before = alertsStore.length;
+  alertsStore = alertsStore.filter(a => a.id !== ctx.params.id);
+  sendJson(ctx.res, 200, { ok: alertsStore.length < before });
+});
+
+router.get('/api/notifications', (ctx) => sendJson(ctx.res, 200, { notifications: notifStore }));
+router.post('/api/notifications/read-all', (ctx) => {
+  notifStore.forEach(n => { n.read = true; });
+  sendJson(ctx.res, 200, { ok: true });
+});
+router.delete('/api/notifications', (ctx) => {
+  notifStore = [];
+  sendJson(ctx.res, 200, { ok: true });
+});
 // ---- AI chat (streaming). Vercel supports streaming Node responses. ----
 router.post('/api/chat', async (ctx) => {
   const history = Array.isArray(ctx.body && ctx.body.messages)
@@ -286,39 +323,71 @@ router.post('/api/chat', async (ctx) => {
     finish();
   }
 });
+// ---- SSE live feed: full snapshot once, then the frontend reconnects (polling) ----
+router.get('/api/events', async (ctx) => {
+  const market = await loadMarket();
+  const { signals, summary } = await loadSignals(true);
+  sendSse(ctx.res, 200);
+  sendEvent(ctx.res, 'hello', { ts: Date.now() });
+  sendEvent(ctx.res, 'market', {
+    prices: market.prices, stats24h: market.stats24h,
+    global: market.global, listings: market.listings, ts: Date.now(),
+  });
+  sendEvent(ctx.res, 'signals', { signals, summary, ts: Date.now() });
+  ctx.res.end();
+});
+
+// ---- static files ----
+function serveStatic(req, res) {
+  const pathname = decodeURIComponent(String(req.path || req.url || '/').split('?')[0]);
+  let rel = pathname === '/' ? '/index.html' : pathname;
+  if (rel.startsWith('/api/')) return false;
+  const abs = path.normalize(path.join(PUBLIC_DIR, '.' + rel));
+  if (!abs.startsWith(PUBLIC_DIR)) return false;
+  let data;
+  try { data = fs.readFileSync(abs); } catch { return false; }
+  const ext = path.extname(abs).toLowerCase();
+  res.writeHead(200, {
+    'Content-Type': MIME[ext] || 'application/octet-stream',
+    'Cache-Control': 'no-cache',
+    'Content-Length': data.length,
+  });
+  res.end(data);
+  return true;
+}
+
+// ------------------------------------------------------------------ entry point
+module.exports = async (req, res) => {
+  try {
+    const qs = req.query
+      ? new URLSearchParams(req.query).toString()
+      : (String(req.url || '').includes('?') ? String(req.url).split('?')[1] || '' : '');
+    req.url = (req.path || (req.url && req.url.split('?')[0]) || '/') + (qs ? '?' + qs : '');
+
+    const match = router.match(req);
+    const ctx = { req, res, params: match ? match.params : {}, query: match ? match.query : {}, body: null };
+    if (!match) {
+      if (!serveStatic(req, res)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Not found');
+      }
+      return;
+    }
+    if (req.method === 'POST' || req.method === 'PUT') {
+      // Vercel's Node runtime pre-parses JSON bodies into req.body.
+      ctx.body = (req.body && typeof req.body === 'object' && Object.keys(req.body).length > -1)
+        ? req.body
+        : await readJsonBody(req);
+    }
+    await match.handler(ctx);
+  } catch (err) {
+    console.error('[serverless]', String(err && err.message));
+    if (!res.headersSent) {
+      const body = JSON.stringify({ error: String(err && err.message || 'Internal error') });
+      res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8', 'Content-Length': Buffer.byteLength(body) });
+      res.end(body);
+    } else {
+      try { res.end(); } catch { /* ignore */ }
+    }
   }
-});
-
-router.delete('/api/alerts/:id', (ctx) => {
-  const before = alertsStore.length;
-  alertsStore = alertsStore.filter(a => a.id !== ctx.params.id);
-  sendJson(ctx.res, 200, { ok: alertsStore.length < before });
-});
-
-router.get('/api/notifications', (ctx) => sendJson(ctx.res, 200, { notifications: notifStore }));
-router.post('/api/notifications/read-all', (ctx) => {
-  notifStore.forEach(n => { n.read = true; });
-  sendJson(ctx.res, 200, { ok: true });
-});
-router.delete('/api/notifications', (ctx) => {
-  notifStore = [];
-  sendJson(ctx.res, 200, { ok: true });
-});
-      openPositions: 0, closedTrades: 0, wins: 0, losses: 0, winRate: 0,
-      realizedPnl: 0, floatingPnl: 0, totalPnl: 0, direction: 'positive', lastTrade: null,
-    },
-    positions: [],
-    history: [],
-    note: 'Paper trading is fully persistent on the local server. On Vercel it resets per instance.',
-  });
-});
-    'X-Accel-Buffering': 'no',
-  });
-  res.write('retry: 10000\n\n');
-  return res;
-}
-
-function sendEvent(res, event, data) {
-  const payload = 'event: ' + event + '\ndata: ' + JSON.stringify(data) + '\n\n';
-  try { res.write(payload); } catch { /* closed */ }
-}
+};

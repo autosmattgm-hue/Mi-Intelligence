@@ -5,7 +5,9 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "node --watch server/index.js"
+    "dev": "node --watch server/index.js",
+    "vercel:dev": "vercel dev",
+    "vercel:deploy": "vercel --prod"
   },
   "engines": {
     "node": ">=18.0.0"
