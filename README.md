@@ -22,6 +22,9 @@ into every message.
 | **Price Alerts** | Create "above / below target" alerts. MI watches the market and pops up an **in-app notification** |
 | **Notifications** | Fully in-app permission system (no browser spam). Toast pop-ups, sound toggle, notification center, badge |
 | **MI Assistant** | Real streaming AI chat powered by OpenRouter. Grounded in live prices + signals + CoinMarketCap market data |
+| **Chart scanning** | Upload a chart / screenshot — MI's **vision** detects patterns and turns it into a trade plan |
+| **Trade timing** | The **MI timing engine** analyses real hourly candles to recommend the best hours & days to trade |
+| **Beginner → Pro** | Adaptive answers: switch to simple step-by-step guidance or advanced professional analysis |
 | **Real-time push** | Server-Sent Events push live prices, fresh signals, alerts and paper trades to the open page |
 
 ---

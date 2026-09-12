@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+<title>MI — Master Intelligence | Advanced Trading AI Suite</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080c14'/%3E%3Ctext x='32' y='42' font-family='Segoe UI' font-size='26' font-weight='900' fill='%2306b6d4' text-anchor='middle'%3EMI%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="app-shell">
+
+  <!-- ============================ TOP BAR ============================ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">MI</div>
+      <div class="brand-text">
+        <div class="brand-name">Master Intelligence</div>
+        <div class="brand-tag">Advanced Trading AI Suite</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Connecting…</span></div>
+      <div class="clock" id="clock">--:--:-- UTC</div>
+      <button class="icon-btn" id="soundToggle" title="Toggle notification sound">🔊</button>
+      <button class="icon-btn" id="bellBtn" title="Notifications">
+        🔔<span class="badge hidden" id="bellBadge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================ NAV ============================ -->
+  <nav class="nav" id="nav">
+    <button class="nav-tab active" data-view="overview">📊 Overview</button>
+    <button class="nav-tab" data-view="market">🌐 Market</button>
+    <button class="nav-tab" data-view="signals">🎯 Signals</button>
+    <button class="nav-tab" data-view="portfolio">💰 Portfolio</button>
+    <button class="nav-tab" data-view="risk">🛡️ Risk Manager</button>
+    <button class="nav-tab" data-view="alerts">🔔 Alerts</button>
+    <button class="nav-tab" data-view="ai">🤖 MI Assistant</button>
+  </nav>
+
+  <div class="banner hidden" id="banner">
+    <span id="bannerText"></span><button class="banner-close" id="bannerClose">✕</button>
+  </div>
+
+  <main class="views">
+
+    <!-- ============================ OVERVIEW ============================ -->
+    <section class="view active" data-view="overview">
+      <div class="stats-bar" id="statsBar"><div class="stat-card">Loading live market data…</div></div>
+
+      <div class="grid-2col">
+        <!-- Chart -->
+        <div class="panel">
+          <div class="panel-head wrap">
+            <div>
+              <strong>MI Live Chart</strong>
+              <span class="sub">Real OHLCV · Binance + CoinMarketCap · live</span>
+            </div>
+            <div class="chart-opts">
+              <select id="chartSymbol" class="input select" title="Trading pair"></select>
+              <div class="seg" id="chartTimeframes">
+                <button data-tf="1m" class="active">1m</button>
+                <button data-tf="5m">5m</button>
+                <button data-tf="15m">15m</button>
+                <button data-tf="1h">1H</button>
+                <button data-tf="4h">4H</button>
+                <button data-tf="1d">1D</button>
+              </div>
+              <div class="seg" id="chartIndicators">
+                <button data-ind="ema" class="active" title="EMA 9/21/50">📐 EMA</button>
+                <button data-ind="bb" class="active" title="Bollinger Bands">📊 BB</button>
+                <button data-ind="vwap" title="Volume-Weighted Average Price">🎯 VWAP</button>
+                <button data-ind="vol" class="active" title="Volume">📈 Vol</button>
+                <button data-ind="rsi" class="active" title="RSI panel">💫 RSI</button>
+                <button data-ind="macd" class="active" title="MACD panel">🌀 MACD</button>
+                <button data-ind="stoch" class="active" title="Stochastic panel">⚡ Stoch</button>
+              </div>
+            </div>
+          </div>
+          <div class="chart-info-row" id="chartInfoRow">
+            <span class="ci-price" id="ciPrice">—</span>
+            <span class="ci-item">O <b id="ciO">–</b></span>
+            <span class="ci-item">H <b id="ciH">–</b></span>
+            <span class="ci-item">L <b id="ciL">–</b></span>
+            <span class="ci-item">C <b id="ciC">–</b></span>
+            <span class="ci-item" id="ciChg">–</span>
+            <span class="ci-sep">·</span>
+            <span class="ci-item muted">Rng <b id="ciRngH">–</b> / <b id="ciRngL">–</b></span>
+            <span class="ci-item muted">Vol(24h) <b id="ciVol">–</b></span>
+            <span class="ci-item muted">MktCap <b id="ciMc">–</b></span>
+            <span class="ci-src" id="ciSrc">…</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart"></canvas>
+            <div class="chart-tooltip hidden" id="chartTooltip"></div>
+          </div>
+          <div class="chart-hint">🖱️ Scroll to zoom · Drag to pan · Hover for OHLCV &amp; indicators</div>
+        </div>
+
+        <!-- Signal -->
+        <div class="panel">
+          <div class="panel-head wrap">
+            <div>
+              <strong>MI Primary Signal</strong>
+              <span class="sub" id="signalSub">—</span>
+            </div>
+            <button class="btn ghost sm" id="signalSetAlert">🔔 Set alert</button>
+          </div>
+          <div class="signal" id="signalPanel"></div>
+        </div>
+      </div>
+<!-- Info cards -->
+      <div class="info-cards">
+        <div class="info-card">
+          <div class="info-card-head">🤖 How MI works</div>
+          <div class="info-card-body">
+            The MI engine pulls <strong>real market data</strong> — prices, market cap &amp; rankings from <strong>CoinMarketCap</strong>
+            and <strong>OHLCV candles</strong> from Binance — then computes EMA, RSI, MACD, Bollinger Bands, ATR and volume
+            confluence on every cycle. Signals, confidence, take-profit and stop-loss levels are derived from those
+            calculations, then cross-checked by the OpenRouter AI assistant.
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-head">⚠️ Important notice</div>
+          <div class="info-card-body">
+            MI is an <strong>analytical tool, not financial advice</strong>. Markets carry risk of loss. Always do your own research
+            and use stop-losses and position sizing that fit your own risk tolerance. AI output can contain errors.
+          </div>
+        </div>
+        <div class="info-card">
+          <div class="info-card-head">🗂️ Data sources</div>
+          <div class="info-card-body">
+            Prices, market cap &amp; rankings — <strong>CoinMarketCap</strong>. Chart candles — <strong>Binance public market data</strong>
+            (spot). Signals &amp; analysis — <strong>MI engine</strong> (on-server). AI answers — <strong>OpenRouter</strong>.
+            Notifications are delivered <strong>inside the app</strong> via your own MI permission.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ MARKET (CoinMarketCap) ============================ -->
+    <section class="view" data-view="market">
+      <div class="stats-bar" id="marketStats"></div>
+      <div class="panel">
+        <div class="panel-head wrap">
+          <div>
+            <strong>CoinMarketCap — Cryptocurrency Rankings</strong>
+            <span class="sub" id="marketUpdated">Top 100 coins ranked by market cap · live from CoinMarketCap</span>
+          </div>
+          <button class="btn ghost sm" id="marketRefresh">↻ Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th><th>Coin</th><th>Price</th><th>1h %</th><th>24h %</th><th>7d %</th><th>30d %</th>
+                <th>Market Cap</th><th>Volume (24h)</th><th>MCap Dominance</th><th>Circulating</th>
+              </tr>
+            </thead>
+            <tbody id="marketBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SIGNALS ============================ -->
+    <section class="view" data-view="signals">
+      <div class="panel">
+        <div class="panel-head wrap">
+          <div>
+            <strong>All MI Signals — Live</strong>
+            <span class="sub" id="signalsUpdated">—</span>
+          </div>
+          <button class="btn ghost sm" id="signalsRefresh">↻ Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Asset</th><th>Signal</th><th>Confidence</th><th>Price</th>
+                <th>Entry</th><th>Take Profit</th><th>Stop Loss</th><th>R/R</th>
+                <th>Trend</th><th>RSI</th><th>MACD</th><th>Rating</th>
+              </tr>
+            </thead>
+            <tbody id="signalsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ PORTFOLIO ============================ -->
+    <section class="view" data-view="portfolio">
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head">
+            <div><strong>My Holdings</strong><span class="sub">Stored locally in your browser · values at live market prices</span></div>
+          </div>
+          <div class="totals" id="portfolioTotals"></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Asset</th><th>Amount</th><th>Entry</th><th>Price</th><th>Value</th><th>PnL</th><th>24h</th><th></th></tr></thead>
+              <tbody id="holdingsBody"></tbody>
+            </table>
+          </div>
+          <form class="add-form" id="addForm">
+            <select id="addSymbol" class="input select"></select>
+            <input id="addAmount" class="input" type="number" step="any" min="0" placeholder="Amount" required>
+            <input id="addEntry" class="input" type="number" step="any" min="0" placeholder="Entry price (optional)" required>
+            <button class="btn primary sm" type="submit">＋ Add</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ RISK MANAGER ============================ -->
+    <section class="view" data-view="risk">
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head"><div><strong>Paper Trading — MI Track Record</strong><span class="sub">Real signals, real prices, simulated capital</span></div></div>
+          <div class="stats-bar sm" id="paperStats"></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>TP</th><th>SL</th><th>Conf</th><th>R/R</th><th>Status</th></tr></thead>
+              <tbody id="paperPositions"></tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>Symbol</th><th>Side</th><th>Entry</th><th>Exit</th><th>PnL</th><th>Reason</th><th>Closed</th></tr></thead>
+              <tbody id="paperHistory"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><strong>Position Size Calculator</strong><span class="sub">Risk-based sizing on a real indicator</span></div></div>
+          <form class="calc-form" id="calcForm">
+            <label>Account size (USD)<input id="calcAccount" class="input" type="number" value="10000" min="0" step="any"></label>
+            <label>Risk per trade (%)<input id="calcRisk" class="input" type="number" value="2" min="0.1" max="100" step="0.1"></label>
+            <label>Pair<select id="calcSymbol" class="input select"></select></label>
+            <label>Stop-loss distance (USD from entry)<input id="calcStop" class="input" type="number" value="0" min="0" step="any"></label>
+            <div class="calc-result">
+              <div>Suggested position size: <strong id="calcSize">—</strong></div>
+              <div>USDT risked: <strong id="calcRiskUsd">—</strong></div>
+              <div>Stop distance: <strong id="calcStopPct">—</strong></div>
+            </div>
+            <p class="hint">Sizing = (Account × Risk%) ÷ Stop distance. Example: 10 000 × 2% = $200 risk; with a $500 stop → 0.4 units.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+<!-- ============================ ALERTS ============================ -->
+    <section class="view" data-view="alerts">
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head"><div><strong>Create Price Alert</strong><span class="sub">MI watches the market and notifies you inside the app</span></div></div>
+          <form class="alert-form" id="alertForm">
+            <label>Pair<select id="alertSymbol" class="input select"></select></label>
+            <label>When price moves<select id="alertCondition" class="input select">
+              <option value="above">Above target ▲</option>
+              <option value="below">Below target ▼</option>
+            </select></label>
+            <label>Target price (USD)<input id="alertTarget" class="input" type="number" step="any" min="0" placeholder="e.g. 100000" required></label>
+            <label>Note (optional)<input id="alertNote" class="input" type="text" placeholder="e.g. weekend decision" maxlength="80"></label>
+            <button class="btn primary" type="submit">＋ Create alert</button>
+          </form>
+          <div class="list-head">Active alerts <button class="link-btn" id="alertsClear">Clear triggered</button></div>
+          <div class="list" id="activeAlerts"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <div><strong>Notification History</strong><span class="sub">Pop-ups require your MI permission — enable it in the top bar</span></div>
+            <div>
+              <button class="btn ghost sm" id="notifReadAll">Mark read</button>
+              <button class="btn ghost sm danger" id="notifClear">Clear</button>
+            </div>
+          </div>
+          <div class="list" id="notifHistory"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ AI ASSISTANT ============================ -->
+    <section class="view" data-view="ai">
+      <div class="ai-layout">
+        <div class="panel ai-panel">
+          <div class="panel-head wrap">
+            <div>
+              <strong>MI Assistant — AI Market Analyst</strong>
+              <span class="sub" id="aiModelTag">—</span>
+            </div>
+            <div class="ai-controls">
+              <span class="ai-ctl-label">Explain for</span>
+              <div class="seg" id="aiLevel">
+                <button data-level="beginner" class="active" title="Simple terms, step-by-step">🙂 Beginner</button>
+                <button data-level="balanced" title="In between">🍃 Balanced</button>
+                <button data-level="pro" title="Advanced, concise">🎓 Pro</button>
+              </div>
+            </div>
+            <button class="btn ghost sm" id="chatClear">Clear</button>
+          </div>
+
+          <div class="ai-context" id="aiContext"></div>
+
+          <!-- Trade timing widget (real data) -->
+          <div class="timing-wrap">
+            <div class="timing-head">🕒 When to trade — <span id="timingSymbol">BTC/USDT</span>
+              <span class="link-btn sm" id="timingRefresh">↻ refresh</span>
+            </div>
+            <div class="timing-body" id="timingBody">Loading best trade windows…</div>
+          </div>
+
+          <div class="chat-thread" id="chatThread"></div>
+
+          <!-- image upload zone -->
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="fileInput" accept="image/*" hidden>
+            <div class="upload-row" id="uploadRow">
+              <button type="button" class="btn ghost sm" id="attachBtn">🖼️ Attach chart / screenshot</button>
+              <span class="upload-hint">PNG/JPG/WebP — MI will scan it and turn it into a trade plan</span>
+            </div>
+            <div class="upload-previews" id="uploadPreviews"></div>
+          </div>
+
+          <div class="chips" id="chatChips">
+            <button class="chip">When should I trade today?</button>
+            <button class="chip">Analyze BTC/USDT right now</button>
+            <button class="chip">Best entry for ETH today?</button>
+            <button class="chip">Explain the chart I uploaded</button>
+            <button class="chip">How should I size a 2% risk trade?</button>
+          </div>
+          <form class="chat-input-row" id="chatForm">
+            <input id="chatInput" class="input" type="text" placeholder="Ask MI anything — or attach a chart screenshot above…" autocomplete="off">
+            <button class="btn primary" type="submit" id="chatSend">Send ➤</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span class="mi-name">MI — Master Intelligence</span> · Real data + OpenRouter AI · v5.0 · Market data: CoinMarketCap + Binance public API ·
+    Not financial advice · <span id="footerTime"></span>
+  </footer>
+</div>
+
+<!-- ==================== NOTIFICATION PERMISSION MODAL ==================== -->
+<div class="modal-backdrop hidden" id="permModal">
+  <div class="modal">
+    <div class="modal-icon">🔔</div>
+    <h3>Enable MI notifications?</h3>
+    <p>
+      MI wants to <strong>pop up notifications</strong> inside this app — price alerts, fresh signals, and
+      paper-trading updates. This uses <strong>MI's own permission system</strong> (not your browser's),
+      so nothing is installed or shown outside this site.
+    </p>
+    <p class="muted">You can change this any time from the 🔔 bell in the top bar.</p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="permDeny">Not now</button>
+      <button class="btn primary" id="permAllow">Enable notifications</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== NOTIFICATION CENTER ==================== -->
+<div class="modal-backdrop hidden" id="noticeBackdrop"></div>
+<div class="notice-panel hidden" id="noticePanel">
+  <div class="notice-head">
+    <strong>Notification Center</strong>
+    <div>
+      <button class="link-btn" id="noticePerm">Permission: —</button>
+    </div>
+  </div>
+  <div class="notice-body" id="noticeBody"></div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/notifications.js"></script>
+<script src="/js/chart.js"></script>
+<script src="/js/signals.js"></script>
+<script src="/js/market.js"></script>
+<script src="/js/portfolio.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
