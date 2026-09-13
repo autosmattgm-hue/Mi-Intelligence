@@ -20,6 +20,8 @@ class Store {
     this.data = {
       alerts: [],
       notifications: [],
+      pushSubscriptions: [],
+      signalHistory: [],
       paperPositions: [],
       paperHistory: [],
       settings: {},

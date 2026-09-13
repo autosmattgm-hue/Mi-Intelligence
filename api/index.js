@@ -28,6 +28,7 @@ const cmc = require('../server/coinmarketcap');
 const signalEngine = require('../server/signalEngine');
 const ai = require('../server/ai');
 const timing = require('../server/timing');
+const push = require('../server/push');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -47,6 +48,28 @@ const MIME = {
 
 // ------------------------------------------------------------------ instance cache
 const memo = { market: null, signals: [], summary: null, summaryTs: 0 };
+// Signal history + push subscriptions live in instance memory on Vercel
+// (add Vercel KV/Postgres later for cross-instance persistence).
+const signalHistory = [];
+const lastSignalState = {};
+const pushSubs = [];
+
+function recordSignalHistory(analyses) {
+  for (const a of analyses) {
+    if (!a || a.action === 'HOLD') continue;
+    const stateKey = a.action + '|' + a.quality + '|' + a.confidence;
+    if (lastSignalState[a.symbol] === stateKey) continue;
+    lastSignalState[a.symbol] = stateKey;
+    signalHistory.push({
+      id: a.symbol + '-' + Date.now(),
+      ts: Date.now(),
+      symbol: a.symbol, asset: a.asset, action: a.action, confidence: a.confidence,
+      price: a.price, takeProfit: a.takeProfit, stopLoss: a.stopLoss,
+      riskReward: a.riskReward, quality: a.quality, score: a.score, trend: a.trend,
+    });
+  }
+  if (signalHistory.length > 500) signalHistory.splice(0, signalHistory.length - 500);
+}
 
 async function loadMarket() {
   if (memo.market && Date.now() - memo.market.ts < 45000) return memo.market;
@@ -84,6 +107,7 @@ async function loadSignals(cached = true) {
   }));
   memo.signals = analyses;
   memo.summary = signalEngine.summarize(analyses);
+  recordSignalHistory(analyses);
   memo.summaryTs = Date.now();
   return { signals: analyses, summary: memo.summary };
 }
@@ -187,6 +211,15 @@ router.get('/api/signals', async (ctx) => {
   sendJson(ctx.res, 200, { signals, summary, ts: Date.now() });
 });
 
+// NOTE: registered BEFORE /api/signals/:symbol so it isn't shadowed by the param route.
+router.get('/api/signals/history', (ctx) => {
+  sendJson(ctx.res, 200, { history: signalHistory.slice().sort((a, b) => b.ts - a.ts).slice(0, 200), stored: false });
+});
+router.delete('/api/signals/history', (ctx) => {
+  signalHistory.length = 0;
+  Object.keys(lastSignalState).forEach(k => delete lastSignalState[k]);
+  sendJson(ctx.res, 200, { ok: true });
+});
 router.get('/api/signals/:symbol', async (ctx) => {
   const symbol = String(ctx.params.symbol || '').toUpperCase();
   const { signals } = await loadSignals(true);
@@ -256,6 +289,27 @@ router.post('/api/notifications/read-all', (ctx) => {
 router.delete('/api/notifications', (ctx) => {
   notifStore = [];
   sendJson(ctx.res, 200, { ok: true });
+});
+// ---- web push (outside-the-app notifications) ----
+router.get('/api/push/vapid', (ctx) => sendJson(ctx.res, 200, { publicKey: push.getPublicKey() }));
+router.get('/api/push/status', (ctx) => sendJson(ctx.res, 200, { enabled: pushSubs.length > 0, count: pushSubs.length, supported: true }));
+router.post('/api/push/subscribe', (ctx) => {
+  try {
+    const { endpoint, keys, userAgent } = ctx.body || {};
+    if (!endpoint || !keys || !keys.p256dh || !keys.auth) return sendJson(ctx.res, 400, { error: 'endpoint + keys.p256dh + keys.auth required' });
+    const idx = pushSubs.findIndex(s => s.endpoint === endpoint);
+    if (idx !== -1) pushSubs[idx] = { endpoint: String(endpoint), keys: { p256dh: String(keys.p256dh), auth: String(keys.auth) }, userAgent: userAgent || '' };
+    else pushSubs.push({ endpoint: String(endpoint), keys: { p256dh: String(keys.p256dh), auth: String(keys.auth) }, userAgent: userAgent || '' });
+    while (pushSubs.length > 20) pushSubs.shift();
+    sendJson(ctx.res, 200, { ok: true, count: pushSubs.length });
+  } catch (err) { sendJson(ctx.res, 400, { error: err.message }); }
+});
+router.post('/api/push/unsubscribe', (ctx) => {
+  const { endpoint } = ctx.body || {};
+  const before = pushSubs.length;
+  const idx = pushSubs.findIndex(s => s.endpoint === endpoint);
+  if (idx !== -1) pushSubs.splice(idx, 1);
+  sendJson(ctx.res, 200, { ok: before > pushSubs.length });
 });
 // ---- AI chat (streaming). Vercel supports streaming Node responses. ----
 router.post('/api/chat', async (ctx) => {

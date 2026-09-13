@@ -14,6 +14,7 @@ const PaperEngine = require('./paper');
 const Alerts = require('./alerts');
 const ai = require('./ai');
 const timing = require('./timing');
+const push = require('./push');
 
 const PORT = process.env.PORT || 3009;
 const API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -32,6 +33,52 @@ function broadcast(event, data) {
   for (const res of [...clients]) {
     try { res.write(payload); } catch { clients.delete(res); }
   }
+  // 🔔 Forward in-app notifications to the user's DEVICE (Web Push) so they
+  // arrive even when the app is closed.
+  if (event === 'notification' && data && typeof data === 'object' && data.title) {
+    push.notifyAll(store.data.pushSubscriptions || [], {
+      title: data.title,
+      body: data.body || '',
+      url: '/',
+      tag: 'mi-' + (data.type || 'notif'),
+    }).then((r) => {
+      if (r.dead && r.dead.length) {
+        const deadSet = new Set(r.dead);
+        store.data.pushSubscriptions = (store.data.pushSubscriptions || []).filter(s => !deadSet.has(s.endpoint));
+        store.save(true);
+      }
+    }).catch((e) => console.error('[push]', e.message));
+  }
+}
+
+// ---- signal history — persisted locally until the user deletes it ----
+const lastSignalState = new Map();
+function recordSignalHistory(analyses) {
+  for (const a of analyses) {
+    if (!a || a.action === 'HOLD') continue;
+    const stateKey = a.action + '|' + a.quality + '|' + a.confidence;
+    if (lastSignalState.get(a.symbol) === stateKey) continue; // unchanged verdict
+    lastSignalState.set(a.symbol, stateKey);
+    store.data.signalHistory.push({
+      id: a.symbol + '-' + Date.now() + '-' + Math.floor(Math.random() * 1e4),
+      ts: Date.now(),
+      symbol: a.symbol,
+      asset: a.asset,
+      action: a.action,
+      confidence: a.confidence,
+      price: a.price,
+      takeProfit: a.takeProfit,
+      stopLoss: a.stopLoss,
+      riskReward: a.riskReward,
+      quality: a.quality,
+      score: a.score,
+      trend: a.trend,
+    });
+  }
+  if (store.data.signalHistory.length > 500) {
+    store.data.signalHistory.splice(0, store.data.signalHistory.length - 500);
+  }
+  store.save();
 }
 
 // ---------------------------------------------------------------- live state
@@ -107,6 +154,7 @@ async function refreshSignals() {
     }
     market.signals = analyses;
     market.summary = signalEngine.summarize(analyses);
+    recordSignalHistory(analyses);
     market.health.lastSignals = Date.now();
     broadcast('signals', { signals: analyses, summary: market.summary, ts: Date.now() });
 
@@ -190,6 +238,20 @@ router.get('/api/signals', (ctx) => {
   ctx.res.sendJson(200, { signals: market.signals, summary: market.summary, ts: Date.now() });
 });
 
+// ---------------------------------------------------------------- signal history (stored locally until deleted)
+// NOTE: registered BEFORE /api/signals/:symbol so it isn't shadowed by the param route.
+router.get('/api/signals/history', (ctx) => {
+  ctx.res.sendJson(200, {
+    history: store.data.signalHistory.slice().sort((a, b) => b.ts - a.ts).slice(0, 200),
+    stored: true, // persisted in data/db.json until the user deletes it
+  });
+});
+router.delete('/api/signals/history', (ctx) => {
+  store.data.signalHistory = [];
+  lastSignalState.clear();
+  store.save(true);
+  ctx.res.sendJson(200, { ok: true });
+});
 router.get('/api/signals/:symbol', (ctx) => {
   const symbol = String(ctx.params.symbol || '').toUpperCase();
   const sig = market.signals.find(s => s.symbol === symbol) || null;
@@ -234,6 +296,43 @@ router.post('/api/notifications/read-all', (ctx) => {
 
 router.delete('/api/notifications', (ctx) => {
   alerts.clearAll();
+  ctx.res.sendJson(200, { ok: true });
+});
+// ---------------------------------------------------------------- web push (outside-the-app notifications)
+router.get('/api/push/vapid', (ctx) => {
+  ctx.res.sendJson(200, { publicKey: push.getPublicKey() });
+});
+router.get('/api/push/status', (ctx) => {
+  ctx.res.sendJson(200, {
+    enabled: (store.data.pushSubscriptions || []).length > 0,
+    count: (store.data.pushSubscriptions || []).length,
+    supported: true,
+  });
+});
+router.post('/api/push/subscribe', (ctx) => {
+  try {
+    const { endpoint, keys, userAgent } = ctx.body || {};
+    if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
+      return ctx.res.sendJson(400, { error: 'endpoint + keys.p256dh + keys.auth required' });
+    }
+    const sub = { endpoint: String(endpoint), keys: { p256dh: String(keys.p256dh), auth: String(keys.auth) }, userAgent: userAgent || '', createdAt: Date.now() };
+    const subs = store.data.pushSubscriptions || [];
+    const idx = subs.findIndex(s => s.endpoint === sub.endpoint);
+    if (idx !== -1) subs[idx] = Object.assign(subs[idx], sub);
+    else subs.push(sub);
+    while (subs.length > 20) subs.shift(); // keep the store tidy
+    store.save(true);
+    ctx.res.sendJson(200, { ok: true, count: subs.length });
+  } catch (err) {
+    ctx.res.sendJson(400, { error: err.message });
+  }
+});
+router.post('/api/push/unsubscribe', (ctx) => {
+  const { endpoint } = ctx.body || {};
+  const subs = store.data.pushSubscriptions || [];
+  const before = subs.length;
+  store.data.pushSubscriptions = subs.filter(s => s.endpoint !== endpoint);
+  if (store.data.pushSubscriptions.length !== before) store.save(true);
   ctx.res.sendJson(200, { ok: true });
 });
 // ---------------------------------------------------------------- AI chat (streaming SSE)

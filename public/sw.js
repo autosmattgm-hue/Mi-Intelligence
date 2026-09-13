@@ -4,7 +4,7 @@
    to the network so live market data is never served stale from cache. */
 'use strict';
 
-const CACHE = 'mi-cache-v1';
+const CACHE = 'mi-cache-v2';
 const SHELL = [
   '/',
   '/index.html',
@@ -21,6 +21,7 @@ const SHELL = [
   '/js/portfolio.js',
   '/js/chat.js',
   '/js/pwa.js',
+  '/js/push.js',
   '/js/app.js',
 ];
 
@@ -38,6 +39,39 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// ---- Web Push: show a system notification when the app is closed. ----
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try { payload = event.data ? event.data.json() : {}; } catch { payload = {}; }
+  const title = payload.title || 'MI — Master Intelligence';
+  const options = {
+    body: payload.body || 'New market update from MI.',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: payload.tag || 'mi-default',
+    renotify: !!payload.tag,
+    data: { url: payload.url || '/' },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin).href;
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const client of list) {
+        if ('focus' in client) {
+          try { client.navigate(url); } catch { /* ignore */ }
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(url);
+    })
+  );
+});
+
+// ---- Static assets & app shell ----
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   if (req.method !== 'GET') return;

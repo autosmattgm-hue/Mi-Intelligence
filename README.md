@@ -28,6 +28,8 @@ into every message.
 | **Real-time push** | Server-Sent Events push live prices, fresh signals, alerts and paper trades to the open page |
 | **High-conviction signals** | Every BUY/SELL carries a **conviction tier** (🔥 HIGH / ⚡ MEDIUM / ○ LOW) based on factor agreement + score, so the app never over-promises a weak setup |
 | **Installable app (PWA)** | **Download MI as an app** — install button + manifest + service worker. Works offline once loaded, with shortcuts straight to Signals / Market / Assistant |
+| **Notifications outside the app** | Real **device / OS notifications** via Web Push (VAPID + encrypted payloads). Alerts & signals pop up even when MI is closed — with its own ON/OFF toggle in the 🔔 center |
+| **Saved locally until deleted** | **Price alerts** and **notification history** persist in `data/db.json`; every new **signal verdict** is saved to a **Signal History** panel in the Signals view — everything stays until *you* delete it |
 
 ---
 
@@ -58,6 +60,8 @@ Then open **http://localhost:3009** in your browser.
 | `OPENROUTER_API_KEY` | *(empty)* | AI assistant key (get one at https://openrouter.ai/keys) |
 | `AI_MODEL` | `openai/gpt-4o-mini` | Which OpenRouter model powers MI |
 | `CMC_API_KEY` | *(empty)* | Optional CoinMarketCap Pro key (https://coinmarketcap.com/api/). Leave empty for the keyless public API. When set, authenticated quotes/ohlcv endpoints are enabled. |
+| `MI_CONTACT_EMAIL` | `mi@localhost` | Contact used in the Web Push VAPID JWT (`sub`) |
+| `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | *(auto)* | Optional explicit Web Push keys (base64url public / PEM private). If unset, MI generates and stores them in `data/vapid.json` on first use. |
 | `SIGNAL_INTERVAL_MS` | `60000` | Signal engine refresh rate |
 | `TICKER_INTERVAL_MS` | `5000` | Live price refresh rate |
 

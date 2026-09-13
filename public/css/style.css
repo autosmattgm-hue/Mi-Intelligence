@@ -432,6 +432,23 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: .74rem; colo
 .notice-head { display: flex; justify-content: space-between; align-items: center; padding: 13px 16px; border-bottom: 1px solid var(--line); }
 .notice-body { max-height: 430px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
 
+/* ---- device (OS) notification toggle ---- */
+.notice-os-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 1px solid var(--line); background: rgba(6,182,212,.05);
+}
+.notice-os-label { display: flex; flex-direction: column; gap: 2px; }
+.notice-os-label span { font-size: .78rem; font-weight: 700; color: var(--text); }
+.notice-os-label em { font-style: normal; font-size: .66rem; color: var(--muted); }
+.os-toggle {
+  min-width: 58px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  background: var(--line2); color: var(--muted); border: 1px solid var(--line2);
+  font-weight: 800; font-size: .72rem; letter-spacing: .5px; transition: all .2s ease;
+}
+.os-toggle:hover { border-color: var(--cyan); }
+.os-toggle.os-on { background: var(--green); border-color: var(--green); color: #04120c; }
+.notice-os-row.hidden { display: none; }
+
 /* ============ footer ============ */
 .footer {
   text-align: center; padding: 18px 0 8px; color: var(--muted); font-size: .68rem;

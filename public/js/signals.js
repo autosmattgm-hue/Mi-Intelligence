@@ -7,6 +7,7 @@
     summary: null,
     selected: 'BTCUSDT',
     paperStats: null,
+    history: [],
   };
 
   function $id(id) { return document.getElementById(id); }
@@ -224,6 +225,39 @@
       });
     }
   }
+// ------------------------------------------------ saved signal history
+  async function refreshHistory() {
+    try {
+      const res = await MI.api.get('/api/signals/history');
+      state.history = res.history || [];
+      renderHistory();
+    } catch { /* ignore */ }
+  }
+
+  function renderHistory() {
+    const body = $id('signalsHistoryBody');
+    if (!body) return;
+    body.innerHTML = '';
+    if (!state.history.length) {
+      body.innerHTML = '<tr><td colspan="9"><div class="empty">No saved signals yet — every new BUY/SELL verdict is stored here automatically and stays until you delete it.</div></td></tr>';
+      return;
+    }
+    state.history.slice(0, 60).forEach(h => {
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="mono">' + MI.fmt.shortTime(h.ts) + '</td>' +
+        '<td class="mono" style="font-weight:700">' + esc(h.asset || h.symbol) + '</td>' +
+        '<td><span class="tag ' + (h.action === 'BUY' ? 'buy' : 'sell') + '">' + h.action + '</span></td>' +
+        '<td>' + h.confidence + '%</td>' +
+        '<td class="mono">' + MI.fmt.price(h.price) + '</td>' +
+        '<td class="mono" style="color:var(--green)">' + (h.takeProfit ? MI.fmt.price(h.takeProfit) : '—') + '</td>' +
+        '<td class="mono" style="color:var(--red)">' + (h.stopLoss ? MI.fmt.price(h.stopLoss) : '—') + '</td>' +
+        '<td class="mono">' + (h.riskReward ? '1:' + h.riskReward : '—') + '</td>' +
+        '<td>' + (h.quality === 'HIGH' ? '🔥 HIGH' : h.quality === 'MEDIUM' ? '⚡ MEDIUM' : '○ LOW') + '</td>';
+      body.appendChild(tr);
+    });
+  }
+
 // ------------------------------------------------ refresh / events / init
   async function refreshSignals() {
     try {
@@ -239,6 +273,18 @@
 
   function init() {
     $id('signalsRefresh').addEventListener('click', () => refreshSignals());
+    const histClear = $id('signalsHistoryClear');
+    if (histClear) histClear.addEventListener('click', async () => {
+      if (!confirm('Delete all saved signal history? This cannot be undone.')) return;
+      try {
+        await MI.api.del('/api/signals/history');
+        state.history = [];
+        renderHistory();
+        MI.toast('success', 'Signal history cleared', 'All saved signals have been deleted from this machine.');
+      } catch (err) {
+        MI.toast('error', 'Could not clear history', err.message);
+      }
+    });
     $id('signalSetAlert').addEventListener('click', () => {
       const sig = findSignal(state.selected) || state.signals[0];
       const target = document.getElementById('alertTarget');
@@ -251,6 +297,7 @@
       switchView('alerts');
     });
     refreshSignals();
+    refreshHistory();
     MINotify.onEvent('signals', () => {
       state.signals = MINotify.getSignals();
       state.summary = MINotify.getSummary();

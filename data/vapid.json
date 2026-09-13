@@ -1,0 +1,6 @@
+{
+  "publicKey": "BLO6Ffw8spfXqmB9ZXA5gIlx3c_zuJT2JfHmhTS9l42lSy1biZvSw1yFfzZkK1bK147fVA_afBm0EUFKbkDyHOo",
+  "privateKeyPem": "-----BEGIN PRIVATE KEY-----\nMIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgBYluTTJUuRSUS6hf\nlB2R9uE5Vd2JBfxsl70lictdXe+hRANCAASzuhX8PLKX16pgfWVwOYCJcd3P87iU\n9iXx5oU0vZeNpUstW4mb0sNchX82ZCtWyteO31QP2nwZtBFBSm5A8hzq\n-----END PRIVATE KEY-----\n",
+  "contact": "mailto:mi@localhost",
+  "createdAt": 1789284824520
+}

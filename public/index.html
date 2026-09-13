@@ -201,6 +201,26 @@
           </table>
         </div>
       </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-head wrap">
+          <div>
+            <strong>📜 Saved Signal History</strong>
+            <span class="sub" id="signalsHistorySub">Signals are stored locally until you delete them</span>
+          </div>
+          <button class="btn ghost sm danger" id="signalsHistoryClear">🗑 Clear history</button>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Time (UTC)</th><th>Asset</th><th>Signal</th><th>Confidence</th><th>Price</th>
+                <th>Take Profit</th><th>Stop Loss</th><th>R/R</th><th>Tier</th>
+              </tr>
+            </thead>
+            <tbody id="signalsHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <!-- ============================ PORTFOLIO ============================ -->
@@ -267,7 +287,7 @@
     <section class="view" data-view="alerts">
       <div class="grid-2col">
         <div class="panel">
-          <div class="panel-head"><div><strong>Create Price Alert</strong><span class="sub">MI watches the market and notifies you inside the app</span></div></div>
+          <div class="panel-head"><div><strong>Create Price Alert</strong><span class="sub">MI watches the market — alerts are stored on this machine until you delete them</span></div></div>
           <form class="alert-form" id="alertForm">
             <label>Pair<select id="alertSymbol" class="input select"></select></label>
             <label>When price moves<select id="alertCondition" class="input select">
@@ -283,7 +303,7 @@
         </div>
         <div class="panel">
           <div class="panel-head">
-            <div><strong>Notification History</strong><span class="sub">Pop-ups require your MI permission — enable it in the top bar</span></div>
+            <div><strong>Notification History</strong><span class="sub">Saved locally in data/db.json · kept until you clear</span></div>
             <div>
               <button class="btn ghost sm" id="notifReadAll">Mark read</button>
               <button class="btn ghost sm danger" id="notifClear">Clear</button>
@@ -386,6 +406,13 @@
       <button class="link-btn" id="noticePerm">Permission: —</button>
     </div>
   </div>
+  <div class="notice-os-row" id="noticeOsRow">
+    <div class="notice-os-label">
+      <span>📳 Device / OS notifications</span>
+      <em id="noticeOsSub">Pings arrive even when MI is closed</em>
+    </div>
+    <button class="os-toggle" id="noticeOs" title="Toggle device notifications">OFF</button>
+  </div>
   <div class="notice-body" id="noticeBody"></div>
 </div>
 
@@ -397,6 +424,7 @@
 <script src="/js/portfolio.js"></script>
 <script src="/js/chat.js"></script>
 <script src="/js/pwa.js"></script>
+<script src="/js/push.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>
