@@ -195,6 +195,15 @@ router.get('/api/config', (ctx) => {
   });
 });
 
+// Vercel is stateless — mode is carried per request via ?mode=. Accept the
+// frontend's POST so the hosted app never 404s (returns the requested mode).
+router.post('/api/mode', (ctx) => {
+  const mode = marketModes.isValid(ctx.body && ctx.body.mode)
+    ? ctx.body.mode
+    : marketModes.DEFAULT_MODE;
+  sendJson(ctx.res, 200, { ok: true, mode, symbols: marketModes.getSymbols(mode) });
+});
+
 router.get('/api/market', async (ctx) => {
   const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
   const market = await loadMarket(mode);

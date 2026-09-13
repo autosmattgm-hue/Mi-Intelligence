@@ -6,7 +6,7 @@
   'use strict';
 
   const LS = 'mi.mode';
-  const state = { current: localStorage.getItem(LS) || 'crypto', modes: [] };
+  const state = { current: localStorage.getItem(LS) || 'crypto', modes: [], serverless: false };
 
   function $(id) { return document.getElementById(id); }
 
@@ -62,6 +62,7 @@
       b.addEventListener('click', () => switchTo(b.dataset.mode));
     });
     // Server-reported mode wins (local server actually switched).
+    state.serverless = cfg.platform === 'vercel-serverless';
     if (cfg.mode && cfg.modes) setMode(cfg.mode);
     highlight();
   }
@@ -70,8 +71,11 @@
     if (!mode || !state.modes.some(m => m.id === mode)) return;
     if (state.current === mode && window.MI && MI.mode === mode) return;
     setMode(mode);
-    // Tell the local server (Vercel ignores this endpoint).
-    try { if (window.MI && MI.api) await MI.api.post('/api/mode', { mode }); } catch { /* Vercel */ }
+    // Tell the LOCAL server to switch (Vercel is stateless — mode travels with
+    // every request via ?mode=, so we skip the POST entirely there).
+    if (!state.serverless) {
+      try { if (window.MI && MI.api) await MI.api.post('/api/mode', { mode }); } catch { /* ignore */ }
+    }
     // Reconnect the live feed on the new mode and force a full refresh.
     if (window.MINotify && typeof MINotify.switchMode === 'function') MINotify.switchMode(mode);
     if (window.MISignals && typeof MISignals.handleModeChange === 'function') MISignals.handleModeChange(mode);

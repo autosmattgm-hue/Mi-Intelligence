@@ -96,3 +96,5 @@
 [ticker] fetch failed
 [ticker] fetch failed
 [signals] skip DOGEUSDT The operation was aborted due to timeout
+[signals] skip ETHUSDT The operation was aborted due to timeout
+[signals] skip DOGEUSDT The operation was aborted due to timeout
