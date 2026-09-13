@@ -13,6 +13,16 @@
   function $id(id) { return document.getElementById(id); }
   function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
+  // Forex prices use their own decimals and no $ sign; crypto uses MI.fmt.
+  function fmtPrice(p, sig) {
+    if (p === null || p === undefined || isNaN(p)) return '—';
+    if (sig && sig.mode === 'forex') return Number(p).toFixed(sig.precision || 5);
+    return MI.fmt.price(p);
+  }
+  function isBuyAction(a) { return a === 'BUY' || a === 'CALL'; }
+  function isSellAction(a) { return a === 'SELL' || a === 'PUT'; }
+  function tagClass(a) { return isBuyAction(a) ? 'buy' : isSellAction(a) ? 'sell' : 'hold'; }
+
   function getPrices() { return (window.MINotify && MINotify.getPrices()) || {}; }
   function getStats() { return (window.MINotify && MINotify.getStats()) || {}; }
 
@@ -36,7 +46,9 @@
       { label: 'Market Sentiment', value: sum.sentiment || '—',
         sub: sum.directional > 0 ? sum.bullishPct + '% of ' + sum.directional + ' active signals bullish' : 'waiting for signals' },
       { label: 'Active Signals', value: (sum.buys || 0) + ' / ' + (sum.sells || 0),
-        sub: (sum.buys || 0) + ' BUY · ' + (sum.sells || 0) + ' SELL · ' + (sum.holds || 0) + ' HOLD' + (sum.highConviction ? ' · ' + sum.highConviction + ' 🔥 high conviction' : '') },
+        sub: (window.MI && MI.mode === 'pocket')
+          ? (sum.buys || 0) + ' CALL · ' + (sum.sells || 0) + ' PUT · ' + (sum.holds || 0) + ' NEUTRAL' + (sum.highConviction ? ' · ' + sum.highConviction + ' 🔥' : '')
+          : (sum.buys || 0) + ' BUY · ' + (sum.sells || 0) + ' SELL · ' + (sum.holds || 0) + ' HOLD' + (sum.highConviction ? ' · ' + sum.highConviction + ' 🔥 high conviction' : '') },
       { label: 'Avg Confidence', value: sum.avgConfidence ? sum.avgConfidence + '%' : '—', sub: 'across live signals' },
       { label: 'Avg R/R', value: sum.avgRiskReward !== undefined && sum.avgRiskReward !== null ? sum.avgRiskReward : '—', sub: 'reward : risk' },
       { label: 'Paper Win Rate', value: paper && paper.winRate ? paper.winRate + '%' : '—',
@@ -66,23 +78,31 @@
     if (subEl) subEl.textContent = sig.asset + ' · updated ' + MI.fmt.shortTime(sig.time);
 
     const cls = sig.action.toLowerCase();
-    const colorClass = sig.action === 'BUY' ? 'green' : sig.action === 'SELL' ? 'red' : 'gold';
+    const colorClass = isBuyAction(sig.action) ? 'green' : isSellAction(sig.action) ? 'red' : 'gold';
 
     el.innerHTML =
       '<div class="signal-top">' +
       '<div class="signal-big ' + cls + '">' + sig.action + '</div>' +
-      '<div class="signal-price"><div class="label">Live price</div><div class="val">' + MI.fmt.price(sig.price) + '</div>' +
-      '<div class="lvl">S ' + MI.fmt.price(sig.support) + ' · R ' + MI.fmt.price(sig.resistance) + '</div></div>' +
+      '<div class="signal-price"><div class="label">Live price</div><div class="val">' + fmtPrice(sig.price, sig) + '</div>' +
+      '<div class="lvl">S ' + fmtPrice(sig.support, sig) + ' · R ' + fmtPrice(sig.resistance, sig) + '</div></div>' +
       '</div>' +
-      '<div class="conf"><span class="conf-label">MI Confidence</span>' +
+      '<div class="conf"><span class="conf-label">' + (sig.mode === 'pocket' ? 'Win Probability' : 'MI Confidence') + '</span>' +
       '<div class="conf-bar"><div class="conf-fill ' + cls + '" style="width:' + sig.confidence + '%"></div></div>' +
       '<span class="conf-pct">' + sig.confidence + '%</span></div>' +
       '<div class="signal-grid">' +
-      '<div class="sig-item"><div class="k">Entry</div><div class="v ' + colorClass + '">' + MI.fmt.price(sig.entry) + '</div></div>' +
-      '<div class="sig-item"><div class="k">Take Profit</div><div class="v green">' + (sig.takeProfit ? MI.fmt.price(sig.takeProfit) : '—') + '</div></div>' +
-      '<div class="sig-item"><div class="k">Stop Loss</div><div class="v red">' + (sig.stopLoss ? MI.fmt.price(sig.stopLoss) : '—') + '</div></div>' +
+      '<div class="sig-item"><div class="k">Entry</div><div class="v ' + colorClass + '">' + fmtPrice(sig.entry, sig) + '</div></div>' +
+      '<div class="sig-item"><div class="k">Take Profit</div><div class="v green">' + (sig.takeProfit ? fmtPrice(sig.takeProfit, sig) : '—') + '</div></div>' +
+      '<div class="sig-item"><div class="k">Stop Loss</div><div class="v red">' + (sig.stopLoss ? fmtPrice(sig.stopLoss, sig) : '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">Risk / Reward</div><div class="v gold">' + (sig.riskReward ? '1 : ' + sig.riskReward : '—') + '</div></div>' +
-      '<div class="sig-item"><div class="k">Conviction</div><div class="v ' + (sig.quality === 'HIGH' ? 'gold' : sig.quality === 'MEDIUM' ? 'cyan' : '') + '">' + (sig.quality === 'HIGH' ? '🔥 HIGH' : sig.quality === 'MEDIUM' ? '⚡ MEDIUM' : sig.action === 'HOLD' ? '—' : '○ LOW') + '</div></div>' +
+      (sig.mode === 'pocket'
+        ? '<div class="sig-item"><div class="k">Expiry</div><div class="v gold">' + esc(sig.expiry || '5m') + '</div></div>' +
+          '<div class="sig-item"><div class="k">Payout (est.)</div><div class="v green">' + (sig.payout ? sig.payout + '%' : '—') + '</div></div>'
+        : '') +
+      (sig.mode === 'forex'
+        ? '<div class="sig-item"><div class="k">TP / SL (pips)</div><div class="v">' + (sig.tpPips != null ? sig.tpPips : '—') + ' / ' + (sig.slPips != null ? sig.slPips : '—') + '</div></div>' +
+          '<div class="sig-item"><div class="k">Sessions</div><div class="v cyan">' + esc(sig.sessionLabel || '—') + '</div></div>'
+        : '') +
+      '<div class="sig-item"><div class="k">Conviction</div><div class="v ' + (sig.quality === 'HIGH' ? 'gold' : sig.quality === 'MEDIUM' ? 'cyan' : '') + '">' + (sig.quality === 'HIGH' ? '🔥 HIGH' : sig.quality === 'MEDIUM' ? '⚡ MEDIUM' : (sig.action === 'HOLD' || sig.action === 'NEUTRAL') ? '—' : '○ LOW') + '</div></div>' +
       '<div class="sig-item"><div class="k">Timeframe</div><div class="v">' + esc(sig.timeframe || '15m + 1h') + '</div></div>' +
       '<div class="sig-item"><div class="k">Confluence</div><div class="v">' + esc(sig.confluence || '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">Trend</div><div class="v cyan">' + esc(sig.trend) + '</div></div>' +
@@ -135,17 +155,17 @@
       return;
     }
     state.signals.forEach(s => {
-      const clsTag = s.action === 'BUY' ? 'buy' : s.action === 'SELL' ? 'sell' : 'hold';
+      const clsTag = tagClass(s.action);
       const tr = document.createElement('tr');
       tr.style.cursor = 'pointer';
       tr.innerHTML =
         '<td class="mono" style="font-weight:800">' + esc(s.asset) + '</td>' +
         '<td><span class="tag ' + clsTag + '" title="Conviction: ' + (s.quality || 'LOW') + '">' + s.action + (s.quality === 'HIGH' ? ' 🔥' : s.quality === 'MEDIUM' ? ' ⚡' : '') + '</span></td>' +
         '<td>' + s.confidence + '%</td>' +
-        '<td class="mono">' + MI.fmt.price(s.price) + '</td>' +
-        '<td class="mono">' + MI.fmt.price(s.entry) + '</td>' +
-        '<td class="mono" style="color:var(--green)">' + (s.takeProfit ? MI.fmt.price(s.takeProfit) : '—') + '</td>' +
-        '<td class="mono" style="color:var(--red)">' + (s.stopLoss ? MI.fmt.price(s.stopLoss) : '—') + '</td>' +
+        '<td class="mono">' + fmtPrice(s.price, s) + '</td>' +
+        '<td class="mono">' + fmtPrice(s.entry, s) + '</td>' +
+        '<td class="mono" style="color:var(--green)">' + (s.takeProfit ? fmtPrice(s.takeProfit, s) : '—') + '</td>' +
+        '<td class="mono" style="color:var(--red)">' + (s.stopLoss ? fmtPrice(s.stopLoss, s) : '—') + '</td>' +
         '<td class="mono">' + (s.riskReward ? '1:' + s.riskReward : '—') + '</td>' +
         '<td>' + esc(s.trend) + '</td>' +
         '<td class="mono">' + (s.rsi !== null ? s.rsi : '—') + '</td>' +
@@ -310,7 +330,13 @@
     MINotify.onEvent('paper', () => loadPaper());
   }
 
+  // Runs on market-mode switch: pull fresh signals for the new mode.
+  function handleModeChange() {
+    refreshSignals();
+    refreshHistory();
+  }
+
   window.MISignals = {
-    state, init, refreshSignals, renderStatsBar, renderSignalPanel, renderTable, switchView,
+    state, init, refreshSignals, handleModeChange, renderStatsBar, renderSignalPanel, renderTable, switchView,
   };
 })();

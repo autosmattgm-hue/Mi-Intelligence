@@ -11,6 +11,8 @@
   const state = {
     symbol: 'BTCUSDT',
     tf: '15m',
+    mode: 'crypto',
+    symbols: [],
     candles: [],
     stats: null,
     source: '',
@@ -148,8 +150,16 @@
   }
 
 // ============================================ formatting
+  function pricePrec(symbol) {
+    const s = String(symbol || '').toUpperCase();
+    if (s === 'XAUUSD' || s === 'XAGUSD') return 2;
+    if (s.indexOf('JPY') !== -1) return 3;
+    if (s.endsWith('USDT')) return 2;
+    return 5;
+  }
   function fmtP(v) {
     if (v === null || v === undefined || isNaN(v)) return '—';
+    if (state.mode === 'forex') return Number(v).toFixed(pricePrec(state.symbol));
     if (v >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
     if (v >= 1) return v.toFixed(2);
     return v.toFixed(5);
@@ -807,20 +817,42 @@ const lh = m.hist[m.hist.length - 1];
   }
 
   function populateSymbols(symbols) {
+    state.symbols = (symbols || []).slice();
+    const label = (s) => String(s).endsWith('USDT')
+      ? String(s).replace(/USDT$/, '/USDT')
+      : String(s).replace(/^(.{3})(.{3})$/, '$1/$2');
     const sel = document.getElementById('chartSymbol');
     const alertSel = document.getElementById('alertSymbol');
     const addSel = document.getElementById('addSymbol');
     const calcSel = document.getElementById('calcSymbol');
-    const opts = symbols.map(s =>
-      '<option value="' + s + '">' + s.replace(/USDT$/, '/USDT') + '</option>').join('');
+    const opts = state.symbols.map(s =>
+      '<option value="' + s + '">' + label(s) + '</option>').join('');
     if (sel) sel.innerHTML = opts;
     if (alertSel) alertSel.innerHTML = opts;
     if (addSel) addSel.innerHTML = opts;
     if (calcSel) calcSel.innerHTML = opts;
   }
 
+  // Called when the user switches Crypto / Pocket / Forex mode.
+  function handleModeChange(mode) {
+    state.mode = mode || 'crypto';
+    if (window.MI && MI.api) {
+      MI.api.get('/api/config').then(cfg => {
+        const syms = (cfg && cfg.symbols) || [];
+        if (syms.length) populateSymbols(syms);
+        const def = mode === 'forex' ? 'EURUSD' : 'BTCUSDT';
+        if (!state.symbols.includes(state.symbol)) {
+          state.symbol = syms.includes(def) ? def : (syms[0] || 'BTCUSDT');
+        }
+        loadCandles();
+      }).catch(() => {});
+    } else {
+      loadCandles();
+    }
+  }
+
   window.MIChart = {
-    init, populateSymbols, loadCandles, doDraw, onMarket, resize,
+    init, populateSymbols, loadCandles, doDraw, onMarket, resize, handleModeChange,
     setSymbol: function (s) { state.symbol = s; loadCandles(); },
     getSymbol: function () { return state.symbol; },
   };

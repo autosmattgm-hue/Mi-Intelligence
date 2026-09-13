@@ -15,6 +15,8 @@ const Alerts = require('./alerts');
 const ai = require('./ai');
 const timing = require('./timing');
 const push = require('./push');
+const marketModes = require('./marketModes');
+const fx = require('./fx');
 
 const PORT = process.env.PORT || 3009;
 const API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -55,7 +57,7 @@ function broadcast(event, data) {
 const lastSignalState = new Map();
 function recordSignalHistory(analyses) {
   for (const a of analyses) {
-    if (!a || a.action === 'HOLD') continue;
+    if (!a || a.action === 'HOLD' || a.action === 'NEUTRAL') continue;
     const stateKey = a.action + '|' + a.quality + '|' + a.confidence;
     if (lastSignalState.get(a.symbol) === stateKey) continue; // unchanged verdict
     lastSignalState.set(a.symbol, stateKey);
@@ -82,86 +84,123 @@ function recordSignalHistory(analyses) {
 }
 
 // ---------------------------------------------------------------- live state
-const market = {
-  prices: {},
-  stats24h: {},
-  global: null,
-  listings: [],
-  signals: [],
-  summary: null,
-  health: {
-    dataSource: 'starting',
-    lastTicker: 0,
-    lastSignals: 0,
-    providers: { coinmarketcap: false, binance: false },
-  },
-};
+// The app runs in three modes (crypto | pocket | forex), each with its own
+// market state so switching modes keeps previously-fetched data warm.
+let CURRENT_MODE = process.env.MI_MODE || marketModes.DEFAULT_MODE;
+if (!marketModes.isValid(CURRENT_MODE)) CURRENT_MODE = marketModes.DEFAULT_MODE;
+
+function newModeState() {
+  return {
+    prices: {},
+    stats24h: {},
+    global: null,
+    listings: [],
+    signals: [],
+    summary: null,
+    health: {
+      dataSource: 'starting',
+      lastTicker: 0,
+      lastSignals: 0,
+      providers: { coinmarketcap: false, binance: false },
+    },
+  };
+}
+const modeStates = {};
+function getModeState() {
+  if (!modeStates[CURRENT_MODE]) modeStates[CURRENT_MODE] = newModeState();
+  return modeStates[CURRENT_MODE];
+}
+let market = getModeState();
 
 const paper = new PaperEngine(store, broadcast);
 const alerts = new Alerts(store, broadcast);
 
 // ---------------------------------------------------------------- data loops
 async function refreshMarket() {
+  const mode = CURRENT_MODE;
+  const st = getModeState();
   try {
-    // Primary source: CoinMarketCap. Fallback: Binance ticker if CMC fails.
-    let prices, stats24h, global, listings;
-    try {
-      const overview = await cmc.getMarketOverview(100);
-      prices = overview.prices;
-      stats24h = overview.stats24h;
-      global = overview.global;
-      listings = overview.listings;
-      market.health.providers.coinmarketcap = true;
-    } catch (cmcErr) {
-      console.error('[ticker][cmc]', cmcErr.message);
-      market.health.providers.coinmarketcap = false;
-      const fallback = await Promise.all([
-        binance.getTickerPrices(binance.DEFAULT_SYMBOLS),
-        binance.get24hStats(binance.DEFAULT_SYMBOLS),
-      ]);
-      prices = fallback[0];
-      stats24h = fallback[1];
+    let prices, stats24h, global, listings, source;
+    if (mode === 'crypto') {
+      try {
+        const overview = await cmc.getMarketOverview(100);
+        prices = overview.prices;
+        stats24h = overview.stats24h;
+        global = overview.global;
+        listings = overview.listings;
+        st.health.providers.coinmarketcap = true;
+        source = 'coinmarketcap';
+      } catch (cmcErr) {
+        console.error('[ticker][cmc]', cmcErr.message);
+        st.health.providers.coinmarketcap = false;
+        const fallback = await Promise.all([
+          binance.getTickerPrices(binance.DEFAULT_SYMBOLS),
+          binance.get24hStats(binance.DEFAULT_SYMBOLS),
+        ]);
+        prices = fallback[0];
+        stats24h = fallback[1];
+        global = null;
+        listings = [];
+        source = 'binance-fallback';
+      }
+    } else {
+      const r = await marketModes.getPrices(mode);
+      prices = r.prices;
+      stats24h = r.stats24h;
       global = null;
       listings = [];
+      source = r.source || 'mixed';
     }
 
-    market.prices = Object.assign({}, prices);
-    market.stats24h = Object.assign({}, stats24h);
-    market.global = global;
-    market.listings = listings;
-    market.health.providers.binance = true;
-    market.health.lastTicker = Date.now();
-    market.health.dataSource = market.health.providers.coinmarketcap ? 'coinmarketcap' : 'binance-fallback';
-    broadcast('market', { prices, stats24h, global, listings, ts: Date.now() });
-    paper.integrate(market.signals, market.prices);
+    st.prices = Object.assign({}, prices);
+    st.stats24h = Object.assign({}, stats24h);
+    st.global = global;
+    st.listings = listings;
+    st.health.providers.binance = true;
+    st.health.lastTicker = Date.now();
+    st.health.dataSource = source;
+    broadcast('market', { prices: st.prices, stats24h: st.stats24h, global: st.global, listings: st.listings, ts: Date.now(), mode });
+    if (mode === 'crypto') paper.integrate(st.signals, st.prices);
   } catch (err) {
-    market.health.dataSource = 'error';
+    st.health.dataSource = 'error';
     console.error('[ticker]', err.message);
   }
 }
 
 async function refreshSignals() {
+  const mode = CURRENT_MODE;
+  const st = getModeState();
   try {
+    const mCfg = marketModes.MODES[mode] || marketModes.MODES.crypto;
+    const interval = mCfg.klineInterval;
     const analyses = [];
-    for (const symbol of binance.DEFAULT_SYMBOLS) {
+    for (const symbol of mCfg.symbols) {
       try {
-        const klines = await binance.getKlines(symbol, '15m', 200);
-        const analysis = signalEngine.analyzeSymbol(symbol, klines);
+        let klines;
+        if (fx.isFxCandidate(symbol)) klines = await fx.getKlines(symbol, interval, 200);
+        else klines = await binance.getKlines(symbol, interval, 200);
+        const opts = { mode };
+        if (mode === 'forex') { opts.precision = fx.precision(symbol); opts.pip = fx.pipSize(symbol); }
+        const analysis = signalEngine.analyzeSymbol(symbol, klines, opts);
         if (analysis) analyses.push(analysis);
       } catch (e) {
         console.warn('[signals] skip', symbol, e.message);
       }
     }
-    market.signals = analyses;
-    market.summary = signalEngine.summarize(analyses);
+    st.signals = analyses;
+    st.summary = signalEngine.summarize(analyses);
     recordSignalHistory(analyses);
-    market.health.lastSignals = Date.now();
-    broadcast('signals', { signals: analyses, summary: market.summary, ts: Date.now() });
+    st.health.lastSignals = Date.now();
+    broadcast('signals', { signals: analyses, summary: st.summary, ts: Date.now(), mode });
 
-    alerts.check(market.prices, analyses);
-    paper.integrate(analyses, market.prices);
+    if (mode === 'crypto') {
+      alerts.check(st.prices, analyses);
+      paper.integrate(analyses, st.prices);
+    }
 
-    for (const symbol of binance.DEFAULT_SYMBOLS) binance.invalidateKlines(symbol);
+    for (const symbol of mCfg.symbols) {
+      if (!fx.isFxCandidate(symbol)) binance.invalidateKlines(symbol);
+    }
   } catch (err) {
     console.error('[signals]', err.message);
   }
@@ -173,8 +212,9 @@ const router = new Router();
 router.get('/api/health', (ctx) => {
   ctx.res.sendJson(200, {
     status: 'ok',
-    version: '5.0.0',
-    source: 'CoinMarketCap + Binance public market data',
+    version: '6.0.0',
+    mode: CURRENT_MODE,
+    source: 'CoinMarketCap + Binance + Yahoo Finance public market data',
     marketSource: market.health.dataSource,
     providers: market.health.providers,
     aiModel: AI_MODEL,
@@ -186,13 +226,44 @@ router.get('/api/health', (ctx) => {
 });
 
 router.get('/api/config', (ctx) => {
+  const queryMode = ctx.query.mode;
+  const mode = marketModes.isValid(queryMode) ? queryMode : CURRENT_MODE;
   ctx.res.sendJson(200, {
-    symbols: cmc.TRACKED,
+    symbols: marketModes.getSymbols(mode),
     intervals: Object.keys(binance.INTERVALS),
     aiModel: AI_MODEL,
     aiEnabled: !!API_KEY,
-    dataSource: 'CoinMarketCap (prices + market data) + Binance (chart candles)',
+    dataSource: 'CoinMarketCap (prices + market data) + Binance (candles) + Yahoo Finance (FX)',
     cmcKeyConfigured: !!process.env.CMC_API_KEY,
+    mode: CURRENT_MODE,
+    modes: Object.keys(marketModes.MODES).map(k => ({
+      id: k,
+      label: marketModes.MODES[k].label,
+      icon: marketModes.MODES[k].icon,
+      description: marketModes.MODES[k].description,
+      symbols: marketModes.MODES[k].symbols,
+    })),
+  });
+});
+
+// Switch the whole dashboard between Crypto / Pocket Option / Forex modes.
+router.post('/api/mode', (ctx) => {
+  const next = ctx.body && ctx.body.mode;
+  if (!marketModes.isValid(next)) return ctx.res.sendJson(400, { error: 'Invalid mode. Use: crypto | pocket | forex' });
+  if (next !== CURRENT_MODE) {
+    CURRENT_MODE = next;
+    market = getModeState();
+    // Warm the new mode immediately (state is kept per mode, so switching
+    // back is instant).
+    refreshMarket();
+    refreshSignals();
+    broadcast('mode', { mode: CURRENT_MODE, ts: Date.now() });
+  }
+  ctx.res.sendJson(200, {
+    ok: true,
+    mode: CURRENT_MODE,
+    symbols: marketModes.getSymbols(CURRENT_MODE),
+    modes: Object.keys(marketModes.MODES).map(k => ({ id: k, label: marketModes.MODES[k].label, icon: marketModes.MODES[k].icon })),
   });
 });
 
@@ -221,13 +292,23 @@ router.get('/api/market/klines', async (ctx) => {
   const symbol = String(ctx.query.symbol || 'BTCUSDT').toUpperCase();
   const interval = ctx.query.interval || '15m';
   const limit = Number(ctx.query.limit) || 300;
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : CURRENT_MODE;
   try {
-    const result = await cmc.getKlines(symbol, interval);
+    let candles, source;
+    if (fx.isFxCandidate(symbol)) {
+      candles = await fx.getKlines(symbol, interval, limit);
+      source = 'yahoo';
+    } else {
+      const result = await cmc.getKlines(symbol, interval);
+      candles = result.candles.slice(-limit);
+      source = result.source;
+    }
     ctx.res.sendJson(200, {
       symbol,
       interval,
-      candles: result.candles.slice(-limit),
-      source: result.source,
+      mode,
+      candles,
+      source,
     });
   } catch (err) {
     ctx.res.sendJson(502, { error: err.message });

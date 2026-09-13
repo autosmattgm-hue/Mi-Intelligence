@@ -30,6 +30,10 @@ into every message.
 | **Installable app (PWA)** | **Download MI as an app** — install button + manifest + service worker. Works offline once loaded, with shortcuts straight to Signals / Market / Assistant |
 | **Notifications outside the app** | Real **device / OS notifications** via Web Push (VAPID + encrypted payloads). Alerts & signals pop up even when MI is closed — with its own ON/OFF toggle in the 🔔 center |
 | **Saved locally until deleted** | **Price alerts** and **notification history** persist in `data/db.json`; every new **signal verdict** is saved to a **Signal History** panel in the Signals view — everything stays until *you* delete it |
+| **💠 Crypto mode** | Default — CoinMarketCap + Binance **spot** dashboard: top-100 rankings, global metrics, BUY/SELL signals with TP/SL |
+| **⏱️ Pocket Option mode** | Short-expiry **digital-option** signals on crypto + FX: instant **CALL / PUT** verdicts with recommended **expiry** (1m/5m/15m), **payout estimate** (80–94%) and win probability, scanned on 5m momentum |
+| **💱 Forex mode** | FX majors + **XAU/USD & XAG/USD** (live Yahoo Finance data): **pip-based** trade plans (TP/SL in pips), per-pair precision, and the **active trading sessions** (Tokyo / London / New York / Sydney) |
+| **Mode switcher** | One tap in the top bar — every view (chart, signals, stats, portfolio, assistant) instantly re-works for the active mode; local server keeps per-mode state, Vercel uses `?mode=` |
 
 ---
 
@@ -64,6 +68,7 @@ Then open **http://localhost:3009** in your browser.
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | *(auto)* | Optional explicit Web Push keys (base64url public / PEM private). If unset, MI generates and stores them in `data/vapid.json` on first use. |
 | `SIGNAL_INTERVAL_MS` | `60000` | Signal engine refresh rate |
 | `TICKER_INTERVAL_MS` | `5000` | Live price refresh rate |
+| `MI_MODE` | `crypto` | Default market mode on boot (`crypto` / `pocket` / `forex`) |
 
 > ⚠️ **Security:** `.env` is git-ignored and must never be committed or shared.
 > Your API keys stay on the server — the browser never sees them.
@@ -74,9 +79,10 @@ Then open **http://localhost:3009** in your browser.
 
 | Method | Path | Description |
 | --- | --- | --- |
-| GET | `/api/health` | Service + data-source status |
-| GET | `/api/config` | Symbols, intervals, AI model |
-| GET | `/api/market` | Latest prices + 24h stats + global metrics + top-100 listings |
+| GET | `/api/health` | Service + data-source status (includes current `mode`) |
+| GET | `/api/config?mode=` | Symbols, intervals, AI model + **all modes** |
+| POST | `/api/mode` | Switch the server between `crypto` / `pocket` / `forex` |
+| GET | `/api/market?mode=` | Latest prices + 24h stats + global metrics + top-100 listings |
 | GET | `/api/market/ranking?limit=100` | CoinMarketCap-style ranked market overview |
 | GET | `/api/market/klines?symbol=BTCUSDT&interval=15m&limit=300` | OHLCV candles (Binance; CMC when keyed) |
 | GET | `/api/signals` | All signals + market summary |

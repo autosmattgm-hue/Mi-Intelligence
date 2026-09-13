@@ -115,7 +115,7 @@ class Alerts {
     // 2) High-confidence signal alerts (debounced per signal key)
     if (Array.isArray(signals)) {
       for (const sig of signals) {
-        if (!sig || sig.action === 'HOLD' || sig.confidence < 85) continue;
+        if (!sig || sig.action === 'HOLD' || sig.action === 'NEUTRAL' || sig.confidence < 85) continue;
         const key = sig.symbol + '|' + sig.action;
         if (!this.notifiedSignalKeys.has(key)) {
           this.notifiedSignalKeys.add(key);

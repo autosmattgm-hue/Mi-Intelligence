@@ -136,5 +136,10 @@
     if (window.MINotify) MINotify.onEvent('market', render);
   }
 
-  window.MIPortfolio = { init, render };
+  // Re-render when the market mode changes (prices now come from FX/crypto).
+  function handleModeChange() {
+    render();
+  }
+
+  window.MIPortfolio = { init, render, handleModeChange };
 })();

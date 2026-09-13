@@ -99,6 +99,18 @@
     state.listings = (window.MINotify && MINotify.getListings()) || state.listings;
   }
 
+  // Fx / Pocket modes have no CoinMarketCap ranking — show a mode note instead.
+  function handleModeChange(mode) {
+    const body = $id('marketBody');
+    const statsEl = $id('marketStats');
+    if (mode && mode !== 'crypto') {
+      if (body) body.innerHTML = '<tr><td colspan="11"><div class="empty">📉 CoinMarketCap rankings are only available in 💠 Crypto mode. Switch modes in the top bar to see live FX / binary-option assets here.</div></td></tr>';
+      if (statsEl) statsEl.innerHTML = '<div class="stat-card"><div class="stat-label">Market Mode</div><div class="stat-value">' + (mode === 'forex' ? '💱 Forex' : '⏱️ Pocket Option') + '</div><div class="stat-sub">CoinMarketCap global metrics are crypto-only. Signals & chart are live for this mode above.</div></div>';
+      return;
+    }
+    refresh();
+  }
+
   async function refresh() {
     try {
       const res = await MI.api.get('/api/market/ranking?limit=100');
@@ -123,5 +135,5 @@
     refresh();
   }
 
-  window.MIMarket = { init, refresh, renderStats, renderTable };
+  window.MIMarket = { init, refresh, renderStats, renderTable, handleModeChange };
 })();

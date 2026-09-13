@@ -15,6 +15,24 @@ function last(arr) { return arr.length ? arr[arr.length - 1] : null; }
 function pctChange(a, b) { return (a > 0 && b > 0) ? ((a - b) / b) * 100 : 0; }
 
 // Resample 15m closes into hourly closes for slower-timeframe confluence.
+// Pick a recommended binary-option expiry based on volatility + signal strength.
+function chooseExpiry(atrPct, absS) {
+  if (absS >= 45 && atrPct < 0.35) return '1m';
+  if (absS >= 35) return '5m';
+  return '15m';
+}
+
+// Which FX trading sessions are currently open (UTC).
+function activeSessions(t) {
+  const h = new Date(t).getUTCHours();
+  const s = [];
+  if (h >= 21 || h < 6) s.push('Sydney');
+  if (h >= 0 && h < 9) s.push('Tokyo');
+  if (h >= 7 && h < 16) s.push('London');
+  if (h >= 12 && h < 21) s.push('New York');
+  return s.length ? s : ['Closed market'];
+}
+
 function resampleHourly(closes) {
   const out = [];
   for (let i = 0; i + 3 < closes.length; i += 4) {
@@ -23,7 +41,7 @@ function resampleHourly(closes) {
   return out;
 }
 
-function analyzeSymbol(symbol, klines) {
+function analyzeSymbol(symbol, klines, opts) {
   if (!klines || klines.length < 60) return null;
   const closes = klines.map(k => k.close);
   const vols = klines.map(k => k.volume);
@@ -154,7 +172,14 @@ function analyzeSymbol(symbol, klines) {
 
   // ----------------------------------------------------------------------
   // Verdict — confluence score transformed into an actionable signal.
-  const action = score >= 25 ? 'BUY' : score <= -25 ? 'SELL' : 'HOLD';
+  const mode = (opts && opts.mode) || 'crypto';
+  const dir = score >= 25 ? 1 : score <= -25 ? -1 : 0;
+  // Pocket Option mode: direction is a CALL (up) or PUT (down) for short
+  // expiries. Forex/Crypto: classic BUY / SELL / HOLD.
+  let action;
+  if (mode === 'pocket') action = dir === 1 ? 'CALL' : dir === -1 ? 'PUT' : 'NEUTRAL';
+  else action = dir === 1 ? 'BUY' : dir === -1 ? 'SELL' : 'HOLD';
+  const isNeutral = action === 'HOLD' || action === 'NEUTRAL';
   const absS = Math.abs(score);
 
   // Factor agreement — how many independent signals point the same way.
@@ -167,30 +192,36 @@ function analyzeSymbol(symbol, klines) {
   // MIDDLE scores that barely pass the threshold stay LOW / MEDIUM so the
   // UI never over-promises on a weak setup.
   let quality = 'LOW';
-  if (action !== 'HOLD') {
+  if (!isNeutral) {
     if ((absS >= 40 && dominant >= 5) || absS >= 55) quality = 'HIGH';
     else if (absS >= 28 && dominant >= 4) quality = 'MEDIUM';
     else if (absS >= 25 && dominant >= 3) quality = 'LOW';
   }
 
   const cap = quality === 'HIGH' ? 97 : quality === 'MEDIUM' ? 90 : 82;
-  const rawConf = action === 'HOLD'
+  const rawConf = isNeutral
     ? Math.round(48 + absS * 0.9)
     : Math.round(52 + Math.min(absS, 80) * 0.9);
-  const confidence = action === 'HOLD' ? rawConf : Math.min(cap, rawConf);
+  const confidence = isNeutral ? rawConf : Math.min(cap, rawConf);
 
   // Trade plan (only when a directional signal exists)
   let entry = price, tp = null, sl = null, rr = null;
-  if (action !== 'HOLD' && atrV > 0) {
-    const isBuy = action === 'BUY';
+  if (!isNeutral && atrV > 0) {
+    const isBuy = dir === 1;
     sl = isBuy ? price - atrV * 1.6 : price + atrV * 1.6;
     tp = isBuy ? price + atrV * 2.6 : price - atrV * 2.6;
     rr = round2(Math.abs(tp - price) / Math.abs(price - sl));
   }
 
+  const fxPip = (opts && opts.pip) || 0.0001;
+  const asset = (mode === 'forex' || (mode === 'pocket' && !symbol.endsWith('USDT')))
+    ? symbol.replace(/^(.{3})(.{3})$/, '$1/$2')
+    : symbol.replace(/USDT$/, '') + '/USDT';
+
   return {
     symbol,
-    asset: symbol.replace(/USDT$/, '') + '/USDT',
+    asset,
+    mode,
     price: round2(price),
     time: new Date().toISOString(),
     action,
@@ -199,8 +230,8 @@ function analyzeSymbol(symbol, klines) {
     takeProfit: tp ? round2(tp) : null,
     stopLoss: sl ? round2(sl) : null,
     riskReward: rr,
-    duration: action === 'HOLD' ? '—' : '1h – 4h',
-    rating: action === 'HOLD' ? '—' : '★'.repeat(Math.min(5, 1 + Math.floor(confidence / 20))),
+    duration: isNeutral ? '—' : (mode === 'pocket' ? 'expiry ' + chooseExpiry(atrPct, absS) : '1h – 4h'),
+    rating: isNeutral ? '—' : '★'.repeat(Math.min(5, 1 + Math.floor(confidence / 20))),
     trend: trendUp ? 'Uptrend' : trendDown ? 'Downtrend' : 'Sideways',
     rsi: rsiV === null ? null : round2(rsiV),
     atrPct: round2(atrPct),
@@ -211,11 +242,27 @@ function analyzeSymbol(symbol, klines) {
     momentum: { m1h: round2(m1h), m6h: round2(m6h), m24h: round2(m24h) },
     rangePosition: round2(rangePos),
     confluence,
-    timeframe: '15m + 1h',
+    timeframe: mode === 'pocket' ? '5m momentum' : '15m + 1h',
     quality,
     bullCount,
     bearCount,
-    direction: score >= 0 ? 'bull' : 'bear',
+    direction: mode === 'pocket' ? (dir === 1 ? 'call' : dir === -1 ? 'put' : 'flat') : (score >= 0 ? 'bull' : 'bear'),
+    // Forex mode: pip-based plan + sessions
+    ...(mode === 'forex' ? {
+      precision: (opts && opts.precision) || 5,
+      pipValue: fxPip,
+      tpPips: tp ? Math.round(Math.abs(tp - price) / fxPip) : null,
+      slPips: sl ? Math.round(Math.abs(price - sl) / fxPip) : null,
+      sessions: activeSessions(),
+      sessionLabel: activeSessions().join(' · '),
+    } : {}),
+    // Pocket Option mode: expiry, payout estimate (typical 80-94% digital-option payouts), win probability
+    ...(mode === 'pocket' ? {
+      expiry: chooseExpiry(atrPct, absS),
+      payout: Math.max(80, Math.min(94, Math.round(78 + atrPct * 4))),
+      winProbability: confidence,
+      directionUp: dir === 1,
+    } : {}),
     factors,
     score,
   };
@@ -223,9 +270,9 @@ function analyzeSymbol(symbol, klines) {
 
 function summarize(analyses) {
   const valid = analyses.filter(a => a);
-  const withSignal = valid.filter(a => a.action !== 'HOLD');
-  const buys = withSignal.filter(a => a.action === 'BUY').length;
-  const sells = withSignal.filter(a => a.action === 'SELL').length;
+  const withSignal = valid.filter(a => a.action !== 'HOLD' && a.action !== 'NEUTRAL');
+  const buys = withSignal.filter(a => a.action === 'BUY' || a.action === 'CALL').length;
+  const sells = withSignal.filter(a => a.action === 'SELL' || a.action === 'PUT').length;
   const total = valid.length;
   const directional = buys + sells;
   // Sentiment measures the direction of ACTIVE signals only — HOLD verdicts

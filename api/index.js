@@ -29,6 +29,8 @@ const signalEngine = require('../server/signalEngine');
 const ai = require('../server/ai');
 const timing = require('../server/timing');
 const push = require('../server/push');
+const marketModes = require('../server/marketModes');
+const fx = require('../server/fx');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -56,7 +58,7 @@ const pushSubs = [];
 
 function recordSignalHistory(analyses) {
   for (const a of analyses) {
-    if (!a || a.action === 'HOLD') continue;
+    if (!a || a.action === 'HOLD' || a.action === 'NEUTRAL') continue;
     const stateKey = a.action + '|' + a.quality + '|' + a.confidence;
     if (lastSignalState[a.symbol] === stateKey) continue;
     lastSignalState[a.symbol] = stateKey;
@@ -71,45 +73,62 @@ function recordSignalHistory(analyses) {
   if (signalHistory.length > 500) signalHistory.splice(0, signalHistory.length - 500);
 }
 
-async function loadMarket() {
-  if (memo.market && Date.now() - memo.market.ts < 45000) return memo.market;
+async function loadMarket(mode = 'crypto') {
+  mode = marketModes.isValid(mode) ? mode : 'crypto';
+  const key = 'market:' + mode;
+  if (memo[key] && Date.now() - memo[key].ts < 45000) return memo[key];
   let prices = {}, stats24h = {}, global = null, listings = [];
-  let src = 'coinmarketcap';
-  try {
-    const overview = await cmc.getMarketOverview(100);
-    prices = overview.prices;
-    stats24h = overview.stats24h;
-    global = overview.global;
-    listings = overview.listings;
-  } catch (e) {
-    src = 'binance-fallback';
-    const [p, s] = await Promise.all([
-      binance.getTickerPrices(binance.DEFAULT_SYMBOLS),
-      binance.get24hStats(binance.DEFAULT_SYMBOLS),
-    ]);
-    prices = p; stats24h = s;
+  let src;
+  if (mode === 'crypto') {
+    src = 'coinmarketcap';
+    try {
+      const overview = await cmc.getMarketOverview(100);
+      prices = overview.prices;
+      stats24h = overview.stats24h;
+      global = overview.global;
+      listings = overview.listings;
+    } catch (e) {
+      src = 'binance-fallback';
+      const [p, s] = await Promise.all([
+        binance.getTickerPrices(binance.DEFAULT_SYMBOLS),
+        binance.get24hStats(binance.DEFAULT_SYMBOLS),
+      ]);
+      prices = p; stats24h = s;
+    }
+  } else {
+    const r = await marketModes.getPrices(mode);
+    prices = r.prices; stats24h = r.stats24h; src = r.source || 'mixed';
   }
-  memo.market = { prices, stats24h, global, listings, source: src, ts: Date.now() };
-  return memo.market;
+  memo[key] = { prices, stats24h, global, listings, source: src, mode, ts: Date.now() };
+  return memo[key];
 }
 
-async function loadSignals(cached = true) {
-  if (cached && memo.signals.length && Date.now() - memo.summaryTs < 45000) {
-    return { signals: memo.signals, summary: memo.summary };
+async function loadSignals(mode = 'crypto', cached = true) {
+  mode = marketModes.isValid(mode) ? mode : 'crypto';
+  const sigKey = 'signals:' + mode;
+  const tsKey = 'summaryTs:' + mode;
+  if (cached && memo[sigKey] && memo[sigKey].length && Date.now() - memo[tsKey] < 45000) {
+    return { signals: memo[sigKey], summary: memo['summary:' + mode] };
   }
+  const mCfg = marketModes.MODES[mode] || marketModes.MODES.crypto;
+  const interval = mCfg.klineInterval;
   const analyses = [];
-  await Promise.all(binance.DEFAULT_SYMBOLS.map(async (symbol) => {
+  await Promise.all(mCfg.symbols.map(async (symbol) => {
     try {
-      const klines = await binance.getKlines(symbol, '15m', 200);
-      const analysis = signalEngine.analyzeSymbol(symbol, klines);
+      const klines = fx.isFxCandidate(symbol)
+        ? await fx.getKlines(symbol, interval, 200)
+        : await binance.getKlines(symbol, interval, 200);
+      const opts = { mode };
+      if (mode === 'forex') { opts.precision = fx.precision(symbol); opts.pip = fx.pipSize(symbol); }
+      const analysis = signalEngine.analyzeSymbol(symbol, klines, opts);
       if (analysis) analyses.push(analysis);
     } catch { /* skip */ }
   }));
-  memo.signals = analyses;
-  memo.summary = signalEngine.summarize(analyses);
+  memo[sigKey] = analyses;
+  memo['summary:' + mode] = signalEngine.summarize(analyses);
+  memo[tsKey] = Date.now();
   recordSignalHistory(analyses);
-  memo.summaryTs = Date.now();
-  return { signals: analyses, summary: memo.summary };
+  return { signals: analyses, summary: memo['summary:' + mode] };
 }
 
 // ------------------------------------------------------------------ JSON helpers
@@ -142,11 +161,13 @@ function sendEvent(res, event, data) {
 const router = new Router();
 
 router.get('/api/health', async (ctx) => {
-  const market = await loadMarket();
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
+  const market = await loadMarket(mode);
   sendJson(ctx.res, 200, {
     status: 'ok',
-    version: '5.0.0',
-    source: 'CoinMarketCap + Binance public market data',
+    version: '6.0.0',
+    mode,
+    source: 'CoinMarketCap + Binance + Yahoo Finance public market data',
     marketSource: market.source,
     providers: { coinmarketcap: market.source === 'coinmarketcap', binance: true },
     aiModel: AI_MODEL,
@@ -157,35 +178,45 @@ router.get('/api/health', async (ctx) => {
 });
 
 router.get('/api/config', (ctx) => {
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
   sendJson(ctx.res, 200, {
-    symbols: cmc.TRACKED,
+    symbols: marketModes.getSymbols(mode),
     intervals: Object.keys(binance.INTERVALS),
     aiModel: AI_MODEL,
     aiEnabled: !!API_KEY,
-    dataSource: 'CoinMarketCap (prices + market) + Binance (candles)',
+    dataSource: 'CoinMarketCap (prices + market) + Binance (candles) + Yahoo Finance (FX)',
     cmcKeyConfigured: !!process.env.CMC_API_KEY,
     platform: 'vercel-serverless',
+    mode,
+    modes: Object.keys(marketModes.MODES).map(k => ({
+      id: k, label: marketModes.MODES[k].label, icon: marketModes.MODES[k].icon,
+      description: marketModes.MODES[k].description, symbols: marketModes.MODES[k].symbols,
+    })),
   });
 });
 
 router.get('/api/market', async (ctx) => {
-  const market = await loadMarket();
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
+  const market = await loadMarket(mode);
   sendJson(ctx.res, 200, {
     prices: market.prices,
     stats24h: market.stats24h,
     global: market.global,
     listings: market.listings,
+    mode,
     ts: Date.now(),
   });
 });
 
 router.get('/api/market/ranking', async (ctx) => {
-  const market = await loadMarket();
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
+  const market = await loadMarket(mode);
   const limit = Math.min(Number(ctx.query.limit) || 100, 200);
   sendJson(ctx.res, 200, {
     global: market.global,
     listings: (market.listings || []).slice(0, limit),
-    source: 'coinmarketcap',
+    source: market.source,
+    mode,
     ts: Date.now(),
   });
 });
@@ -194,21 +225,27 @@ router.get('/api/market/klines', async (ctx) => {
   const symbol = String(ctx.query.symbol || 'BTCUSDT').toUpperCase();
   const interval = ctx.query.interval || '15m';
   const limit = Number(ctx.query.limit) || 300;
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
   try {
-    const result = await cmc.getKlines(symbol, interval);
-    sendJson(ctx.res, 200, {
-      symbol, interval,
-      candles: result.candles.slice(-limit),
-      source: result.source,
-    });
+    let candles, source;
+    if (fx.isFxCandidate(symbol)) {
+      candles = await fx.getKlines(symbol, interval, limit);
+      source = 'yahoo';
+    } else {
+      const result = await cmc.getKlines(symbol, interval);
+      candles = result.candles.slice(-limit);
+      source = result.source;
+    }
+    sendJson(ctx.res, 200, { symbol, interval, mode, candles, source });
   } catch (err) {
     sendJson(ctx.res, 502, { error: err.message });
   }
 });
 
 router.get('/api/signals', async (ctx) => {
-  const { signals, summary } = await loadSignals(true);
-  sendJson(ctx.res, 200, { signals, summary, ts: Date.now() });
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
+  const { signals, summary } = await loadSignals(mode, true);
+  sendJson(ctx.res, 200, { signals, summary, mode, ts: Date.now() });
 });
 
 // NOTE: registered BEFORE /api/signals/:symbol so it isn't shadowed by the param route.
@@ -222,10 +259,11 @@ router.delete('/api/signals/history', (ctx) => {
 });
 router.get('/api/signals/:symbol', async (ctx) => {
   const symbol = String(ctx.params.symbol || '').toUpperCase();
-  const { signals } = await loadSignals(true);
-  const market = await loadMarket();
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
+  const { signals } = await loadSignals(mode, true);
+  const market = await loadMarket(mode);
   const sig = signals.find(s => s.symbol === symbol) || null;
-  sendJson(ctx.res, 200, { signal: sig, price: market.prices[symbol] || null });
+  sendJson(ctx.res, 200, { signal: sig, price: market.prices[symbol] || null, mode });
 });
 
 router.get('/api/paper', async (ctx) => {
@@ -321,8 +359,9 @@ router.post('/api/chat', async (ctx) => {
     return sendJson(ctx.res, 503, { error: 'OpenRouter API key is not configured. Add OPENROUTER_API_KEY in the Vercel project Environment Variables.' });
   }
 
-  const market = await loadMarket();
-  const { signals, summary } = await loadSignals(true);
+  const mode = marketModes.isValid(ctx.body && ctx.body.mode) ? ctx.body.mode : marketModes.DEFAULT_MODE;
+  const market = await loadMarket(mode);
+  const { signals, summary } = await loadSignals(mode, true);
 
   // Optional image uploads (vision models) + audience level.
   const images = Array.isArray(ctx.body && ctx.body.images)
@@ -408,15 +447,16 @@ router.get('/api/timing', async (ctx) => {
 
 // ---- SSE live feed: full snapshot once, then the frontend reconnects (polling) ----
 router.get('/api/events', async (ctx) => {
-  const market = await loadMarket();
-  const { signals, summary } = await loadSignals(true);
+  const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;
+  const market = await loadMarket(mode);
+  const { signals, summary } = await loadSignals(mode, true);
   sendSse(ctx.res, 200);
   sendEvent(ctx.res, 'hello', { ts: Date.now() });
   sendEvent(ctx.res, 'market', {
     prices: market.prices, stats24h: market.stats24h,
-    global: market.global, listings: market.listings, ts: Date.now(),
+    global: market.global, listings: market.listings, ts: Date.now(), mode,
   });
-  sendEvent(ctx.res, 'signals', { signals, summary, ts: Date.now() });
+  sendEvent(ctx.res, 'signals', { signals, summary, ts: Date.now(), mode });
   ctx.res.end();
 });
 

@@ -49,7 +49,7 @@ class PaperEngine {
 
     // 3) Open positions when a strong NEW signal appears.
     for (const sig of signals) {
-      if (!sig || sig.action === 'HOLD' || sig.confidence < MIN_CONFIDENCE) continue;
+      if (!sig || sig.action === 'HOLD' || sig.action === 'NEUTRAL' || sig.confidence < MIN_CONFIDENCE) continue;
       if (this.positions.some(p => p.symbol === sig.symbol)) continue;
       const prev = this.lastSignalState[sig.symbol];
       if (prev && sig.action === prev.action && sig.confidence <= prev.confidence) continue;

@@ -128,15 +128,21 @@
     } catch { /* ignore */ }
   }
 // ------------------------------------------------ SSE live feed
-  function connectSSE() {
-    if (state.sse) return;
-    const src = new EventSource('/api/events');
+  function connectSSE(force) {
+    if (state.sse && !force) return;
+    if (state.sse) { try { state.sse.close(); } catch { /* ignore */ } state.sse = null; }
+    const mode = (window.MI && MI.mode) || 'crypto';
+    const src = new EventSource('/api/events?mode=' + encodeURIComponent(mode));
     src.onopen = () => setLiveStatus(true);
     src.onerror = () => setLiveStatus(false); // EventSource auto-reconnects
     src.addEventListener('hello', () => setLiveStatus(true));
+    src.addEventListener('mode', (e) => {
+      try { emit('mode', JSON.parse(e.data).mode); } catch { /* ignore */ }
+    });
     src.addEventListener('market', (e) => {
       try {
         const d = JSON.parse(e.data);
+        if (d.mode && window.MI && MI.mode && d.mode !== MI.mode) return;
         state.lastMarket = {
           prices: d.prices || {},
           stats24h: d.stats24h || {},
@@ -149,6 +155,7 @@
     src.addEventListener('signals', (e) => {
       try {
         const d = JSON.parse(e.data);
+        if (d.mode && window.MI && MI.mode && d.mode !== MI.mode) return;
         state.lastSignals = { signals: d.signals || [], summary: d.summary || null };
         emit('signals', state.lastSignals);
       } catch { /* ignore */ }
@@ -189,6 +196,25 @@
   }
 
   function setLiveStatus(online) { emit('connection', online); }
+
+  // Called by the mode switcher when the user changes market mode.
+  function switchMode(mode) {
+    // Force a fresh data pull for the new mode, then reconnect the live feed.
+    try {
+      MI.api.get('/api/market').then(r => {
+        state.lastMarket = { prices: r.prices || {}, stats24h: r.stats24h || {}, global: r.global, listings: r.listings };
+        emit('market', state.lastMarket);
+      }).catch(() => {});
+    } catch { /* ignore */ }
+    try {
+      MI.api.get('/api/signals').then(r => {
+        state.lastSignals = { signals: r.signals || [], summary: r.summary || null };
+        emit('signals', state.lastSignals);
+        emit('mode', mode);
+      }).catch(() => {});
+    } catch { /* ignore */ }
+    setTimeout(() => connectSSE(true), 400);
+  }
 
   // ------------------------------------------------ alerts CRUD + render
   async function refreshAlerts() {
@@ -290,6 +316,7 @@
 
   window.MINotify = {
     state, init, toast, playSound, refreshNotifications, refreshAlerts, renderAlerts, onEvent, connectSSE,
+    switchMode,
     isGranted: () => state.permission === 'granted',
     getPrices: () => state.lastMarket.prices,
     getStats: () => state.lastMarket.stats24h,
