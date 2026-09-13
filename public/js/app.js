@@ -17,15 +17,21 @@
   }
 
   // ------------------------------------------------ nav tabs
+  function showView(name) {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t.dataset.view === name));
+    document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === name));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   function initNav() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        const name = tab.dataset.view;
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.toggle('active', t === tab));
-        document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === name));
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
+      tab.addEventListener('click', () => showView(tab.dataset.view));
     });
+    // Support PWA shortcuts & deep links: /?view=signals|market|ai|...
+    const urlView = new URLSearchParams(window.location.search).get('view');
+    if (urlView && document.querySelector('.nav-tab[data-view="' + urlView + '"]')) {
+      showView(urlView);
+    }
   }
 
   // ------------------------------------------------ status / health

@@ -35,7 +35,7 @@
       { label: 'Market Sentiment', value: sum.sentiment || '—',
         sub: sum.directional > 0 ? sum.bullishPct + '% of ' + sum.directional + ' active signals bullish' : 'waiting for signals' },
       { label: 'Active Signals', value: (sum.buys || 0) + ' / ' + (sum.sells || 0),
-        sub: (sum.buys || 0) + ' BUY · ' + (sum.sells || 0) + ' SELL · ' + (sum.holds || 0) + ' HOLD' },
+        sub: (sum.buys || 0) + ' BUY · ' + (sum.sells || 0) + ' SELL · ' + (sum.holds || 0) + ' HOLD' + (sum.highConviction ? ' · ' + sum.highConviction + ' 🔥 high conviction' : '') },
       { label: 'Avg Confidence', value: sum.avgConfidence ? sum.avgConfidence + '%' : '—', sub: 'across live signals' },
       { label: 'Avg R/R', value: sum.avgRiskReward !== undefined && sum.avgRiskReward !== null ? sum.avgRiskReward : '—', sub: 'reward : risk' },
       { label: 'Paper Win Rate', value: paper && paper.winRate ? paper.winRate + '%' : '—',
@@ -81,6 +81,9 @@
       '<div class="sig-item"><div class="k">Take Profit</div><div class="v green">' + (sig.takeProfit ? MI.fmt.price(sig.takeProfit) : '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">Stop Loss</div><div class="v red">' + (sig.stopLoss ? MI.fmt.price(sig.stopLoss) : '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">Risk / Reward</div><div class="v gold">' + (sig.riskReward ? '1 : ' + sig.riskReward : '—') + '</div></div>' +
+      '<div class="sig-item"><div class="k">Conviction</div><div class="v ' + (sig.quality === 'HIGH' ? 'gold' : sig.quality === 'MEDIUM' ? 'cyan' : '') + '">' + (sig.quality === 'HIGH' ? '🔥 HIGH' : sig.quality === 'MEDIUM' ? '⚡ MEDIUM' : sig.action === 'HOLD' ? '—' : '○ LOW') + '</div></div>' +
+      '<div class="sig-item"><div class="k">Timeframe</div><div class="v">' + esc(sig.timeframe || '15m + 1h') + '</div></div>' +
+      '<div class="sig-item"><div class="k">Confluence</div><div class="v">' + esc(sig.confluence || '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">Trend</div><div class="v cyan">' + esc(sig.trend) + '</div></div>' +
       '<div class="sig-item"><div class="k">RSI (14)</div><div class="v">' + (sig.rsi !== null ? sig.rsi : '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">MACD</div><div class="v">' + esc(sig.macdState) + '</div></div>' +
@@ -136,7 +139,7 @@
       tr.style.cursor = 'pointer';
       tr.innerHTML =
         '<td class="mono" style="font-weight:800">' + esc(s.asset) + '</td>' +
-        '<td><span class="tag ' + clsTag + '">' + s.action + '</span></td>' +
+        '<td><span class="tag ' + clsTag + '" title="Conviction: ' + (s.quality || 'LOW') + '">' + s.action + (s.quality === 'HIGH' ? ' 🔥' : s.quality === 'MEDIUM' ? ' ⚡' : '') + '</span></td>' +
         '<td>' + s.confidence + '%</td>' +
         '<td class="mono">' + MI.fmt.price(s.price) + '</td>' +
         '<td class="mono">' + MI.fmt.price(s.entry) + '</td>' +

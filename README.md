@@ -26,6 +26,8 @@ into every message.
 | **Trade timing** | The **MI timing engine** analyses real hourly candles to recommend the best hours & days to trade |
 | **Beginner → Pro** | Adaptive answers: switch to simple step-by-step guidance or advanced professional analysis |
 | **Real-time push** | Server-Sent Events push live prices, fresh signals, alerts and paper trades to the open page |
+| **High-conviction signals** | Every BUY/SELL carries a **conviction tier** (🔥 HIGH / ⚡ MEDIUM / ○ LOW) based on factor agreement + score, so the app never over-promises a weak setup |
+| **Installable app (PWA)** | **Download MI as an app** — install button + manifest + service worker. Works offline once loaded, with shortcuts straight to Signals / Market / Assistant |
 
 ---
 

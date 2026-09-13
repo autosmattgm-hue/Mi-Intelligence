@@ -1,0 +1,24 @@
+{
+  "name": "MI — Master Intelligence | Advanced Trading AI Suite",
+  "short_name": "MI Trading",
+  "description": "Real-time AI crypto trading dashboard — live CoinMarketCap & Binance data, high-conviction signals, paper trading, risk manager and AI assistant.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070b13",
+  "theme_color": "#06b6d4",
+  "lang": "en",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "View Signals", "short_name": "Signals", "url": "/?view=signals", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Market Overview", "short_name": "Market", "url": "/?view=market", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "AI Assistant", "short_name": "Ask MI", "url": "/?view=ai", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

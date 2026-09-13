@@ -156,9 +156,28 @@ function analyzeSymbol(symbol, klines) {
   // Verdict — confluence score transformed into an actionable signal.
   const action = score >= 25 ? 'BUY' : score <= -25 ? 'SELL' : 'HOLD';
   const absS = Math.abs(score);
-  const confidence = action === 'HOLD'
+
+  // Factor agreement — how many independent signals point the same way.
+  // "Sure" signals require AGREEMENT, not just a passing score.
+  const bullCount = factors.filter(f => f.impact === 'bull').length;
+  const bearCount = factors.filter(f => f.impact === 'bear').length;
+  const dominant = Math.max(bullCount, bearCount);
+
+  // Conviction tier — multi-factor, aligned setups earn HIGH conviction.
+  // MIDDLE scores that barely pass the threshold stay LOW / MEDIUM so the
+  // UI never over-promises on a weak setup.
+  let quality = 'LOW';
+  if (action !== 'HOLD') {
+    if ((absS >= 40 && dominant >= 5) || absS >= 55) quality = 'HIGH';
+    else if (absS >= 28 && dominant >= 4) quality = 'MEDIUM';
+    else if (absS >= 25 && dominant >= 3) quality = 'LOW';
+  }
+
+  const cap = quality === 'HIGH' ? 97 : quality === 'MEDIUM' ? 90 : 82;
+  const rawConf = action === 'HOLD'
     ? Math.round(48 + absS * 0.9)
-    : Math.min(97, Math.round(52 + Math.min(absS, 80) * 0.9));
+    : Math.round(52 + Math.min(absS, 80) * 0.9);
+  const confidence = action === 'HOLD' ? rawConf : Math.min(cap, rawConf);
 
   // Trade plan (only when a directional signal exists)
   let entry = price, tp = null, sl = null, rr = null;
@@ -193,6 +212,10 @@ function analyzeSymbol(symbol, klines) {
     rangePosition: round2(rangePos),
     confluence,
     timeframe: '15m + 1h',
+    quality,
+    bullCount,
+    bearCount,
+    direction: score >= 0 ? 'bull' : 'bear',
     factors,
     score,
   };
@@ -213,12 +236,14 @@ function summarize(analyses) {
     : 0;
   const rrVals = withSignal.map(a => a.riskReward).filter(v => v !== null);
   const avgRR = rrVals.length ? (rrVals.reduce((a, b) => a + b, 0) / rrVals.length).toFixed(2) : '—';
+  const highConviction = withSignal.filter(a => a.quality === 'HIGH').length;
   return {
     total,
     buys,
     sells,
     holds: total - buys - sells,
     directional,
+    highConviction,
     bullishPct,
     sentiment: bullishPct >= 55 ? 'Bullish' : bullishPct <= 35 ? 'Bearish' : 'Neutral',
     avgConfidence: avgConf,
