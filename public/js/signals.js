@@ -33,7 +33,7 @@
         sub: btcStats ? MI.fmt.pct(btcStats.priceChangePercent) + ' (24h)' : '—',
         cls: btcStats && btcStats.priceChangePercent >= 0 ? 'stat-up' : 'stat-down' },
       { label: 'Market Sentiment', value: sum.sentiment || '—',
-        sub: sum.bullishPct >= 0 ? sum.bullishPct + '% of ' + (sum.total || 0) + ' assets bullish' : 'scoring…' },
+        sub: sum.directional > 0 ? sum.bullishPct + '% of ' + sum.directional + ' active signals bullish' : 'waiting for signals' },
       { label: 'Active Signals', value: (sum.buys || 0) + ' / ' + (sum.sells || 0),
         sub: (sum.buys || 0) + ' BUY · ' + (sum.sells || 0) + ' SELL · ' + (sum.holds || 0) + ' HOLD' },
       { label: 'Avg Confidence', value: sum.avgConfidence ? sum.avgConfidence + '%' : '—', sub: 'across live signals' },

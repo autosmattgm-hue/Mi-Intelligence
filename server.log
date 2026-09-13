@@ -1,0 +1,6 @@
+
+🏦  MI — Master Intelligence Trading Suite
+   ➜ Local:   http://localhost:3009
+   ➜ Source:  12 assets via CoinMarketCap (prices/market) + Binance (chart candles)
+   ➜ CMC key: configured (authenticated endpoints enabled)
+   ➜ AI:      openai/gpt-4o-mini (enabled)
