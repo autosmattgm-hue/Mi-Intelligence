@@ -454,6 +454,14 @@ router.get('/api/timing', async (ctx) => {
   }
 });
 
+// ---- auth (password gate) ----
+router.post('/api/login', (ctx) => {
+  const pass = String((ctx.body && ctx.body.password) || '');
+  const expected = process.env.MI_PASSWORD || 'Admin2026';
+  if (pass === expected) return sendJson(ctx.res, 200, { ok: true });
+  return sendJson(ctx.res, 401, { error: 'Invalid password' });
+});
+
 // ---- SSE live feed: full snapshot once, then the frontend reconnects (polling) ----
 router.get('/api/events', async (ctx) => {
   const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : marketModes.DEFAULT_MODE;

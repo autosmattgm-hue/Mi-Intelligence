@@ -530,7 +530,15 @@ router.get('/api/events', (ctx) => {
   });
 });
 
-// ---------------------------------------------------------------- HTTP server
+// ---------------------------------------------------------------- auth
+router.post('/api/login', (ctx) => {
+  const pass = String((ctx.body && ctx.body.password) || '');
+  const expected = process.env.MI_PASSWORD || 'Admin2026';
+  if (pass === expected) return ctx.res.sendJson(200, { ok: true });
+  return ctx.res.sendJson(401, { error: 'Invalid password' });
+});
+
+// ---------------------------------------------------------------- router
 const server = createServer(async (req, res) => {
   decorateRes(res);
   const match = router.match(req);

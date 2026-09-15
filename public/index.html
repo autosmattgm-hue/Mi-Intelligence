@@ -18,6 +18,19 @@
 </head>
 <body>
 
+<!-- ==================== LOGIN (auth gate) ==================== -->
+<div class="login-overlay" id="loginOverlay">
+  <form class="login-card" id="loginForm" autocomplete="on">
+    <div class="login-logo">🧠</div>
+    <div class="login-title">MI — <span class="accent">Master Intelligence</span></div>
+    <div class="login-sub">Advanced Trading AI Suite · Secure Access</div>
+    <input class="login-field" id="loginPass" type="password" placeholder="Enter access password" autocomplete="current-password" autofocus>
+    <button class="login-btn" type="submit" id="loginBtn">🔓 Unlock MI</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Protected trading terminal · authorized access only</div>
+  </form>
+</div>
+
 <div class="toast-wrap" id="toastWrap"></div>
 
 <div class="app-shell">
@@ -36,6 +49,7 @@
       <div class="mode-switcher" id="modeSwitcher" title="Market mode"></div>
       <div class="clock" id="clock">--:--:-- UTC</div>
       <button class="icon-btn" id="installBtn" title="Install MI as an app" hidden>⬇️</button>
+      <button class="icon-btn" id="logoutBtn" title="Log out" hidden>🚪</button>
       <button class="icon-btn" id="soundToggle" title="Toggle notification sound">🔊</button>
       <button class="icon-btn" id="bellBtn" title="Notifications">
         🔔<span class="badge hidden" id="bellBadge">0</span>
@@ -418,6 +432,7 @@
 </div>
 
 <script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
 <script src="/js/notifications.js"></script>
 <script src="/js/chart.js"></script>
 <script src="/js/signals.js"></script>

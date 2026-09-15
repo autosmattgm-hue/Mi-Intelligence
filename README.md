@@ -34,6 +34,8 @@ into every message.
 | **⏱️ Pocket Option mode** | Short-expiry **digital-option** signals on crypto + FX: instant **CALL / PUT** verdicts with recommended **expiry** (1m/5m/15m), **payout estimate** (80–94%) and win probability, scanned on 5m momentum |
 | **💱 Forex mode** | FX majors + **XAU/USD & XAG/USD** (live Yahoo Finance data): **pip-based** trade plans (TP/SL in pips), per-pair precision, and the **active trading sessions** (Tokyo / London / New York / Sydney) |
 | **Mode switcher** | One tap in the top bar — every view (chart, signals, stats, portfolio, assistant) instantly re-works for the active mode; local server keeps per-mode state, Vercel uses `?mode=` |
+| **🔐 Login page** | Password-protected entry (`Admin2026` by default, change via `MI_PASSWORD`). Session lasts 7 days; 🚪 button in the top bar logs you out |
+| **📱 Fully responsive** | Optimized for phones & tablets — scrollable tables, stacked panels, mobile-bottom notification drawer, touch-friendly nav |
 
 ---
 
@@ -61,6 +63,7 @@ Then open **http://localhost:3009** in your browser.
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `PORT` | `3009` | HTTP port |
+| `MI_PASSWORD` | `Admin2026` | Password for the **login page** (change in `.env` or Vercel env vars) |
 | `OPENROUTER_API_KEY` | *(empty)* | AI assistant key (get one at https://openrouter.ai/keys) |
 | `AI_MODEL` | `openai/gpt-4o-mini` | Which OpenRouter model powers MI |
 | `CMC_API_KEY` | *(empty)* | Optional CoinMarketCap Pro key (https://coinmarketcap.com/api/). Leave empty for the keyless public API. When set, authenticated quotes/ohlcv endpoints are enabled. |

@@ -4,7 +4,7 @@
    to the network so live market data is never served stale from cache. */
 'use strict';
 
-const CACHE = 'mi-cache-v4';
+const CACHE = 'mi-cache-v5';
 const SHELL = [
   '/',
   '/index.html',
@@ -14,6 +14,7 @@ const SHELL = [
   '/icon-512.png',
   '/icon-maskable-512.png',
   '/js/api.js',
+  '/js/auth.js',
   '/js/notifications.js',
   '/js/chart.js',
   '/js/signals.js',
