@@ -36,27 +36,43 @@
     const stats = getStats();
     const sum = state.summary || {};
     const paper = state.paperStats;
-    const btc = prices['BTCUSDT'];
-    const btcStats = stats['BTCUSDT'];
+    const mode = (window.MI && MI.mode) || 'crypto';
+    const isFx = mode === 'forex';
+
+    // Watch price — mode-aware so FX/Pocket show a real currency rate.
+    const prefer = isFx ? 'EURUSD' : 'BTCUSDT';
+    const watch = (prices[prefer] != null) ? prefer
+      : (state.signals.find(s => prices[s.symbol] != null) || {}).symbol;
+    const wv = watch ? prices[watch] : undefined;
+    const ws = watch ? stats[watch] : undefined;
+    const watchSig = watch && state.signals.find(s => s.symbol === watch) || {};
+    const watchLabel = isFx
+      ? String(watch).replace(/^(.{3})(.{3})$/, '$1/$2')
+      : String(watch).replace(/USDT$/, '/USDT');
+    const fxPrec = isFx ? (watchSig.precision || 5) : 0;
+    const watchValue = wv != null
+      ? (isFx ? Number(wv).toFixed(fxPrec) : MI.fmt.price(wv))
+      : '—';
 
     const cards = [
-      { label: 'Bitcoin', value: btc ? MI.fmt.price(btc) : '—',
-        sub: btcStats ? MI.fmt.pct(btcStats.priceChangePercent) + ' (24h)' : '—',
-        cls: btcStats && btcStats.priceChangePercent >= 0 ? 'stat-up' : 'stat-down' },
+      { label: isFx ? ('💱 ' + watchLabel) : (mode === 'pocket' ? '⏱️ ' + watchLabel : 'Bitcoin'),
+        value: watchValue,
+        sub: ws && ws.priceChangePercent != null
+          ? MI.fmt.pct(ws.priceChangePercent) + ' (24h)'
+          : (isFx ? 'FX · Yahoo Finance' : '—'),
+        cls: ws && ws.priceChangePercent != null ? (ws.priceChangePercent >= 0 ? 'stat-up' : 'stat-down') : '' },
       { label: 'Market Sentiment', value: sum.sentiment || '—',
         sub: sum.directional > 0 ? sum.bullishPct + '% of ' + sum.directional + ' active signals bullish' : 'waiting for signals' },
       { label: 'Active Signals', value: (sum.buys || 0) + ' / ' + (sum.sells || 0),
         sub: (window.MI && MI.mode === 'pocket')
           ? (sum.buys || 0) + ' CALL · ' + (sum.sells || 0) + ' PUT · ' + (sum.holds || 0) + ' NEUTRAL' + (sum.highConviction ? ' · ' + sum.highConviction + ' 🔥' : '')
           : (sum.buys || 0) + ' BUY · ' + (sum.sells || 0) + ' SELL · ' + (sum.holds || 0) + ' HOLD' + (sum.highConviction ? ' · ' + sum.highConviction + ' 🔥 high conviction' : '') },
-      { label: 'Avg Confidence', value: sum.avgConfidence ? sum.avgConfidence + '%' : '—', sub: 'across live signals' },
-      { label: 'Avg R/R', value: sum.avgRiskReward !== undefined && sum.avgRiskReward !== null ? sum.avgRiskReward : '—', sub: 'reward : risk' },
-      { label: 'Paper Win Rate', value: paper && paper.winRate ? paper.winRate + '%' : '—',
-        sub: paper ? paper.closedTrades + ' closed trades' : 'waiting for data' },
-      { label: 'Paper PnL', value: paper ? (paper.totalPnl >= 0 ? '+' : '') + '$' + paper.totalPnl.toFixed(0) : '—',
-        sub: paper ? paper.openPositions + ' open · ' + (paper.realizedPnl >= 0 ? '+' : '') + '$' + paper.realizedPnl.toFixed(0) + ' realized' : '—',
-        cls: paper && paper.totalPnl >= 0 ? 'stat-up' : paper && paper.totalPnl < 0 ? 'stat-down' : '' },
-      { label: 'Last Updated', value: MI.fmt.time(sum.generatedAt), sub: '15m candles · ' + (state.signals.length || 0) + ' assets' },
+      { label: 'Avg Confidence', value: sum.avgConfidence ? sum.avgConfidence + '%' : '—', sub: (isFx ? 'on live FX data' : (mode === 'pocket' ? 'on 5m momentum' : 'across live signals')) },
+      { label: 'Avg R/R', value: sum.avgRiskReward !== undefined && sum.avgRiskReward !== null ? sum.avgRiskReward : '—', sub: isFx ? 'in pips' : 'reward : risk' },
+      { label: (isFx || mode === 'pocket') ? 'Asset Count' : 'Paper Win Rate',
+        value: isFx ? (sum.total || 0) : (paper && paper.winRate ? paper.winRate + '%' : '—'),
+        sub: isFx ? 'pairs tracked live' : (paper ? paper.closedTrades + ' closed trades' : 'crypto mode only') },
+      { label: 'Last Updated', value: MI.fmt.time(sum.generatedAt), sub: (mode === 'pocket' ? '5m candles · ' : '15m candles · ') + (state.signals.length || 0) + ' assets' },
     ];
 
     el.innerHTML = cards.map(c =>
@@ -129,11 +145,13 @@
     const text =
       'MI SIGNAL — ' + sig.asset + '\n' +
       'Action: ' + sig.action + ' (confidence ' + sig.confidence + '%)\n' +
-      'Entry: ' + MI.fmt.price(sig.entry) + '\n' +
-      'Take Profit: ' + MI.fmt.price(sig.takeProfit) + '\n' +
-      'Stop Loss: ' + MI.fmt.price(sig.stopLoss) + '\n' +
-      'Risk/Reward: 1:' + sig.riskReward + '\n' +
-      'Trend: ' + sig.trend + ' | RSI: ' + (sig.rsi !== null ? sig.rsi : '—') + ' | MACD: ' + sig.macdState +
+      'Entry: ' + fmtPrice(sig.entry, sig) + '\n' +
+      'Take Profit: ' + fmtPrice(sig.takeProfit, sig) + '\n' +
+      'Stop Loss: ' + fmtPrice(sig.stopLoss, sig) + '\n' +
+      'Risk/Reward: 1:' + sig.riskReward +
+      (sig.mode === 'pocket' ? '\nExpiry: ' + (sig.expiry || '5m') + ' · Est. payout: ' + (sig.payout || '—') + '%' : '') +
+      (sig.mode === 'forex' ? '\nSessions: ' + esc(sig.sessionLabel || '—') : '') +
+      '\nTrend: ' + sig.trend + ' | RSI: ' + (sig.rsi !== null ? sig.rsi : '—') + ' | MACD: ' + sig.macdState +
       '\nGenerated by MI Master Intelligence — not financial advice.';
     try {
       navigator.clipboard.writeText(text);

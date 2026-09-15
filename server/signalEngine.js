@@ -214,6 +214,10 @@ function analyzeSymbol(symbol, klines, opts) {
   }
 
   const fxPip = (opts && opts.pip) || 0.0001;
+  // Forex prices need their market precision (5 dp majors / 2-3 dp JPY & metals) —
+  // not the 2-dp crypto rounding.
+  const fpx = Math.pow(10, mode === 'forex' ? ((opts && opts.precision) || 5) : 2);
+  const rPrec = (v) => (v === null || v === undefined || isNaN(v)) ? v : Math.round(v * fpx) / fpx;
   const asset = (mode === 'forex' || (mode === 'pocket' && !symbol.endsWith('USDT')))
     ? symbol.replace(/^(.{3})(.{3})$/, '$1/$2')
     : symbol.replace(/USDT$/, '') + '/USDT';
@@ -222,13 +226,13 @@ function analyzeSymbol(symbol, klines, opts) {
     symbol,
     asset,
     mode,
-    price: round2(price),
+    price: rPrec(price),
     time: new Date().toISOString(),
     action,
     confidence,
-    entry: round2(entry),
-    takeProfit: tp ? round2(tp) : null,
-    stopLoss: sl ? round2(sl) : null,
+    entry: rPrec(entry),
+    takeProfit: tp ? rPrec(tp) : null,
+    stopLoss: sl ? rPrec(sl) : null,
     riskReward: rr,
     duration: isNeutral ? '—' : (mode === 'pocket' ? 'expiry ' + chooseExpiry(atrPct, absS) : '1h – 4h'),
     rating: isNeutral ? '—' : '★'.repeat(Math.min(5, 1 + Math.floor(confidence / 20))),
@@ -236,8 +240,8 @@ function analyzeSymbol(symbol, klines, opts) {
     rsi: rsiV === null ? null : round2(rsiV),
     atrPct: round2(atrPct),
     volRatio: round2(volRatio),
-    support: round2(support),
-    resistance: round2(resistance),
+    support: rPrec(support),
+    resistance: rPrec(resistance),
     macdState: histNow === null ? '—' : histNow >= 0 ? 'Bullish' : 'Bearish',
     momentum: { m1h: round2(m1h), m6h: round2(m6h), m24h: round2(m24h) },
     rangePosition: round2(rangePos),

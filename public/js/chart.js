@@ -242,9 +242,10 @@
     if (!candles || !candles.length) return;
     const last = candles[candles.length - 1];
     const first = candles[0];
+    const isFx = state.mode === 'forex';
     const changePct = first && first.close ? ((last.close - first.close) / first.close) * 100 : 0;
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    set('ciPrice', '$' + fmtP(last.close));
+    set('ciPrice', (isFx ? '' : '$') + fmtP(last.close));
     set('ciO', fmtP(last.open));
     set('ciH', fmtP(last.high));
     set('ciL', fmtP(last.low));
@@ -255,12 +256,13 @@
       chgEl.style.color = changePct >= 0 ? 'var(--green)' : 'var(--red)';
     }
     const stat = state.stats && state.stats[state.symbol];
-    set('ciVol', stat ? fmtBig(stat.quoteVolume) : '—');
-    set('ciMc', stat ? fmtBig(stat.marketCap) : '—');
+    set('ciVol', isFx ? '—' : (stat ? fmtBig(stat.quoteVolume) : '—'));
+    set('ciMc', isFx ? 'FX' : (stat ? fmtBig(stat.marketCap) : '—'));
     const srcEl = document.getElementById('ciSrc');
     if (srcEl) {
-      srcEl.textContent = 'Data: ' + (state.source === 'coinmarketcap' ? 'CMC + Binance' : 'Binance');
-      srcEl.className = 'ci-src' + (state.source === 'binance' ? ' binance' : '');
+      const srcMap = { coinmarketcap: 'CMC + Binance', yahoo: 'Yahoo Finance', binance: 'Binance' };
+      srcEl.textContent = 'Data: ' + (srcMap[state.source] || state.source || 'Binance');
+      srcEl.className = 'ci-src' + (state.source === 'yahoo' ? ' yahoo' : state.source === 'binance' ? ' binance' : '');
     }
   }
 
