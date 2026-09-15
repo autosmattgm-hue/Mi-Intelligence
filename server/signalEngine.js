@@ -33,6 +33,135 @@ function activeSessions(t) {
   return s.length ? s : ['Closed market'];
 }
 
+// Wilder smoothing (used by ADX/ATR-style indicators).
+function wilders(values, p) {
+  const out = new Array(values.length).fill(null);
+  if (values.length < p) return out;
+  let s = 0;
+  for (let i = 0; i < p; i++) s += values[i];
+  out[p - 1] = s / p;
+  for (let i = p; i < values.length; i++) out[i] = (out[i - 1] * (p - 1) + values[i]) / p;
+  return out;
+}
+
+// Average Directional Index (14) — tells a REAL trend from chop.
+function adxArr(klines, p = 14) {
+  const n = klines.length;
+  const tr = new Array(n).fill(0), up = new Array(n).fill(0), dn = new Array(n).fill(0);
+  for (let i = 1; i < n; i++) {
+    const h = klines[i].high, l = klines[i].low, pc = klines[i - 1].close;
+    tr[i] = Math.max(h - l, Math.abs(h - pc), Math.abs(l - pc));
+    const um = h - klines[i - 1].high, dm = klines[i - 1].low - l;
+    up[i] = (um > dm && um > 0) ? um : 0;
+    dn[i] = (dm > um && dm > 0) ? dm : 0;
+  }
+  const atr = wilders(tr, p), wUp = wilders(up, p), wDn = wilders(dn, p);
+  const dx = new Array(n).fill(0);
+  for (let i = p - 1; i < n; i++) {
+    const diP = atr[i] > 0 ? 100 * wUp[i] / atr[i] : 0;
+    const diM = atr[i] > 0 ? 100 * wDn[i] / atr[i] : 0;
+    const s = diP + diM;
+    dx[i] = s > 0 ? 100 * Math.abs(diP - diM) / s : 0;
+  }
+  return wilders(dx, p);
+}
+
+// Stochastic oscillator (14, 3, 3).
+function stochArr(klines, kp = 14, kSm = 3, dSm = 3) {
+  const n = klines.length;
+  const raw = new Array(n).fill(null), k = new Array(n).fill(null), d = new Array(n).fill(null);
+  for (let i = kp - 1; i < n; i++) {
+    let hi = -Infinity, lo = Infinity;
+    for (let j = i - kp + 1; j <= i; j++) { hi = Math.max(hi, klines[j].high); lo = Math.min(lo, klines[j].low); }
+    raw[i] = (hi - lo) > 0 ? 100 * (klines[i].close - lo) / (hi - lo) : 50;
+  }
+  for (let i = 0; i < n; i++) {
+    if (raw[i] === null) continue;
+    let a = 0, c = 0;
+    for (let j = i - kSm + 1; j <= i; j++) { if (raw[j] !== null) { a += raw[j]; c++; } }
+    if (c === kSm) k[i] = a / kSm;
+  }
+  for (let i = 0; i < n; i++) {
+    if (k[i] === null) continue;
+    let a = 0, c = 0;
+    for (let j = i - dSm + 1; j <= i; j++) { if (k[j] !== null) { a += k[j]; c++; } }
+    if (c === dSm) d[i] = a / dSm;
+  }
+  return { raw, k, d };
+}
+
+// Daily VWAP (volume-weighted average price grouped by UTC day).
+function dailyVwap(klines) {
+  const day = new Map();
+  for (const c of klines) {
+    const key = new Date(c.openTime).toISOString().slice(0, 10);
+    if (!day.has(key)) day.set(key, { pv: 0, v: 0 });
+    const g = day.get(key);
+    const v = c.volume > 0 ? c.volume : 1;
+    g.pv += c.close * v; g.v += v;
+  }
+  const lastKey = new Date(klines[klines.length - 1].openTime).toISOString().slice(0, 10);
+  const g = day.get(lastKey);
+  const vwap = g && g.v > 0 ? g.pv / g.v : null;
+  const price = klines[klines.length - 1].close;
+  const distancePct = (vwap && price) ? ((price - vwap) / vwap) * 100 : null;
+  return { vwap, distancePct };
+}
+
+// Swing structure — higher-highs/higher-lows vs lower-highs/lower-lows.
+function swingStructure(klines) {
+  const n = klines.length;
+  const highs = [], lows = [];
+  for (let i = 2; i < n - 2; i++) {
+    const h = klines[i].high;
+    if (h > klines[i - 1].high && h > klines[i - 2].high && h > klines[i + 1].high && h > klines[i + 2].high) highs.push(h);
+    const l = klines[i].low;
+    if (l < klines[i - 1].low && l < klines[i - 2].low && l < klines[i + 1].low && l < klines[i + 2].low) lows.push(l);
+  }
+  if (highs.length >= 2 && lows.length >= 2) {
+    const a = highs[highs.length - 1], b = highs[highs.length - 2];
+    const c = lows[lows.length - 1], dLow = lows[lows.length - 2];
+    if (a > b && c > dLow) return { type: 'uptrend', count: highs.length + lows.length };
+    if (a < b && c < dLow) return { type: 'downtrend', count: highs.length + lows.length };
+  }
+  return { type: 'mixed', count: highs.length + lows.length };
+}
+
+// Confirmatory candlestick pattern on the most recent bar.
+function lastCandlePattern(klines) {
+  const n = klines.length;
+  if (n < 2) return { pattern: null, dir: 0 };
+  const c = klines[n - 1], p = klines[n - 2];
+  const body = Math.abs(c.close - c.open), range = c.high - c.low;
+  if (range <= 0) return { pattern: null, dir: 0 };
+  const upper = c.high - Math.max(c.open, c.close);
+  const lower = Math.min(c.open, c.close) - c.low;
+  if (c.close > c.open && c.open < p.close && c.close > p.open) return { pattern: 'Bullish Engulfing', dir: 1 };
+  if (c.close < c.open && c.open > p.close && c.close < p.open) return { pattern: 'Bearish Engulfing', dir: -1 };
+  if (c.close > c.open && lower >= 2 * body && upper <= body * 0.4 && body > 0) return { pattern: 'Hammer', dir: 1 };
+  if (c.close < c.open && upper >= 2 * body && lower <= body * 0.4 && body > 0) return { pattern: 'Shooting Star', dir: -1 };
+  if (body <= range * 0.12) return { pattern: 'Doji', dir: 0 };
+  return { pattern: null, dir: 0 };
+}
+
+// RSI divergence over the last ~8 bars — a smart-money reversal tell.
+function rsiDivergence(closes, rArr) {
+  const n = closes.length;
+  if (n < 12) return null;
+  const cur = closes[n - 1], curRsi = rArr[n - 1];
+  if (rArr[n - 1] === null) return null;
+  let loIdx = n - 9, hiIdx = n - 9, lo = Infinity, hi = -Infinity;
+  for (let i = n - 9; i <= n - 3; i++) {
+    if (closes[i] < lo) { lo = closes[i]; loIdx = i; }
+    if (closes[i] > hi) { hi = closes[i]; hiIdx = i; }
+  }
+  const rsiLo = rArr[loIdx], rsiHi = rArr[hiIdx];
+  if (rsiLo === null || rsiHi === null) return null;
+  if (cur < lo && curRsi > rsiLo) return { type: 'bullish', at: curRsi - rsiLo };
+  if (cur > hi && curRsi < rsiHi) return { type: 'bearish', at: curRsi - rsiHi };
+  return null;
+}
+
 function resampleHourly(closes) {
   const out = [];
   for (let i = 0; i + 3 < closes.length; i += 4) {
@@ -170,6 +299,53 @@ function analyzeSymbol(symbol, klines, opts) {
     factors.push({ name: 'Timeframes', value: 'Insufficient 1h data', impact: 'neutral' });
   }
 
+  // 10) Daily VWAP position — where price sits vs the day's volume-weighted price
+  const vwap = dailyVwap(klines);
+  if (vwap.distancePct !== null) {
+    if (vwap.distancePct > 0.15) { score += 5; factors.push({ name: 'VWAP', value: 'above daily VWAP +' + vwap.distancePct.toFixed(2) + '%', impact: 'bull' }); }
+    else if (vwap.distancePct < -0.15) { score -= 5; factors.push({ name: 'VWAP', value: 'below daily VWAP ' + vwap.distancePct.toFixed(2) + '%', impact: 'bear' }); }
+    else factors.push({ name: 'VWAP', value: 'at daily VWAP', impact: 'neutral' });
+  }
+
+  // 11) Stochastic (14,3,3) oscillator — momentum cross & exhaustion zones
+  const st = stochArr(klines);
+  const stK = last(st.k), stD = last(st.d);
+  const stKPrev = st.k.length > 1 ? st.k[st.k.length - 2] : stK;
+  if (stK !== null) {
+    const bullCross = stKPrev !== null && stKPrev < 20 && stK > stD;
+    const bearCross = stKPrev !== null && stKPrev > 80 && stK < stD;
+    if (bullCross) { score += 6; factors.push({ name: 'Stochastic', value: 'bullish cross in oversold', impact: 'bull' }); }
+    else if (bearCross) { score -= 6; factors.push({ name: 'Stochastic', value: 'bearish cross in overbought', impact: 'bear' }); }
+    else if (stK < 25) { score += 3; factors.push({ name: 'Stochastic', value: '%K ' + stK.toFixed(0) + ' oversold', impact: 'bull' }); }
+    else if (stK > 75) { score -= 3; factors.push({ name: 'Stochastic', value: '%K ' + stK.toFixed(0) + ' overbought', impact: 'bear' }); }
+    else factors.push({ name: 'Stochastic', value: '%K ' + stK.toFixed(0), impact: 'neutral' });
+  }
+
+  // 12) ADX (14) trend strength — real trends earn credit, chop yields nothing
+  const adxV = last(adxArr(klines));
+  if (adxV !== null) {
+    if (adxV >= 22) { score += (trendUp ? 4 : trendDown ? -4 : 0); factors.push({ name: 'ADX', value: adxV.toFixed(0) + ' — strong trend', impact: trendUp ? 'bull' : trendDown ? 'bear' : 'neutral' }); }
+    else if (adxV <= 14) factors.push({ name: 'ADX', value: adxV.toFixed(0) + ' — choppy / weak', impact: 'neutral' });
+    else factors.push({ name: 'ADX', value: adxV.toFixed(0) + ' — developing', impact: 'neutral' });
+  }
+
+  // 13) Price structure — higher-highs/higher-lows confirm a real trend
+  const structure = swingStructure(klines);
+  if (structure.type === 'uptrend') { score += 8; factors.push({ name: 'Structure', value: 'HH · HL — uptrend', impact: 'bull' }); }
+  else if (structure.type === 'downtrend') { score -= 8; factors.push({ name: 'Structure', value: 'LH · LL — downtrend', impact: 'bear' }); }
+  else factors.push({ name: 'Structure', value: 'sideways swings', impact: 'neutral' });
+
+  // 14) Candlestick confirmation on the most recent bar
+  const candle = lastCandlePattern(klines);
+  if (candle.dir === 1) { score += 6; factors.push({ name: 'Candlestick', value: candle.pattern, impact: 'bull' }); }
+  else if (candle.dir === -1) { score -= 6; factors.push({ name: 'Candlestick', value: candle.pattern, impact: 'bear' }); }
+  else if (candle.pattern === 'Doji') factors.push({ name: 'Candlestick', value: 'Doji — indecision', impact: 'neutral' });
+
+  // 15) RSI divergence — smart-money reversal signal
+  const divergence = rsiDivergence(closes, r);
+  if (divergence && divergence.type === 'bullish') { score += 8; factors.push({ name: 'Divergence', value: 'bullish RSI divergence', impact: 'bull' }); }
+  else if (divergence && divergence.type === 'bearish') { score -= 8; factors.push({ name: 'Divergence', value: 'bearish RSI divergence', impact: 'bear' }); }
+
   // ----------------------------------------------------------------------
   // Verdict — confluence score transformed into an actionable signal.
   const mode = (opts && opts.mode) || 'crypto';
@@ -199,10 +375,24 @@ function analyzeSymbol(symbol, klines, opts) {
   }
 
   const cap = quality === 'HIGH' ? 97 : quality === 'MEDIUM' ? 90 : 82;
+
+  // --- IQ gate: never over-promise against the higher-timeframe trend. ---
+  // If the hourly trend clearly disagrees with the intraday direction, the
+  // signal is demoted to LOW and its confidence capped, so only setups the
+  // whole market structure supports can ever claim "HIGH conviction".
+  let effectiveCap = cap;
+  if (!isNeutral && mode !== 'pocket') {
+    const cf = confluence || '';
+    const against =
+      (dir === 1 && (cf.indexOf('Bear') !== -1)) ||
+      (dir === -1 && (cf.indexOf('Bull') !== -1));
+    if (against) { quality = 'LOW'; effectiveCap = 74; }
+  }
+
   const rawConf = isNeutral
     ? Math.round(48 + absS * 0.9)
     : Math.round(52 + Math.min(absS, 80) * 0.9);
-  const confidence = isNeutral ? rawConf : Math.min(cap, rawConf);
+  const confidence = isNeutral ? rawConf : Math.min(effectiveCap, rawConf);
 
   // Trade plan (only when a directional signal exists)
   let entry = price, tp = null, sl = null, rr = null;
@@ -245,6 +435,12 @@ function analyzeSymbol(symbol, klines, opts) {
     macdState: histNow === null ? '—' : histNow >= 0 ? 'Bullish' : 'Bearish',
     momentum: { m1h: round2(m1h), m6h: round2(m6h), m24h: round2(m24h) },
     rangePosition: round2(rangePos),
+    adx: adxV === null ? null : round2(adxV),
+    vwapDistance: vwap.distancePct === null ? null : round2(vwap.distancePct),
+    stochasticK: stK === null ? null : round2(stK),
+    divergence: divergence ? divergence.type : null,
+    structure: structure.type,
+    candlePattern: candle.pattern,
     confluence,
     timeframe: mode === 'pocket' ? '5m momentum' : '15m + 1h',
     quality,

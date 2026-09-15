@@ -125,6 +125,8 @@
       '<div class="sig-item"><div class="k">RSI (14)</div><div class="v">' + (sig.rsi !== null ? sig.rsi : '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">MACD</div><div class="v">' + esc(sig.macdState) + '</div></div>' +
       '<div class="sig-item"><div class="k">Vol vs avg</div><div class="v">' + (sig.volRatio ? sig.volRatio.toFixed(2) + 'x' : '—') + '</div></div>' +
+      '<div class="sig-item"><div class="k">ADX</div><div class="v">' + (sig.adx != null ? sig.adx + ' · ' + (sig.adx >= 22 ? 'strong' : sig.adx <= 14 ? 'weak' : 'developing') : '—') + '</div></div>' +
+      (sig.divergence ? '<div class="sig-item"><div class="k">Divergence</div><div class="v ' + (sig.divergence === 'bullish' ? 'green' : 'red') + '">' + esc(sig.divergence) + '</div></div>' : '') +
       '</div>' +
       '<div class="factors">' + sig.factors.map(f =>
         '<span class="factor ' + f.impact + '" title="' + esc(f.name) + ' — ' + esc(f.value) + '">' + esc(f.name) + ': ' + esc(f.value) + '</span>').join('') +
