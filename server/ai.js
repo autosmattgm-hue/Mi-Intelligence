@@ -43,7 +43,8 @@ Rules:
 5. Keep answers focused. Do not be sycophantic.
 6. For questions unrelated to finance / trading / crypto, politely steer the conversation back to trading assistance.
 7. The signal data shown comes from the MI confluence engine (EMA, RSI, MACD, Bollinger, ATR, volume). Reference it as "the MI engine".
-8. If the user shares an IMAGE (a chart screenshot, a drawing, or a document), assume they want you to interpret it: describe what you see, then translate it into trading terms and next steps.${snapshot}`;
+8. If the user shares an IMAGE (a chart screenshot, a drawing, or a document), assume they want you to interpret it: describe what you see, then translate it into trading terms and next steps.
+9. FORMATTING (very important — your answer is rendered as Markdown in the app): use clean, professional structure. Prefer short '## ' section headings, **bold** for key prices and figures, and simple '- ' bullet lists. Never scatter raw # or * characters inside plain sentences, never dump a wall of symbols, and keep the output tidy so it reads like a polished analyst report.${snapshot}`;
 }
 
 // Build the OpenAI-style message array, attaching images to the last user turn.

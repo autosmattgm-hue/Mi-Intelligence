@@ -15,6 +15,70 @@
   function $id(id) { return document.getElementById(id); }
   function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
+  /* ---- lightweight, XSS-safe Markdown renderer for AI replies ----
+     Input is HTML-escaped first, then transformed into safe tags, so user/AI
+     text can never inject markup. Supports headings, bold/italic/strike,
+     inline code, fenced code, bullet & numbered lists, blockquotes, hr,
+     links and paragraphs. */
+  function inlineMd(s) {
+    return s
+      .replace(/\*\*\*(.+?)\*\*\*/g, '<b><i>$1</i></b>')
+      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+      .replace(/\*(.+?)\*/g, '<i>$1</i>')
+      .replace(/~~(.+?)~~/g, '<del>$1</del>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  }
+
+  function renderMarkdown(src) {
+    const text = String(src || '');
+    const esc = text.replace(/\r\n/g, '\n')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const codeBlocks = [];
+    let md = esc.replace(/```([\s\S]*?)```/g, (_, code) => {
+      codeBlocks.push('<pre><code>' + code.trim() + '</code></pre>');
+      return '\u0000mcode' + (codeBlocks.length - 1) + '\u0000';
+    });
+    const lines = md.split('\n');
+    const out = [];
+    let list = null;
+    const flushList = () => {
+      if (!list) return;
+      out.push('<' + list.type + '>' + list.items.map(i => '<li>' + i + '</li>').join('') + '</' + list.type + '>');
+      list = null;
+    };
+    const isBlockStart = (l) => {
+      const t = l.trim();
+      return !t || /^(#{1,5})\s/.test(t) || /^[-*]\s/.test(t) || /^\d+[.)]\s/.test(t) || /^&gt;/.test(t) ||
+        /^(-{3,}|\*{3,}|_{3,})$/.test(t) || /^\u0000mcode\d+\u0000$/.test(t);
+    };
+    let i = 0;
+    const n = lines.length;
+    while (i < n) {
+      const line = lines[i];
+      const trimmed = line.trim();
+      if (!trimmed) { flushList(); i++; continue; }
+      const codeMatch = line.match(/^\u0000mcode(\d+)\u0000$/);
+      if (codeMatch) { flushList(); out.push(codeBlocks[+codeMatch[1]]); i++; continue; }
+      const h = trimmed.match(/^(#{1,5})\s+(.*)$/);
+      if (h) { flushList(); const lv = h[1].length; out.push('<h' + lv + '>' + inlineMd(h[2]) + '</h' + lv + '>'); i++; continue; }
+      const bq = trimmed.match(/^&gt;\s?(.*)$/);
+      if (bq) { flushList(); out.push('<blockquote>' + inlineMd(bq[1]) + '</blockquote>'); i++; continue; }
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed) && trimmed.length <= 80) { flushList(); out.push('<hr>'); i++; continue; }
+      const ul = trimmed.match(/^[-*]\s+(.*)$/);
+      const ol = trimmed.match(/^\d+[.)]\s+(.*)$/);
+      if (ul) { if (list && list.type !== 'ul') flushList(); if (!list) list = { type: 'ul', items: [] }; list.items.push(inlineMd(ul[1])); i++; continue; }
+      if (ol) { if (list && list.type !== 'ol') flushList(); if (!list) list = { type: 'ol', items: [] }; list.items.push(inlineMd(ol[1])); i++; continue; }
+      flushList();
+      const para = [inlineMd(trimmed)];
+      i++;
+      while (i < n && !isBlockStart(lines[i])) { para.push(inlineMd(lines[i].trim())); i++; }
+      out.push('<p>' + para.join('<br>') + '</p>');
+    }
+    flushList();
+    return out.join('');
+  }
+
   function renderContext() {
     const el = $id('aiContext');
     if (!el) return;
@@ -36,7 +100,8 @@
     if (!thread) return null;
     const el = document.createElement('div');
     el.className = 'msg ' + role + (cls ? ' ' + cls : '');
-    el.textContent = text;
+    if (role === 'ai') el.innerHTML = renderMarkdown(text);
+    else el.textContent = text;
     thread.appendChild(el);
     thread.scrollTop = thread.scrollHeight;
     return el;
@@ -214,7 +279,7 @@
           try {
             const json = JSON.parse(data);
             if (json.error) { error = json.error; break; }
-            if (json.delta) { answer += json.delta; aiBubble.textContent = answer; }
+            if (json.delta) { answer += json.delta; aiBubble.innerHTML = renderMarkdown(answer); }
           } catch { /* partial */ }
         }
         threadAutoScroll();
@@ -223,7 +288,7 @@
       if (error) throw new Error(error);
       if (!answer) throw new Error('The assistant returned no content. Check model availability on OpenRouter.');
 
-      aiBubble.textContent = answer;
+      aiBubble.innerHTML = renderMarkdown(answer);
       history.push({ role: 'assistant', content: answer });
     } catch (err) {
       aiBubble.textContent = '';
