@@ -152,14 +152,14 @@
 // ============================================ formatting
   function pricePrec(symbol) {
     const s = String(symbol || '').toUpperCase();
-    if (s === 'XAUUSD' || s === 'XAGUSD') return 2;
+    if (s === 'US500' || s === 'USTEC' || s === 'US30' || s === 'USOIL' || s === 'XAUUSD' || s === 'XAGUSD') return 2;
     if (s.indexOf('JPY') !== -1) return 3;
     if (s.endsWith('USDT')) return 2;
     return 5;
   }
   function fmtP(v) {
     if (v === null || v === undefined || isNaN(v)) return '—';
-    if (state.mode === 'forex') return Number(v).toFixed(pricePrec(state.symbol));
+    if (state.mode !== 'crypto') return Number(v).toFixed(pricePrec(state.symbol));
     if (v >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
     if (v >= 1) return v.toFixed(2);
     return v.toFixed(5);
@@ -242,7 +242,7 @@
     if (!candles || !candles.length) return;
     const last = candles[candles.length - 1];
     const first = candles[0];
-    const isFx = state.mode === 'forex';
+    const isFx = state.mode === 'forex' || (state.mode === 'pocket' && !String(state.symbol).endsWith('USDT'));
     const changePct = first && first.close ? ((last.close - first.close) / first.close) * 100 : 0;
     const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     set('ciPrice', (isFx ? '' : '$') + fmtP(last.close));

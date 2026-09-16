@@ -191,9 +191,19 @@
           </table>
         </div>
       </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-head wrap">
+          <div>
+            <strong>🧠 Market Pulse — Sentiment &amp; Calendar</strong>
+            <span class="sub">Fear &amp; Greed index · BTC funding rate · high-impact events (real feed)</span>
+          </div>
+          <button class="btn ghost sm" id="pulseRefresh">↻ Refresh</button>
+        </div>
+        <div class="stats-bar sm" id="pulseStats"></div>
+        <div class="list-head">Upcoming high-impact events</div>
+        <div class="list" id="pulseEvents"></div>
+      </div>
     </section>
-
-    <!-- ============================ SIGNALS ============================ -->
     <section class="view" data-view="signals">
       <div class="panel">
         <div class="panel-head wrap">
@@ -233,6 +243,45 @@
               </tr>
             </thead>
             <tbody id="signalsHistoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-head wrap">
+          <div>
+            <strong>🎯 MI Signal Accuracy — real performance</strong>
+            <span class="sub" id="accuracySub">Every signal is graded against live prices: TP hit = win, SL hit = loss</span>
+          </div>
+          <button class="btn ghost sm" id="accuracyRefresh">↻ Refresh</button>
+          <button class="btn ghost sm danger" id="accuracyClear">🗑 Reset grades</button>
+        </div>
+        <div class="stats-bar sm" id="accuracyStats"></div>
+        <div class="acc-layout">
+          <div class="acc-col">
+            <div class="acc-head">By conviction tier</div>
+            <div class="list" id="accuracyTiers"></div>
+          </div>
+          <div class="acc-col">
+            <div class="acc-head">🔬 Backtest (no look-ahead) — how would MI have done?</div>
+            <div>
+              <form class="bt-form" id="backtestForm">
+                <label>Symbol<input id="btSymbol" class="input" type="text" value="BTCUSDT" autocomplete="off"></label>
+                <label>Interval<select id="btInterval" class="input select">
+                  <option value="1h">1h</option><option value="4h">4h</option><option value="1d">1d</option>
+                </select></label>
+                <label>History<select id="btBars" class="input select">
+                  <option value="400">~17 days</option><option value="720" selected>~30 days</option><option value="900">~37 days</option>
+                </select></label>
+                <button class="btn primary" type="submit">▶ Run backtest</button>
+              </form>
+              <div id="backtestResult" class="bt-result"></div>
+            </div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Time</th><th>Asset</th><th>Signal</th><th>Conf.</th><th>Tier</th><th>Entry</th><th>TP</th><th>SL</th><th>Result</th></tr></thead>
+            <tbody id="accuracyBody"></tbody>
           </table>
         </div>
       </div>
@@ -295,6 +344,38 @@
             </div>
             <p class="hint">Sizing = (Account × Risk%) ÷ Stop distance. Example: 10 000 × 2% = $200 risk; with a $500 stop → 0.4 units.</p>
           </form>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:14px">
+        <div class="panel-head wrap">
+          <div><strong>📈 Performance Analytics — Equity Curve</strong><span class="sub">Cumulative paper-trading PnL over time</span></div>
+          <button class="btn ghost sm" id="equityRefresh">↻ Refresh</button>
+        </div>
+        <canvas id="equityChart" height="210" class="equity-canvas"></canvas>
+      </div>
+      <div class="grid-2col" style="margin-top:14px">
+        <div class="panel">
+          <div class="panel-head wrap">
+            <div><strong>📓 Trade Journal</strong><span class="sub">Your private notes — saved in this browser</span></div>
+            <button class="btn ghost sm danger" id="journalClear">🗑 Clear</button>
+          </div>
+          <form class="journal-form" id="journalForm">
+            <label>Setup tag<select id="journalTag" class="input select">
+              <option>Breakout</option><option>Reversal</option><option>Trend-follow</option><option>Mean reversion</option><option>News / event</option><option>Other</option>
+            </select></label>
+            <label>What did I do &amp; why?<textarea id="journalNote" class="input" rows="2" placeholder="e.g. Entered on the HIGH signal after London open, 2% risk…"></textarea></label>
+            <button class="btn primary" type="submit">＋ Save entry</button>
+          </form>
+          <div class="list" id="journalList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><strong>🛡️ Risk Guardrails</strong><span class="sub">Stop MI from pushing you past your own limits</span></div></div>
+          <form class="calc-form" id="guardForm">
+            <label>Max risk per trade (%)<input id="guardRisk" class="input" type="number" value="2" min="0.1" max="100" step="0.1"></label>
+            <label>Daily loss limit (%)<input id="guardDay" class="input" type="number" value="5" min="0.5" max="100" step="0.5"></label>
+            <button class="btn primary" type="submit">💾 Save guardrails</button>
+          </form>
+          <div class="list" id="guardStatus"></div>
         </div>
       </div>
     </section>
@@ -438,6 +519,7 @@
 <script src="/js/signals.js"></script>
 <script src="/js/market.js"></script>
 <script src="/js/portfolio.js"></script>
+<script src="/js/risk.js"></script>
 <script src="/js/chat.js"></script>
 <script src="/js/pwa.js"></script>
 <script src="/js/push.js"></script>

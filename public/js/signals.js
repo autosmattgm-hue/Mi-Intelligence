@@ -8,15 +8,17 @@
     selected: 'BTCUSDT',
     paperStats: null,
     history: [],
+    accuracy: null,
+    accuracyHistory: [],
   };
 
   function $id(id) { return document.getElementById(id); }
   function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-  // Forex prices use their own decimals and no $ sign; crypto uses MI.fmt.
+  // FX/indices keep their own decimals and no $ sign; crypto uses MI.fmt.
   function fmtPrice(p, sig) {
     if (p === null || p === undefined || isNaN(p)) return '—';
-    if (sig && sig.mode === 'forex') return Number(p).toFixed(sig.precision || 5);
+    if (sig && (sig.mode === 'forex' || (sig.mode === 'pocket' && sig.precision))) return Number(p).toFixed(sig.precision || 5);
     return MI.fmt.price(p);
   }
   function isBuyAction(a) { return a === 'BUY' || a === 'CALL'; }
@@ -298,6 +300,102 @@
     });
   }
 
+// ------------------------------------------------ signal accuracy & backtest
+  async function refreshAccuracy() {
+    try {
+      const res = await MI.api.get('/api/accuracy');
+      state.accuracy = res.stats || null;
+      state.accuracyHistory = res.history || [];
+      renderAccuracy();
+    } catch { /* ignore */ }
+  }
+
+  function renderAccuracy() {
+    const el = $id('accuracyStats');
+    if (!el) return;
+    const s = state.accuracy;
+    if (!s) { el.innerHTML = '<div class="stat-card"><div class="stat-value">…</div><div class="stat-sub">grading signals…</div></div>'; return; }
+    const cards = [
+      { label: 'Graded', value: s.graded, sub: s.wins + 'W · ' + s.losses + 'L' },
+      { label: 'Win Rate', value: s.winRate + '%', sub: 'real TP/SL hits', cls: s.winRate >= 50 ? 'stat-up' : 'stat-down' },
+      { label: 'Expectancy', value: (s.expectancy > 0 ? '+' : '') + s.expectancy + 'R', sub: 'per trade', cls: s.expectancy >= 0 ? 'stat-up' : 'stat-down' },
+      { label: 'Avg R (win/loss)', value: s.avgWin + ' / ' + s.avgLoss, sub: 'reward vs risk' },
+      { label: 'Open / Expired', value: s.open + ' / ' + s.expired, sub: 'grading / timed out' },
+      { label: '30d projection', value: (s.projected30d > 0 ? '+' : '') + s.projected30d + '%', sub: '@2% risk · 2 trades/day', cls: s.projected30d >= 0 ? 'stat-up' : 'stat-down' },
+    ];
+    el.innerHTML = cards.map(c =>
+      '<div class="stat-card"><div class="stat-label">' + c.label + '</div>' +
+      '<div class="stat-value ' + (c.cls || '') + '">' + c.value + '</div>' +
+      '<div class="stat-sub">' + c.sub + '</div></div>').join('');
+
+    const t = $id('accuracyTiers');
+    if (t) {
+      const byTier = s.byTier || {};
+      const keys = (s.byTier ? Object.keys(s.byTier) : []).sort();
+      t.innerHTML = keys.map(k => {
+        const v = byTier[k] || { wins: 0, losses: 0 };
+        const grad = v.wins + v.losses;
+        const wr = grad ? Math.round((v.wins / grad) * 100) : 0;
+        return '<div class="acc-tier"><b>' + esc(k) + '</b> — ' + v.wins + 'W / ' + v.losses + 'L · <span class="' + (wr >= 50 ? 'ok' : '') + '">' + wr + '%</span></div>';
+      }).join('') || '<div class="empty">No graded signals yet — MI grades every emitted signal automatically.</div>';
+    }
+
+    const body = $id('accuracyBody');
+    if (body) {
+      body.innerHTML = '';
+      const items = state.accuracyHistory || [];
+      if (!items.length) {
+        body.innerHTML = '<tr><td colspan="9"><div class="empty">No graded signals yet. Every BUY/SELL MI emits is graded against live prices (TP hit = WIN, SL hit = LOSS).</div></td></tr>';
+        return;
+      }
+      items.slice(0, 40).forEach(r => {
+        const tr = document.createElement('tr');
+        const resHtml = r.result === 'win' ? '<span class="tag buy">WIN</span>'
+          : r.result === 'loss' ? '<span class="tag sell">LOSS</span>'
+          : '<span class="tag hold">' + esc(r.status) + '</span>';
+        tr.innerHTML =
+          '<td class="mono">' + MI.fmt.shortTime(r.ts) + '</td>' +
+          '<td class="mono" style="font-weight:700">' + esc(r.symbol) + '</td>' +
+          '<td><span class="tag ' + tagClass(r.action) + '">' + r.action + '</span></td>' +
+          '<td>' + r.confidence + '%</td>' +
+          '<td>' + esc(r.quality || '—') + '</td>' +
+          '<td class="mono">' + MI.fmt.price(r.entry) + '</td>' +
+          '<td class="mono">' + MI.fmt.price(r.takeProfit) + '</td>' +
+          '<td class="mono">' + MI.fmt.price(r.stopLoss) + '</td>' +
+          '<td>' + resHtml + '</td>';
+        body.appendChild(tr);
+      });
+    }
+  }
+
+  async function runBacktest() {
+    const sym = ($id('btSymbol').value || 'BTCUSDT').trim().toUpperCase();
+    const interval = $id('btInterval').value;
+    const bars = $id('btBars').value;
+    const mode = (window.MI && MI.mode) || 'crypto';
+    const box = $id('backtestResult');
+    if (!box) return;
+    box.innerHTML = '<div class="empty">⏳ Running no-look-ahead backtest on ' + esc(sym) + ' (' + esc(interval) + ' · ' + esc(bars) + ' bars)…</div>';
+    try {
+      const r = await MI.api.get('/api/backtest?symbol=' + encodeURIComponent(sym) + '&interval=' + encodeURIComponent(interval) + '&bars=' + encodeURIComponent(bars) + '&mode=' + encodeURIComponent(mode));
+      const rows = [
+        '<div class="bt-line">📊 Signals generated: <b>' + r.signals + '</b> across ' + r.candles + ' candles (' + esc(sym) + ' · ' + esc(interval) + ')</div>',
+        '<div class="bt-line">Win / Loss / Expired: <b>' + r.wins + ' / ' + r.losses + ' / ' + r.expired + '</b></div>',
+        '<div class="bt-line">Win rate (graded): <b class="' + (r.winRate >= 50 ? 'ok' : '') + '">' + r.winRate + '%</b></div>',
+        '<div class="bt-line">Expectancy: <b>' + (r.expectancy >= 0 ? '+' : '') + r.expectancy + 'R</b> per trade</div>',
+        '<div class="bt-line">30-day projection (@2% risk, 2/day): <b>' + (r.projection30d >= 0 ? '+' : '') + r.projection30d + '%</b></div>',
+      ];
+      if (r.recent && r.recent.length) {
+        rows.push('<div class="bt-line sub">Recent ' + r.recent.length + ' graded:</div><div class="bt-recents">' +
+          r.recent.map(x => '<span class="bt-chip ' + (x.result === 'win' ? 'buy' : x.result === 'loss' ? 'sell' : 'hold') + '">' + esc(x.action) + ' ' + (x.result === 'win' ? '✓' : x.result === 'loss' ? '✗' : '·') + '</span>').join('') + '</div>');
+      }
+      box.innerHTML = '<div class="bt-result-inner">' + rows.join('') + '</div>';
+      MI.toast('success', 'Backtest complete', esc(sym) + ' · ' + r.winRate + '% win rate · ' + (r.expectancy >= 0 ? '+' : '') + r.expectancy + 'R expectancy.');
+    } catch (err) {
+      box.innerHTML = '<div class="empty">Backtest error: ' + esc(err.message) + '</div>';
+    }
+  }
+
 // ------------------------------------------------ refresh / events / init
   async function refreshSignals() {
     try {
@@ -313,6 +411,20 @@
 
   function init() {
     $id('signalsRefresh').addEventListener('click', () => refreshSignals());
+    const accRefresh = $id('accuracyRefresh');
+    if (accRefresh) accRefresh.addEventListener('click', () => refreshAccuracy());
+    const accClear = $id('accuracyClear');
+    if (accClear) accClear.addEventListener('click', async () => {
+      if (!confirm('Delete all graded signal history?')) return;
+      try {
+        await MI.api.del('/api/accuracy');
+        state.accuracy = null; state.accuracyHistory = [];
+        renderAccuracy();
+        MI.toast('success', 'Accuracy reset', 'All saved grades were deleted.');
+      } catch (err) { MI.toast('error', 'Could not reset', err.message); }
+    });
+    const btForm = $id('backtestForm');
+    if (btForm) btForm.addEventListener('submit', (e) => { e.preventDefault(); runBacktest(); });
     const histClear = $id('signalsHistoryClear');
     if (histClear) histClear.addEventListener('click', async () => {
       if (!confirm('Delete all saved signal history? This cannot be undone.')) return;
@@ -338,6 +450,7 @@
     });
     refreshSignals();
     refreshHistory();
+    refreshAccuracy();
     MINotify.onEvent('signals', () => {
       state.signals = MINotify.getSignals();
       state.summary = MINotify.getSummary();
@@ -357,6 +470,6 @@
   }
 
   window.MISignals = {
-    state, init, refreshSignals, handleModeChange, renderStatsBar, renderSignalPanel, renderTable, switchView,
+    state, init, refreshSignals, handleModeChange, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView,
   };
 })();

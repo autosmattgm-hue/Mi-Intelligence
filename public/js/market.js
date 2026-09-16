@@ -106,9 +106,53 @@
     if (mode && mode !== 'crypto') {
       if (body) body.innerHTML = '<tr><td colspan="11"><div class="empty">📉 CoinMarketCap rankings are only available in 💠 Crypto mode. Switch modes in the top bar to see live FX / binary-option assets here.</div></td></tr>';
       if (statsEl) statsEl.innerHTML = '<div class="stat-card"><div class="stat-label">Market Mode</div><div class="stat-value">' + (mode === 'forex' ? '💱 Forex' : '⏱️ Pocket Option') + '</div><div class="stat-sub">CoinMarketCap global metrics are crypto-only. Signals & chart are live for this mode above.</div></div>';
+      refreshPulse();
       return;
     }
+    refreshPulse();
     refresh();
+  }
+
+  // ------------------------------------------------ market pulse (sentiment + calendar)
+  async function refreshPulse() {
+    try {
+      const s = await MI.api.get('/api/sentiment');
+      let c = null;
+      try { c = await MI.api.get('/api/calendar'); } catch { /* optional */ }
+      renderPulse(s, c);
+    } catch { /* ignore */ }
+  }
+
+  function renderPulse(s, c) {
+    const el = $id('pulseStats');
+    if (el) {
+      const fg = s && s.fearGreed;
+      const cards = [];
+      if (fg) cards.push({ label: 'Fear & Greed', value: fg.value + ' — ' + esc(fg.classification),
+        sub: 'alternative.me · market sentiment', cls: fg.value >= 55 ? 'stat-up' : fg.value <= 45 ? 'stat-down' : '' });
+      cards.push({ label: 'BTC Funding (perp)', value: s && s.funding != null ? (s.funding >= 0 ? '+' : '') + (s.funding * 100).toFixed(4) + '%' : '—',
+        sub: 'Binance USDⓈ-M · long/short bias' });
+      el.innerHTML = cards.map(card =>
+        '<div class="stat-card"><div class="stat-label">' + card.label + '</div>' +
+        '<div class="stat-value ' + (card.cls || '') + '">' + card.value + '</div>' +
+        '<div class="stat-sub">' + card.sub + '</div></div>').join('');
+    }
+    const ev = $id('pulseEvents');
+    if (!ev) return;
+    ev.innerHTML = '';
+    const list = (c && c.upcoming) || [];
+    if (!list.length) { ev.innerHTML = '<div class="empty">No confirmed high-impact events in the current window.</div>'; return; }
+    list.slice(0, 14).forEach(e => {
+      const d = document.createElement('div');
+      d.className = 'cal-item';
+      const hm = e.time ? new Date(e.time).toUTCString().split(' ')[4] + ' UTC' : '—';
+      d.innerHTML = '<span class="cal-badge ' + (e.isHigh ? 'high' : 'med') + '">' + (e.isHigh ? 'HIGH' : 'MED') + '</span>' +
+        '<span class="cal-time">' + esc(hm) + '</span>' +
+        '<span class="cal-title">' + esc(e.title) + (e.country ? ' <span class="cal-cc">' + esc(e.country) + '</span>' : '') + '</span>' +
+        (e.forecast != null ? '<span class="cal-fc">fc ' + esc(String(e.forecast)) + '</span>' : '') +
+        (e.previous != null ? '<span class="cal-pv">prv ' + esc(String(e.previous)) + '</span>' : '');
+      ev.appendChild(d);
+    });
   }
 
   async function refresh() {
@@ -127,13 +171,16 @@
   function init() {
     const ref = $id('marketRefresh');
     if (ref) ref.addEventListener('click', refresh);
+    const pulse = $id('pulseRefresh');
+    if (pulse) pulse.addEventListener('click', refreshPulse);
     if (window.MINotify) MINotify.onEvent('market', () => {
       pullFromState();
       renderStats();
       renderTable();
     });
     refresh();
+    refreshPulse();
   }
 
-  window.MIMarket = { init, refresh, renderStats, renderTable, handleModeChange };
+  window.MIMarket = { init, refresh, renderStats, renderTable, handleModeChange, refreshPulse };
 })();

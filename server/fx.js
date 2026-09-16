@@ -7,10 +7,13 @@ const YAHOO = 'https://query1.finance.yahoo.com/v8/finance/chart/';
 const UA = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0 Safari/537.36' };
 
 // MI symbol (EURUSD) -> Yahoo symbol (EURUSD=X).
+// Includes FX majors, metals, oil and the stock indices Pocket Option trades
+// (US500 S&P 500, USTEC Nasdaq 100, US30 Dow Jones).
 const SYMBOL_MAP = {
   EURUSD: 'EURUSD=X', GBPUSD: 'GBPUSD=X', USDJPY: 'USDJPY=X', AUDUSD: 'AUDUSD=X',
   USDCHF: 'USDCHF=X', USDCAD: 'USDCAD=X', NZDUSD: 'NZDUSD=X', EURGBP: 'EURGBP=X',
   EURJPY: 'EURJPY=X', GBPJPY: 'GBPJPY=X', XAUUSD: 'GC=F', XAGUSD: 'SI=F',
+  US500: '^GSPC', USTEC: '^NDX', US30: '^DJI', USOIL: 'CL=F',
 };
 
 const DEFAULT_SYMBOLS = Object.keys(SYMBOL_MAP);
@@ -78,16 +81,20 @@ async function getPrices(symbols) {
   return out;
 }
 
-// JPY & gold symbols use 0.01 pip; everything else 0.0001.
+// Price unit rules: indices quote in points (1), metals/oil in 0.01,
+// JPY pairs in 0.01, everything else in 0.0001.
 function pipSize(symbol) {
   const s = String(symbol).toUpperCase();
-  if (s.includes('JPY') || s === 'XAUUSD' || s === 'XAGUSD') return 0.01;
+  if (s === 'US500' || s === 'USTEC' || s === 'US30' || s === 'USOIL') return 1;
+  if (s === 'XAUUSD' || s === 'XAGUSD') return 0.01;
+  if (s.includes('JPY')) return 0.01;
   return 0.0001;
 }
 
-// Display decimals for a symbol (JPY/XAU 2-3, others 4-5).
+// Display decimals for a symbol.
 function precision(symbol) {
   const s = String(symbol).toUpperCase();
+  if (s === 'US500' || s === 'USTEC' || s === 'US30' || s === 'USOIL') return 2;
   if (s === 'XAUUSD' || s === 'XAGUSD') return 2;
   if (s.includes('JPY')) return 3;
   return 5;

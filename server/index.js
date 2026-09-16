@@ -17,6 +17,10 @@ const timing = require('./timing');
 const push = require('./push');
 const marketModes = require('./marketModes');
 const fx = require('./fx');
+const Accuracy = require('./accuracy');
+const backtest = require('./backtest');
+const sentimentApi = require('./sentiment');
+const calendarApi = require('./calendar');
 
 const PORT = process.env.PORT || 3009;
 const API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -114,6 +118,30 @@ let market = getModeState();
 
 const paper = new PaperEngine(store, broadcast);
 const alerts = new Alerts(store, broadcast);
+const accuracy = new Accuracy(store);
+let calendarWarned = new Set(); // debounce economic-calendar notifications
+
+// Notify once per high-impact event arriving within the next 12 hours.
+async function warnHighImpact() {
+  try {
+    const cal = await calendarApi.getCalendar();
+    for (const ev of (cal.imminentHigh || [])) {
+      const key = ev.title + '|' + ev.time;
+      if (!calendarWarned.has(key)) {
+        calendarWarned.add(key);
+        const hm = new Date(ev.time).getUTCHours().toString().padStart(2, '0') +
+          ':' + new Date(ev.time).getUTCMinutes().toString().padStart(2, '0');
+        alerts.addNotification(
+          'calendar',
+          '🕐 High-impact news in the next 12h',
+          `${ev.title} (${ev.country}) at ${hm} UTC — expect volatility. Consider smaller size or waiting.`,
+          { source: 'calendar', time: ev.time }
+        );
+      }
+    }
+    if (calendarWarned.size > 40) calendarWarned = new Set([...calendarWarned].slice(-30));
+  } catch { /* calendar optional */ }
+}
 
 // ---------------------------------------------------------------- data loops
 async function refreshMarket() {
@@ -159,6 +187,7 @@ async function refreshMarket() {
     st.health.providers.binance = true;
     st.health.lastTicker = Date.now();
     st.health.dataSource = source;
+    accuracy.check(st.prices);
     broadcast('market', { prices: st.prices, stats24h: st.stats24h, global: st.global, listings: st.listings, ts: Date.now(), mode });
     if (mode === 'crypto') paper.integrate(st.signals, st.prices);
   } catch (err) {
@@ -180,7 +209,10 @@ async function refreshSignals() {
         if (fx.isFxCandidate(symbol)) klines = await fx.getKlines(symbol, interval, 200);
         else klines = await binance.getKlines(symbol, interval, 200);
         const opts = { mode };
-        if (mode === 'forex') { opts.precision = fx.precision(symbol); opts.pip = fx.pipSize(symbol); }
+        if ((mode === 'forex' || mode === 'pocket') && fx.isFxCandidate(symbol)) {
+          opts.precision = fx.precision(symbol);
+          opts.pip = fx.pipSize(symbol);
+        }
         const analysis = signalEngine.analyzeSymbol(symbol, klines, opts);
         if (analysis) analyses.push(analysis);
       } catch (e) {
@@ -190,6 +222,7 @@ async function refreshSignals() {
     st.signals = analyses;
     st.summary = signalEngine.summarize(analyses);
     recordSignalHistory(analyses);
+    for (const a of analyses) accuracy.observe(a);
     st.health.lastSignals = Date.now();
     broadcast('signals', { signals: analyses, summary: st.summary, ts: Date.now(), mode });
 
@@ -440,6 +473,9 @@ router.post('/api/chat', async (ctx) => {
 
   let tradeTiming = null;
   try { tradeTiming = await timing.getTiming(focusSymbol); } catch { /* timing is optional */ }
+  let sentiment = null, calendar = null;
+  try { sentiment = await sentimentApi.getSentiment(); } catch { /* optional */ }
+  try { calendar = await calendarApi.getCalendar(); } catch { /* optional */ }
 
   const context = {
     prices: market.prices,
@@ -458,6 +494,12 @@ router.post('/api/chat', async (ctx) => {
     paperTrading: paper.stats(market.prices),
     audience,
     tradeTiming,
+    sentiment,
+    economicCalendar: calendar ? {
+      source: calendar.source,
+      high: (calendar.high || []).slice(0, 10).map(e => ({ title: e.title, country: e.country, time: e.time, impact: e.impact })),
+      imminentHigh: (calendar.imminentHigh || []).slice(0, 4).map(e => ({ title: e.title, country: e.country, time: e.time })),
+    } : null,
   };
   const res = ctx.res;
 
@@ -508,6 +550,68 @@ router.get('/api/timing', async (ctx) => {
   } catch (err) {
     ctx.res.sendJson(502, { error: err.message });
   }
+});
+
+// ---------------------------------------------------------------- signal accuracy & backtest
+router.get('/api/accuracy', (ctx) => {
+  ctx.res.sendJson(200, { stats: accuracy.stats(), history: accuracy.history() });
+});
+router.delete('/api/accuracy', (ctx) => {
+  accuracy.clear();
+  ctx.res.sendJson(200, { ok: true });
+});
+router.get('/api/backtest', async (ctx) => {
+  try {
+    const symbol = String(ctx.query.symbol || 'BTCUSDT');
+    const mode = ctx.query.mode || CURRENT_MODE;
+    const interval = ctx.query.interval || '1h';
+    const bars = Number(ctx.query.bars) || 720;
+    const result = await backtest.runBacktest({ symbol, mode, interval, bars });
+    ctx.res.sendJson(200, result);
+  } catch (err) {
+    ctx.res.sendJson(502, { error: err.message });
+  }
+});
+
+// ---------------------------------------------------------------- market sentiment & economic calendar
+router.get('/api/sentiment', async (ctx) => {
+  try { ctx.res.sendJson(200, await sentimentApi.getSentiment()); }
+  catch (err) { ctx.res.sendJson(502, { error: err.message }); }
+});
+router.get('/api/calendar', async (ctx) => {
+  try { ctx.res.sendJson(200, await calendarApi.getCalendar()); }
+  catch (err) { ctx.res.sendJson(502, { error: err.message }); }
+});
+
+// ---------------------------------------------------------------- signal accuracy & backtest
+router.get('/api/accuracy', (ctx) => {
+  ctx.res.sendJson(200, { stats: accuracy.stats(), history: accuracy.history() });
+});
+router.delete('/api/accuracy', (ctx) => {
+  accuracy.clear();
+  ctx.res.sendJson(200, { ok: true });
+});
+router.get('/api/backtest', async (ctx) => {
+  try {
+    const symbol = String(ctx.query.symbol || 'BTCUSDT');
+    const mode = ctx.query.mode || CURRENT_MODE;
+    const interval = ctx.query.interval || '1h';
+    const bars = Number(ctx.query.bars) || 720;
+    const result = await backtest.runBacktest({ symbol, mode, interval, bars });
+    ctx.res.sendJson(200, result);
+  } catch (err) {
+    ctx.res.sendJson(502, { error: err.message });
+  }
+});
+
+// ---------------------------------------------------------------- sentiment & economic calendar
+router.get('/api/sentiment', async (ctx) => {
+  try { ctx.res.sendJson(200, await sentimentApi.getSentiment()); }
+  catch (err) { ctx.res.sendJson(502, { error: err.message }); }
+});
+router.get('/api/calendar', async (ctx) => {
+  try { ctx.res.sendJson(200, await calendarApi.getCalendar()); }
+  catch (err) { ctx.res.sendJson(502, { error: err.message }); }
 });
 
 // ---------------------------------------------------------------- SSE live feed
@@ -574,4 +678,7 @@ server.listen(PORT, () => {
   setInterval(refreshMarket, TICKER_INTERVAL);
   setInterval(refreshSignals, SIGNAL_INTERVAL);
   setInterval(() => alerts.check(market.prices, market.signals), 10000);
+  setInterval(() => accuracy.check(getModeState().prices), 10000);
+  warnHighImpact();
+  setInterval(warnHighImpact, 15 * 60 * 1000);
 });

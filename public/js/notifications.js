@@ -257,6 +257,22 @@
     await MI.api.post('/api/alerts', data);
     refreshAlerts();
   }
+// ---------------------------------------------------------------- economic-calendar warnings
+  function pollCalendar() {
+    try {
+      MI.api.get('/api/calendar').then(c => {
+        const imminent = (c && c.imminentHigh) || [];
+        imminent.forEach(e => {
+          const key = 'mi.cal.warned.' + (e.title || 'x') + '.' + (e.time || '0');
+          if (!e.time || localStorage.getItem(key)) return;
+          localStorage.setItem(key, '1');
+          const hm = new Date(e.time).toUTCString().split(' ')[4];
+          toast('info', '🕐 High-impact news ahead', e.title + ' (' + e.country + ') at ' + hm + ' UTC — expect volatility.');
+        });
+      }).catch(() => {});
+    } catch { /* ignore */ }
+  }
+
 // ------------------------------------------------ listeners / emit
   function onEvent(name, fn) { (listeners[name] = listeners[name] || []).push(fn); }
   function emit(name, data) { (listeners[name] || []).forEach(fn => { try { fn(data); } catch { /* ignore */ } }); }
@@ -312,6 +328,8 @@
     refreshNotifications();
     refreshAlerts();
     connectSSE();
+    pollCalendar();
+    setInterval(() => { pollCalendar(); }, 15 * 60 * 1000);
   }
 
   window.MINotify = {

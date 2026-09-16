@@ -11,6 +11,7 @@
   let streaming = false;
   let level = localStorage.getItem('mi.ai.level') || 'beginner';
   let timingData = null;
+  let pulseChips = [];
 
   function $id(id) { return document.getElementById(id); }
   function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -91,8 +92,21 @@
       '<span class="ctx-chip">🟢 level: ' + esc(level) + '</span>',
       (pendingImages.length ? '<span class="ctx-chip">🖼️ ' + pendingImages.length + ' image ready</span>' : ''),
       '<span class="ctx-chip">🧠 AI has live context + sees your chart</span>',
-    ];
+    ].concat(pulseChips.map(p => '<span class="ctx-chip">' + p + '</span>'));
     el.innerHTML = chips.join('');
+  }
+
+  function loadPulseChips() {
+    try {
+      Promise.all([MI.api.get('/api/sentiment'), MI.api.get('/api/calendar')]).then(([s, c]) => {
+        const next = [];
+        if (s && s.fearGreed) next.push('🧠 ' + s.fearGreed.value + ' · ' + s.fearGreed.classification);
+        const imp = (c && c.imminentHigh) || [];
+        if (imp.length) next.push('🕐 ' + imp.slice(0, 2).map(e => e.title).join(' · '));
+        pulseChips = next;
+        renderContext();
+      }).catch(() => {});
+    } catch { /* optional */ }
   }
 
   function addBubble(role, text, cls) {
@@ -357,6 +371,7 @@
     if (refresh) refresh.addEventListener('click', fetchTiming);
     initLevel();
     fetchTiming();
+    loadPulseChips();
 
     addBubble('ai', '👋 I’m MI — your AI market analyst with VISION.\n\n🖼️ Upload a chart / screenshot above and I’ll scan it.\n🙂 Beginner / 🎓 Pro switcher adjusts every answer.\n🕒 Tap “When should I trade today?” for a real timing plan.\n\nEverything I say is grounded in live CoinMarketCap + Binance data.');
     renderContext();

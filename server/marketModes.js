@@ -24,8 +24,8 @@ const MODES = {
     horizon: '5m momentum',
     klineInterval: '5m',
     symbols: [
-      'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT', 'AVAXUSDT',
-      'EURUSD', 'GBPUSD', 'USDJPY', 'GBPJPY', 'EURGBP', 'XAUUSD',
+      'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'DOGEUSDT',
+      'EURUSD', 'GBPUSD', 'USDJPY', 'XAUUSD', 'US500', 'USTEC', 'US30',
     ],
   },
   forex: {

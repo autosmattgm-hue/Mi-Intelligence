@@ -22,6 +22,7 @@ class Store {
       notifications: [],
       pushSubscriptions: [],
       signalHistory: [],
+      signalAccuracy: [],
       paperPositions: [],
       paperHistory: [],
       settings: {},

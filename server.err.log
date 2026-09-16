@@ -1,1 +1,2 @@
-[signals] skip BTCUSDT The operation was aborted due to timeout
+[store] write error: EPERM: operation not permitted, rename 'F:\Mi Trading\data\db.json.tmp' -> 'F:\Mi Trading\data\db.json'
+[store] write error: EPERM: operation not permitted, rename 'F:\Mi Trading\data\db.json.tmp' -> 'F:\Mi Trading\data\db.json'

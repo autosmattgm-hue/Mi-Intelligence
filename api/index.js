@@ -31,6 +31,10 @@ const timing = require('../server/timing');
 const push = require('../server/push');
 const marketModes = require('../server/marketModes');
 const fx = require('../server/fx');
+const Accuracy = require('../server/accuracy');
+const backtest = require('../server/backtest');
+const sentimentApi = require('../server/sentiment');
+const calendarApi = require('../server/calendar');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const API_KEY = process.env.OPENROUTER_API_KEY || '';
@@ -55,6 +59,8 @@ const memo = { market: null, signals: [], summary: null, summaryTs: 0 };
 const signalHistory = [];
 const lastSignalState = {};
 const pushSubs = [];
+// Signal-accuracy store (instance memory on Vercel; persisted on local npm start).
+const accuracy = new Accuracy({ data: { signalAccuracy: [] }, save() { /* memory only */ } });
 
 function recordSignalHistory(analyses) {
   for (const a of analyses) {
@@ -119,7 +125,10 @@ async function loadSignals(mode = 'crypto', cached = true) {
         ? await fx.getKlines(symbol, interval, 200)
         : await binance.getKlines(symbol, interval, 200);
       const opts = { mode };
-      if (mode === 'forex') { opts.precision = fx.precision(symbol); opts.pip = fx.pipSize(symbol); }
+      if ((mode === 'forex' || mode === 'pocket') && fx.isFxCandidate(symbol)) {
+        opts.precision = fx.precision(symbol);
+        opts.pip = fx.pipSize(symbol);
+      }
       const analysis = signalEngine.analyzeSymbol(symbol, klines, opts);
       if (analysis) analyses.push(analysis);
     } catch { /* skip */ }
@@ -128,6 +137,7 @@ async function loadSignals(mode = 'crypto', cached = true) {
   memo['summary:' + mode] = signalEngine.summarize(analyses);
   memo[tsKey] = Date.now();
   recordSignalHistory(analyses);
+  for (const a of analyses) accuracy.observe(a);
   return { signals: analyses, summary: memo['summary:' + mode] };
 }
 
@@ -384,6 +394,9 @@ router.post('/api/chat', async (ctx) => {
 
   let tradeTiming = null;
   try { tradeTiming = await timing.getTiming(focusSymbol); } catch { /* optional */ }
+  let sSentiment = null, sCalendar = null;
+  try { sSentiment = await sentimentApi.getSentiment(); } catch { /* optional */ }
+  try { sCalendar = await calendarApi.getCalendar(); } catch { /* optional */ }
 
   const context = {
     prices: market.prices,
@@ -401,6 +414,12 @@ router.post('/api/chat', async (ctx) => {
     summary,
     audience,
     tradeTiming,
+    sentiment: sSentiment,
+    economicCalendar: sCalendar ? {
+      source: sCalendar.source,
+      high: (sCalendar.high || []).slice(0, 10).map(e => ({ title: e.title, country: e.country, time: e.time, impact: e.impact })),
+      imminentHigh: (sCalendar.imminentHigh || []).slice(0, 4).map(e => ({ title: e.title, country: e.country, time: e.time })),
+    } : null,
   };
 
   sendSse(ctx.res, 200);
@@ -460,6 +479,39 @@ router.post('/api/login', (ctx) => {
   const expected = process.env.MI_PASSWORD || 'Admin2026';
   if (pass === expected) return sendJson(ctx.res, 200, { ok: true });
   return sendJson(ctx.res, 401, { error: 'Invalid password' });
+});
+
+// ---- signal accuracy, backtest, sentiment & calendar ----
+router.get('/api/accuracy', async (ctx) => {
+  try {
+    const mode = marketModes.isValid(ctx.query.mode) ? ctx.query.mode : 'crypto';
+    const market = await loadMarket(mode);
+    accuracy.check(market.prices);
+    sendJson(ctx.res, 200, { stats: accuracy.stats(), history: accuracy.history() });
+  } catch (e) { sendJson(ctx.res, 502, { error: e.message }); }
+});
+router.delete('/api/accuracy', (ctx) => {
+  accuracy.clear();
+  sendJson(ctx.res, 200, { ok: true });
+});
+router.get('/api/backtest', async (ctx) => {
+  try {
+    const result = await backtest.runBacktest({
+      symbol: String(ctx.query.symbol || 'BTCUSDT'),
+      mode: ctx.query.mode || 'crypto',
+      interval: ctx.query.interval || '1h',
+      bars: Number(ctx.query.bars) || 720,
+    });
+    sendJson(ctx.res, 200, result);
+  } catch (e) { sendJson(ctx.res, 502, { error: e.message }); }
+});
+router.get('/api/sentiment', async (ctx) => {
+  try { sendJson(ctx.res, 200, await sentimentApi.getSentiment()); }
+  catch (e) { sendJson(ctx.res, 502, { error: e.message }); }
+});
+router.get('/api/calendar', async (ctx) => {
+  try { sendJson(ctx.res, 200, await calendarApi.getCalendar()); }
+  catch (e) { sendJson(ctx.res, 502, { error: e.message }); }
 });
 
 // ---- SSE live feed: full snapshot once, then the frontend reconnects (polling) ----

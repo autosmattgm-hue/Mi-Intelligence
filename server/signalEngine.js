@@ -15,9 +15,11 @@ function last(arr) { return arr.length ? arr[arr.length - 1] : null; }
 function pctChange(a, b) { return (a > 0 && b > 0) ? ((a - b) / b) * 100 : 0; }
 
 // Resample 15m closes into hourly closes for slower-timeframe confluence.
-// Pick a recommended binary-option expiry based on volatility + signal strength.
-function chooseExpiry(atrPct, absS) {
-  if (absS >= 45 && atrPct < 0.35) return '1m';
+// Pick a recommended binary-option expiry based on volatility + signal
+// strength + trend power (ADX). Strong, confirmed trends expire fast (1m);
+// slower, lower-conviction setups get more room (5m/15m).
+function chooseExpiry(atrPct, absS, adxV) {
+  if (absS >= 45 && (adxV === null || adxV === undefined || adxV >= 25)) return '1m';
   if (absS >= 35) return '5m';
   return '15m';
 }
@@ -398,8 +400,11 @@ function analyzeSymbol(symbol, klines, opts) {
   let entry = price, tp = null, sl = null, rr = null;
   if (!isNeutral && atrV > 0) {
     const isBuy = dir === 1;
-    sl = isBuy ? price - atrV * 1.6 : price + atrV * 1.6;
-    tp = isBuy ? price + atrV * 2.6 : price - atrV * 2.6;
+    // Calibrated so real forward win-rates are achievable: TP = 2.0 ATR,
+    // SL = 1.4 ATR (≈1.4R). The accuracy tracker showed the previous
+    // 2.6/1.6 target was too ambitious — losses dominated.
+    sl = isBuy ? price - atrV * 1.4 : price + atrV * 1.4;
+    tp = isBuy ? price + atrV * 2.0 : price - atrV * 2.0;
     rr = round2(Math.abs(tp - price) / Math.abs(price - sl));
   }
 
@@ -424,7 +429,7 @@ function analyzeSymbol(symbol, klines, opts) {
     takeProfit: tp ? rPrec(tp) : null,
     stopLoss: sl ? rPrec(sl) : null,
     riskReward: rr,
-    duration: isNeutral ? '—' : (mode === 'pocket' ? 'expiry ' + chooseExpiry(atrPct, absS) : '1h – 4h'),
+    duration: isNeutral ? '—' : (mode === 'pocket' ? 'expiry ' + chooseExpiry(atrPct, absS, adxV) : '1h – 4h'),
     rating: isNeutral ? '—' : '★'.repeat(Math.min(5, 1 + Math.floor(confidence / 20))),
     trend: trendUp ? 'Uptrend' : trendDown ? 'Downtrend' : 'Sideways',
     rsi: rsiV === null ? null : round2(rsiV),
@@ -458,10 +463,12 @@ function analyzeSymbol(symbol, klines, opts) {
     } : {}),
     // Pocket Option mode: expiry, payout estimate (typical 80-94% digital-option payouts), win probability
     ...(mode === 'pocket' ? {
-      expiry: chooseExpiry(atrPct, absS),
+      expiry: chooseExpiry(atrPct, absS, adxV),
       payout: Math.max(80, Math.min(94, Math.round(78 + atrPct * 4))),
       winProbability: confidence,
       directionUp: dir === 1,
+      // FX / index / metals keep their own quote precision & pip size
+      ...(opts && opts.precision ? { precision: opts.precision, pipValue: (opts && opts.pip) || (mode === 'pocket' ? 1 : 0.0001) } : {}),
     } : {}),
     factors,
     score,
