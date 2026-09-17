@@ -782,8 +782,7 @@ const lh = m.hist[m.hist.length - 1];
     canvas.addEventListener('mouseleave', onMouseLeave);
     window.addEventListener('resize', resize);
 
-    const sel = document.getElementById('chartSymbol');
-    if (sel) sel.addEventListener('change', () => { state.symbol = sel.value; loadCandles(); });
+    bindSymbolChange();
 
     document.querySelectorAll('#chartTimeframes button').forEach(b => {
       b.addEventListener('click', () => {
@@ -818,6 +817,25 @@ const lh = m.hist[m.hist.length - 1];
     loadCandles();
   }
 
+  // Rebind the symbol dropdown safely (survives populateSymbols() re-fills and
+// works on both desktop 'change' and mobile 'input').
+  function bindSymbolChange() {
+    const sel = document.getElementById('chartSymbol');
+    if (!sel || sel.dataset.bound) return;
+    sel.dataset.bound = '1';
+    const pick = () => {
+      const v = sel.value;
+      if (v && v !== state.symbol) {
+        state.symbol = v;
+        loadCandles();
+        // Keep the primary signal panel in sync with the chosen currency.
+        if (window.MISignals && typeof MISignals.followChart === 'function') MISignals.followChart(v);
+      }
+    };
+    sel.addEventListener('change', pick);
+    sel.addEventListener('input', pick);
+  }
+
   function populateSymbols(symbols) {
     state.symbols = (symbols || []).slice();
     const label = (s) => String(s).endsWith('USDT')
@@ -829,10 +847,14 @@ const lh = m.hist[m.hist.length - 1];
     const calcSel = document.getElementById('calcSymbol');
     const opts = state.symbols.map(s =>
       '<option value="' + s + '">' + label(s) + '</option>').join('');
-    if (sel) sel.innerHTML = opts;
+    if (sel) {
+      sel.innerHTML = opts;
+      if (state.symbols.includes(state.symbol)) sel.value = state.symbol;
+    }
     if (alertSel) alertSel.innerHTML = opts;
     if (addSel) addSel.innerHTML = opts;
     if (calcSel) calcSel.innerHTML = opts;
+    bindSymbolChange();
   }
 
   // Called when the user switches Crypto / Pocket / Forex mode.
@@ -855,7 +877,11 @@ const lh = m.hist[m.hist.length - 1];
 
   window.MIChart = {
     init, populateSymbols, loadCandles, doDraw, onMarket, resize, handleModeChange,
-    setSymbol: function (s) { state.symbol = s; loadCandles(); },
+    setSymbol: function (s) {
+      state.symbol = s;
+      loadCandles();
+      if (window.MISignals && typeof MISignals.followChart === 'function') MISignals.followChart(s);
+    },
     getSymbol: function () { return state.symbol; },
   };
 })();

@@ -226,8 +226,11 @@ async function refreshSignals() {
     st.health.lastSignals = Date.now();
     broadcast('signals', { signals: analyses, summary: st.summary, ts: Date.now(), mode });
 
+    // Signals → notifications for EVERY mode, so high-conviction calls in
+    // pocket/forex also trigger in-app + device (Web Push) notifications even
+    // when the app is closed.
+    alerts.check(st.prices, analyses);
     if (mode === 'crypto') {
-      alerts.check(st.prices, analyses);
       paper.integrate(analyses, st.prices);
     }
 
@@ -448,6 +451,19 @@ router.post('/api/push/unsubscribe', (ctx) => {
   store.data.pushSubscriptions = subs.filter(s => s.endpoint !== endpoint);
   if (store.data.pushSubscriptions.length !== before) store.save(true);
   ctx.res.sendJson(200, { ok: true });
+});
+router.post('/api/push/test', async (ctx) => {
+  try {
+    const r = await push.notifyAll(store.data.pushSubscriptions || [], {
+      title: 'MI test push',
+      body: 'Device notifications are working ✅',
+      tag: 'mi-test',
+      url: '/',
+    });
+    ctx.res.sendJson(200, { ok: true, delivered: r.delivered, dead: r.dead.length });
+  } catch (err) {
+    ctx.res.sendJson(502, { error: err.message });
+  }
 });
 // ---------------------------------------------------------------- AI chat (streaming SSE)
 router.post('/api/chat', async (ctx) => {

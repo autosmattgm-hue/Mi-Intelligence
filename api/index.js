@@ -368,6 +368,17 @@ router.post('/api/push/unsubscribe', (ctx) => {
   if (idx !== -1) pushSubs.splice(idx, 1);
   sendJson(ctx.res, 200, { ok: before > pushSubs.length });
 });
+router.post('/api/push/test', async (ctx) => {
+  try {
+    const r = await push.notifyAll(pushSubs, {
+      title: 'MI test push',
+      body: 'Device notifications are working ✅',
+      tag: 'mi-test',
+      url: '/',
+    });
+    sendJson(ctx.res, 200, { ok: true, delivered: r.delivered, dead: r.dead.length });
+  } catch (e) { sendJson(ctx.res, 502, { error: e.message }); }
+});
 // ---- AI chat (streaming). Vercel supports streaming Node responses. ----
 router.post('/api/chat', async (ctx) => {
   const history = Array.isArray(ctx.body && ctx.body.messages)

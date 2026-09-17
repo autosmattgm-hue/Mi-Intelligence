@@ -15,6 +15,32 @@
   function $id(id) { return document.getElementById(id); }
   function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
+  // ---- timing cache: when to place a trade (from the MI timing engine) ----
+  const timingCache = {};   // symbol -> { data, at }
+  const timingPending = {};
+  function mtLoadTiming(symbol) {
+    if (!window.MI || !MI.api) return;
+    if (timingPending[symbol]) return;
+    const c = timingCache[symbol];
+    if (c && Date.now() - c.at < 10 * 60 * 1000) return;
+    timingPending[symbol] = true;
+    try {
+      MI.api.get('/api/timing?symbol=' + encodeURIComponent(symbol)).then(t => {
+        timingPending[symbol] = false;
+        timingCache[symbol] = { data: t, at: Date.now() };
+        renderSignalPanel();
+      }).catch(() => { timingPending[symbol] = false; });
+    } catch { timingPending[symbol] = false; }
+  }
+  function entryWindowLabel(symbol) {
+    const c = timingCache[symbol] && timingCache[symbol].data;
+    if (!c || !c.bestHours || !c.bestHours.length) return 'now — ideal within the current session';
+    const b = c.bestHours[0];
+    const bLabel = b.label || (b.hour + ':00 UTC');
+    const quiet = (c.quietHours || []).slice(0, 2).map(q => q.label || (q.hour + ':00')).join(', ');
+    return 'best ' + bLabel + (quiet ? ' · avoid ' + quiet : '');
+  }
+
   // FX/indices keep their own decimals and no $ sign; crypto uses MI.fmt.
   function fmtPrice(p, sig) {
     if (p === null || p === undefined || isNaN(p)) return '—';
@@ -107,6 +133,7 @@
       '<div class="conf"><span class="conf-label">' + (sig.mode === 'pocket' ? 'Win Probability' : 'MI Confidence') + '</span>' +
       '<div class="conf-bar"><div class="conf-fill ' + cls + '" style="width:' + sig.confidence + '%"></div></div>' +
       '<span class="conf-pct">' + sig.confidence + '%</span></div>' +
+      '<div class="pb-time">⏱ Signal updated <b>' + esc(MI.fmt.time(sig.time)) + '</b> UTC · ⌛ Place your trade: <b>' + esc(entryWindowLabel(sig.symbol)) + '</b></div>' +
       '<div class="signal-grid">' +
       '<div class="sig-item"><div class="k">Entry</div><div class="v ' + colorClass + '">' + fmtPrice(sig.entry, sig) + '</div></div>' +
       '<div class="sig-item"><div class="k">Take Profit</div><div class="v green">' + (sig.takeProfit ? fmtPrice(sig.takeProfit, sig) : '—') + '</div></div>' +
@@ -149,6 +176,8 @@
     if (pbTp) pbTp.addEventListener('click', () => setQuickAlert(sig.symbol, sig.takeProfit, sig.action + ' take-profit'));
     const pbSl = $id('pbSlBtn');
     if (pbSl) pbSl.addEventListener('click', () => setQuickAlert(sig.symbol, sig.stopLoss, sig.action + ' stop-loss'));
+    // Load (cached) best entry window for the selected symbol.
+    mtLoadTiming(sig.symbol);
   }
 
   function copySignal(sig) {
@@ -534,13 +563,24 @@
     MINotify.onEvent('signals', () => {
       state.signals = MINotify.getSignals();
       state.summary = MINotify.getSummary();
+      followChart();
       renderStatsBar();
       renderSignalPanel();
       renderTable();
       loadPaper();
     });
-    MINotify.onEvent('market', () => { renderStatsBar(); renderSignalPanel(); });
+    MINotify.onEvent('market', () => { followChart(); renderStatsBar(); renderSignalPanel(); });
     MINotify.onEvent('paper', () => loadPaper());
+  }
+
+  // Follow the currency chosen in the live chart so the primary signal panel
+  // always reflects the symbol currently on screen.
+  function followChart(sym) {
+    const cs = sym || ((window.MIChart && typeof MIChart.getSymbol === 'function') ? MIChart.getSymbol() : null);
+    if (cs && cs !== state.selected) {
+      state.selected = cs;
+      renderSignalPanel();
+    }
   }
 
   // Runs on market-mode switch: pull fresh signals for the new mode.
@@ -550,6 +590,6 @@
   }
 
   window.MISignals = {
-    state, init, refreshSignals, handleModeChange, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView,
+    state, init, refreshSignals, handleModeChange, followChart, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView,
   };
 })();
