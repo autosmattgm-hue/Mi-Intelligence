@@ -133,6 +133,7 @@
       '<div class="factors">' + sig.factors.map(f =>
         '<span class="factor ' + f.impact + '" title="' + esc(f.name) + ' — ' + esc(f.value) + '">' + esc(f.name) + ': ' + esc(f.value) + '</span>').join('') +
       '</div>' +
+      playbookHtml(sig) +
       '<div class="signal-actions">' +
       '<button class="btn ghost sm" id="sigCopy">📋 Copy plan</button>' +
       '<button class="btn ghost sm" id="sigGoChart">📈 Show chart</button>' +
@@ -143,6 +144,11 @@
       if (window.MIChart) MIChart.setSymbol(sig.symbol);
       switchView('overview');
     });
+    // one-tap TP / SL alerts from the playbook
+    const pbTp = $id('pbTpBtn');
+    if (pbTp) pbTp.addEventListener('click', () => setQuickAlert(sig.symbol, sig.takeProfit, sig.action + ' take-profit'));
+    const pbSl = $id('pbSlBtn');
+    if (pbSl) pbSl.addEventListener('click', () => setQuickAlert(sig.symbol, sig.stopLoss, sig.action + ' stop-loss'));
   }
 
   function copySignal(sig) {
@@ -164,6 +170,80 @@
       MI.toast('info', 'Copy manually', text);
     }
   }
+// ------------------------------------------------ actionable playbook
+  // Turns the signal into concrete next steps: entry → stop-loss → take-profit
+  // → position size, plus one-tap TP/SL alert buttons. Mode-aware.
+  function playbookHtml(sig) {
+    const isHold = sig.action === 'HOLD' || sig.action === 'NEUTRAL';
+    const sideWord = isBuyAction(sig.action) ? (sig.mode === 'pocket' ? 'CALL' : 'BUY') : isSellAction(sig.action) ? (sig.mode === 'pocket' ? 'PUT' : 'SELL') : 'WAIT';
+
+    if (isHold) {
+      return '<div class="playbook playbook-wait">' +
+        '<div class="pb-title">🎯 What to do now — <span class="hold-text">WAIT</span></div>' +
+        '<div class="pb-body">No directional edge on <b>' + esc(sig.asset) + '</b> right now. The engine sees <b>' + esc(sig.trend || 'mixed') + '</b>, confluence <b>' + esc(sig.confluence || '—') + '</b> and ADX <b>' + (sig.adx != null ? sig.adx : '—') + '</b>. ' +
+        'Stay on the sidelines, protect any open position, and re-check in ~30–60 min — or after the next high-impact news passes.</div>' +
+        (sig.support && sig.resistance
+          ? '<div class="pb-body">Meanwhile, if price approaches <b>S ' + fmtPrice(sig.support, sig) + '</b> watch for a bounce; at <b>R ' + fmtPrice(sig.resistance, sig) + '</b> watch for rejection.</div>'
+          : '') +
+        '</div>';
+    }
+
+    const entry = fmtPrice(sig.entry, sig);
+    const tp = sig.takeProfit ? fmtPrice(sig.takeProfit, sig) : '—';
+    const sl = sig.stopLoss ? fmtPrice(sig.stopLoss, sig) : '—';
+    const riskUsd = 20; // 2% risk on a $1,000 reference
+    let units = null;
+    if (sig.stopLoss && !isHold) {
+      const dist = Math.abs(sig.price - sig.stopLoss);
+      if (dist > 0) units = (riskUsd / dist);
+    }
+    let steps = [];
+
+    if (sig.mode === 'pocket') {
+      const up = sig.action === 'CALL';
+      const justify = sig.confidence >= (sig.payout || 80);
+      steps = [
+        'Buy the <b>' + sideWord + '</b> binary option expiring in <b>' + esc(sig.expiry || '5m') + '</b> — it wins if <b>' + esc(sig.asset) + '</b> closes ' + (up ? '<b class="buy-text">ABOVE</b>' : '<b class="sell-text">BELOW</b>') + ' the strike near <b>' + entry + '</b>.',
+        'Payout ≈ <b>' + (sig.payout || '—') + '%</b> vs <b>' + sig.confidence + '%</b> win probability — a play only when probability comfortably beats the payout (' + (justify ? '<b class="buy-text">justified ✅</b>' : '<b class="sell-text">not justified ❌ — skip</b>') + ').',
+        'Keep the stake small: reference risk ≤ <b>$' + riskUsd + '</b>. One strong read is not a system — protect your bankroll.',
+      ];
+    } else {
+      steps = [
+        '<b>Enter</b> near <b>' + entry + '</b> — ' + esc(sig.trend || '') + ' with <b>' + sig.confidence + '%</b> confidence (tier: <b>' + esc(sig.quality) + '</b>)' +
+          (sig.riskReward ? ', risking 1 to win <b>' + sig.riskReward + '</b>.' : '.'),
+        '<b>Protect it:</b> place the <b class="sell-text">Stop-Loss at ' + sl + '</b>' + (sig.mode === 'forex' && sig.slPips != null ? ' (' + sig.slPips + ' pips)' : '') + '. If price gets here, the idea is wrong — take the loss, don’t argue with the market.',
+        '<b>Secure the profit:</b> place the <b class="buy-text">Take-Profit at ' + tp + '</b>' + (sig.mode === 'forex' && sig.tpPips != null ? ' (' + sig.tpPips + ' pips)' : '') + '. Let it run to the target — exiting early on a retrace is how wins become tiny.',
+        '<b>Size it:</b> with 2% risk ($' + riskUsd + ' on a $1,000 reference) trade ≈ <b>' + (units && units > 0 ? units.toFixed(4) : '—') + '</b> units at this stop distance.',
+        (sig.mode === 'forex' && sig.sessionLabel ? 'Act during <b>' + esc(sig.sessionLabel) + '</b> for the deepest liquidity. ' : '') +
+          'ADX <b>' + (sig.adx != null ? (sig.adx >= 22 ? 'strong — act promptly' : 'developing — keep size modest') : '—') + '</b>.',
+      ];
+    }
+    steps.push('⚠ Analytical guidance, not financial advice — manage your own risk.');
+
+    return '<div class="playbook">' +
+      '<div class="pb-title">🎯 What to do now — <span class="' + (isBuyAction(sig.action) ? 'buy-text' : 'sell-text') + '">' + sideWord + '</span></div>' +
+      '<ol class="pb-steps">' + steps.map(s => '<li>' + s + '</li>').join('') + '</ol>' +
+      (sig.takeProfit || sig.stopLoss
+        ? '<div class="pb-alerts"><span class="pb-alerts-label">One-tap alerts:</span>' +
+          (sig.takeProfit ? '<button class="btn ghost sm" id="pbTpBtn">🔔 At TP ' + tp + '</button>' : '') +
+          (sig.stopLoss ? '<button class="btn ghost sm" id="pbSlBtn">🔔 At SL ' + sl + '</button>' : '') +
+          '</div>'
+        : '') +
+      '</div>';
+  }
+
+  function setQuickAlert(symbol, target, label) {
+    if (!target) return;
+    const price = (window.MINotify && MINotify.getPrices()) ? MINotify.getPrices()[symbol] : null;
+    const condition = (price !== undefined && price !== null && target > price) ? 'above' : 'below';
+    try {
+      MI.api.post('/api/alerts', { symbol, condition, target, note: 'auto: ' + label }).then(() => {
+        if (window.MINotify && MINotify.refreshAlerts) MINotify.refreshAlerts();
+        MI.toast('success', 'Alert created', esc(symbol) + ' — notify me at ' + MI.fmt.price(target));
+      }).catch(err => MI.toast('error', 'Alert failed', err.message));
+    } catch (e) { /* alert optional */ }
+  }
+
 // ------------------------------------------------ signals table
   function renderTable() {
     const body = $id('signalsBody');
