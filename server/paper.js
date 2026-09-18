@@ -11,16 +11,29 @@ const POSITION_MAX_HOURS = 12; // time-stop window
 const MAX_POSITIONS = 4;
 const NOTIONAL = 1000; // USD per paper position
 const MIN_CONFIDENCE = 80;
+const COOLDOWN_LOSSES = 2;    // consecutive losses that trigger protection
+const COOLDOWN_MS = 30 * 60 * 1000; // 30-minute cooldown after the pattern
 
 class PaperEngine {
   constructor(store, broadcast) {
     this.store = store;
     this.broadcast = broadcast;
     this.lastSignalState = {}; // { symbol: { action, confidence, at } }
+    this.cooldownUntil = 0;
   }
 
   get positions() { return this.store.data.paperPositions; }
   get history() { return this.store.data.paperHistory; }
+
+  // Consecutive losses from the most recent paper trade backwards.
+  lossStreak() {
+    let streak = 0;
+    for (let i = this.history.length - 1; i >= 0; i--) {
+      if ((this.history[i].pnl || 0) <= 0) streak += 1;
+      else break;
+    }
+    return streak;
+  }
 
   // Called on each signal refresh and ticker cycle.
   integrate(signals, prices) {
@@ -51,11 +64,21 @@ class PaperEngine {
     for (const sig of signals) {
       if (!sig || sig.action === 'HOLD' || sig.action === 'NEUTRAL' || sig.confidence < MIN_CONFIDENCE) continue;
       if (this.positions.some(p => p.symbol === sig.symbol)) continue;
+      // Behavioural protection: after 2 straight losses, take a 30-min pause.
+      if (now < this.cooldownUntil) continue;
       const prev = this.lastSignalState[sig.symbol];
       if (prev && sig.action === prev.action && sig.confidence <= prev.confidence) continue;
       this.lastSignalState[sig.symbol] = { action: sig.action, confidence: sig.confidence, at: now };
       this.openPosition(sig, now);
     }
+  }
+
+  // Manual paper trade (one-click from the signal panel) — no confidence gate.
+  openManual(sig, now) {
+    if (!sig || !sig.symbol || !sig.entry) return false;
+    if (this.positions.some(p => p.symbol === sig.symbol)) return false;
+    this.openPosition(sig, now);
+    return true;
   }
 
   openPosition(sig, now) {
@@ -103,11 +126,17 @@ class PaperEngine {
     });
     if (this.history.length > 500) this.history.splice(0, this.history.length - 500);
     this.broadcast('paper', { type: 'close', symbol: pos.symbol, reason, pnl: round2(netPnl) });
+    // Behavioural protection: two straight losses → 30-minute cool-down.
+    if (netPnl <= 0 && this.lossStreak() >= COOLDOWN_LOSSES) {
+      this.cooldownUntil = now + COOLDOWN_MS;
+      this.broadcast('protection', { type: 'cooldown', streak: this.lossStreak(), until: this.cooldownUntil });
+    }
     this.store.save(true);
   }
 
   stats(prices) {
     const closed = this.history;
+    const now = Date.now();
     const wins = closed.filter(h => h.pnl > 0).length;
     const losses = closed.filter(h => h.pnl <= 0).length;
     const realizedPnl = closed.reduce((s, h) => s + h.pnl, 0);
@@ -129,6 +158,12 @@ class PaperEngine {
       totalPnl: round2(realizedPnl + floatingPnl),
       direction: realizedPnl + floatingPnl >= 0 ? 'positive' : 'negative',
       lastTrade: closed.length ? closed[closed.length - 1] : null,
+      protection: {
+        active: now < this.cooldownUntil,
+        until: this.cooldownUntil,
+        streak: this.lossStreak(),
+        leftMs: Math.max(0, this.cooldownUntil - now),
+      },
     };
   }
 }

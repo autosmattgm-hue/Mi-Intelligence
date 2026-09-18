@@ -80,6 +80,7 @@ class Accuracy {
 
     const byTier = {};
     const byMode = {};
+    const bySymbol = {};
     for (const r of closed) {
       const t = r.quality || 'LOW';
       if (!byTier[t]) byTier[t] = { wins: 0, losses: 0 };
@@ -87,6 +88,8 @@ class Accuracy {
       const m = r.mode || 'crypto';
       if (!byMode[m]) byMode[m] = { wins: 0, losses: 0 };
       if (r.result === 'win') byMode[m].wins += 1; else if (r.result === 'loss') byMode[m].losses += 1;
+      if (!bySymbol[r.symbol]) bySymbol[r.symbol] = { wins: 0, losses: 0 };
+      if (r.result === 'win') bySymbol[r.symbol].wins += 1; else if (r.result === 'loss') bySymbol[r.symbol].losses += 1;
     }
 
     return {
@@ -102,6 +105,7 @@ class Accuracy {
       expectancy: +expectancy.toFixed(3), // R per trade
       byTier,
       byMode,
+      bySymbol,
       // 30-day projection at 1R = 2% of account, 2 signals/day
       projected30d: +(expectancy * 0.02 * 2 * 30 * 100).toFixed(0),
       updatedAt: Date.now(),

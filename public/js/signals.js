@@ -10,12 +10,65 @@
     history: [],
     accuracy: null,
     accuracyHistory: [],
+    watchOnly: false,
+    newsZone: null,
   };
 
   function $id(id) { return document.getElementById(id); }
   function esc(s) { return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
-  // ---- timing cache: when to place a trade (from the MI timing engine) ----
+  // ---- signal freshness / validity (how long a signal stays actionable) ----
+  function signalValidMs(sig) {
+    if (sig && sig.mode === 'pocket') {
+      const e = String((sig && sig.expiry) || '5m');
+      if (e === '1m') return 6 * 60 * 1000;
+      if (e === '15m') return 45 * 60 * 1000;
+      return 18 * 60 * 1000;
+    }
+    return 3 * 3600 * 1000;
+  }
+  function signalAge(sig) { return Date.now() - new Date((sig && sig.time) || Date.now()).getTime(); }
+  function isStale(sig) { return sig && sig.time ? signalAge(sig) > signalValidMs(sig) : false; }
+  function remainingLabel(sig) {
+    const left = signalValidMs(sig) - signalAge(sig);
+    if (left <= 0) return 'STALE — re-evaluate';
+    const m = Math.ceil(left / 60000);
+    return m <= 60 ? (m + 'm left') : (Math.floor(m / 60) + 'h ' + (m % 60) + 'm left');
+  }
+
+  // ---- volatility regime label from ATR% ----
+  function regimeLabel(sig) {
+    const a = sig && sig.atrPct;
+    if (a === null || a === undefined || isNaN(a)) return null;
+    if (a < 0.5) return { label: 'LOW vol', cls: 'regime-low' };
+    if (a < 1.5) return { label: 'Normal vol', cls: 'regime-med' };
+    return { label: 'HIGH vol', cls: 'regime-high' };
+  }
+
+  // ---- watchlist (localStorage stars) ----
+  function getWatch() { try { return JSON.parse(localStorage.getItem('mi.watch') || '[]'); } catch { return []; } }
+  function saveWatch(w) { localStorage.setItem('mi.watch', JSON.stringify(w)); }
+  function isWatched(sym) { return getWatch().indexOf(sym) !== -1; }
+  function toggleWatch(sym) {
+    const w = getWatch();
+    const i = w.indexOf(sym);
+    if (i === -1) w.push(sym); else w.splice(i, 1);
+    saveWatch(w);
+    renderTable();
+  }
+
+  // ---- economic-news zone (from /api/calendar) ----
+  function loadNewsZone() {
+    try {
+      MI.api.get('/api/calendar').then(c => {
+        const now = Date.now();
+        state.newsZone = ((c && c.high) || []).find(e => e.time && e.time > now && e.time - now < 30 * 60 * 1000) || null;
+        renderSignalPanel();
+      }).catch(() => {});
+    } catch { /* optional */ }
+  }
+
+// ---- timing cache: when to place a trade (from the MI timing engine) ----
   const timingCache = {};   // symbol -> { data, at }
   const timingPending = {};
   function mtLoadTiming(symbol) {
@@ -41,6 +94,68 @@
     return 'best ' + bLabel + (quiet ? ' · avoid ' + quiet : '');
   }
 
+  // ---- TRADE CLOCK: concrete place-your-trade times in the user's LOCAL time ----
+  // The timing engine reports the best *hours* (UTC) from real volatility. We turn
+  // those into the next upcoming wall-clock moments + a live countdown so the user
+  // always sees an exact "place trade at 2:00 PM" style instruction.
+  function nextOccurrenceUtc(hour) {
+    const now = new Date();
+    const d = new Date(now);
+    d.setUTCSeconds(0, 0);
+    d.setUTCHours(hour, 0, 0, 0);
+    if (d.getTime() <= now.getTime()) d.setUTCDate(d.getUTCDate() + 1);
+    return d;
+  }
+  function fmtClock(d) {
+    if (!d) return '';
+    let h = d.getHours();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12; if (h === 0) h = 12;
+    return h + ':' + String(d.getMinutes()).padStart(2, '0') + ' ' + ampm;
+  }
+  function tradeSchedule(symbol) {
+    const c = timingCache[symbol] && timingCache[symbol].data;
+    if (!c || !c.bestHours || !c.bestHours.length) return null;
+    const now = Date.now();
+    const nexts = c.bestHours.slice(0, 5).map(b => {
+      const d = nextOccurrenceUtc(b.hour);
+      return { hour: b.hour, clock: fmtClock(d), at: d.getTime(), inMin: Math.max(0, Math.round((d.getTime() - now) / 60000)) };
+    });
+    nexts.sort((a, b) => a.inMin - b.inMin);
+    const primary = nexts[0];
+    const inWindow = !primary || primary.inMin <= 0;
+    const avoid = ((c.quietHours || []).slice(0, 3).map(q => {
+      const hh = parseInt(String(q).split(':')[0], 10);
+      return isNaN(hh) ? null : fmtClock(nextOccurrenceUtc(hh));
+    }) || []).filter(Boolean);
+    let tzName = 'your time zone';
+    try { tzName = Intl.DateTimeFormat().resolvedOptions().timeZone || tzName; } catch { /* keep default */ }
+    return { primary, inWindow, nexts, avoid, tzName };
+  }
+  function tradeClockHtml(sig, sched) {
+    const upd = '⏱ Signal updated <b>' + esc(MI.fmt.time(sig.time)) + '</b> UTC';
+    const valid = '<b class="' + (isStale(sig) ? 'sell-text' : '') + '">⏳ ' + esc(remainingLabel(sig)) + '</b>';
+    if (!sched) {
+      return '<div class="pb-time">' + upd + ' · ⌛ Place your trade: <b>' + esc(entryWindowLabel(sig.symbol)) + '</b> · ' + valid + '</div>';
+    }
+    const p = sched.primary;
+    const nowLine = sched.inWindow
+      ? '<div class="tc-status now">● <b>NOW</b> — you are inside the optimal window — place your trade promptly</div>'
+      : '<div class="tc-status soon">⏳ Next placement: <b>' + p.clock + '</b> <em id="tcCount" data-until="' + p.at + '">in ' + p.inMin + 'm</em></div>';
+    const chips = sched.nexts.slice(0, 3).map((w, i) =>
+      '<span class="tc-w' + (i === 0 ? ' top' : '') + '">' + (i === 0 ? '▶ ' : '') + '<b>' + w.clock + '</b><i>' + (i === 0 ? 'ideal' : (w.inMin <= 0 ? 'now' : w.inMin + 'm')) + '</i></span>').join('');
+    const pct = Math.max(4, Math.min(100, 100 - (p.inMin / 60) * 100));
+    return '<div class="trade-clock">' +
+      '<div class="tc-head"><span class="tc-title">⏰ Trade Placement Schedule</span>' +
+      '<span class="tc-tz">' + esc(sched.tzName) + ' · local time</span></div>' +
+      nowLine +
+      '<div class="tc-windows">' + chips + '</div>' +
+      (sched.avoid && sched.avoid.length ? '<div class="tc-avoid">✕ Weak windows (avoid): <b>' + sched.avoid.join(' · ') + '</b></div>' : '') +
+      '<div class="tc-bar"><div class="tc-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="tc-foot">' + upd + ' · ' + valid + '</div>' +
+      '</div>';
+  }
+
   // FX/indices keep their own decimals and no $ sign; crypto uses MI.fmt.
   function fmtPrice(p, sig) {
     if (p === null || p === undefined || isNaN(p)) return '—';
@@ -55,6 +170,17 @@
   function getStats() { return (window.MINotify && MINotify.getStats()) || {}; }
 
   function findSignal(sym) { return state.signals.find(s => s.symbol === sym) || null; }
+
+  // ------------------------------------------------ signal tape (overview marquee)
+  function renderTape() {
+    const tape = $id('signalTape');
+    if (!tape) return;
+    const sigs = state.signals;
+    if (!sigs || !sigs.length) { tape.innerHTML = '<span class="tape-item muted">Loading live signals…</span>'; return; }
+    tape.innerHTML = sigs.slice(0, 24).map(s =>
+      '<span class="tape-item ' + tagClass(s.action) + '">' + esc(s.asset) + ' ' + s.action + ' ' + s.confidence + '%' +
+      (s.quality === 'HIGH' ? ' 🔥' : '') + '</span>').join('');
+  }
 
   // ------------------------------------------------ stats bar
   function renderStatsBar() {
@@ -123,8 +249,13 @@
 
     const cls = sig.action.toLowerCase();
     const colorClass = isBuyAction(sig.action) ? 'green' : isSellAction(sig.action) ? 'red' : 'gold';
+    const regime = regimeLabel(sig);
 
     el.innerHTML =
+      (state.newsZone ? '<div class="ribbon news">🕐 NEWS ZONE — ' + esc(state.newsZone.title) + ' in ~' + Math.max(1, Math.round((state.newsZone.time - Date.now()) / 60000)) + ' min — consider smaller size or waiting</div>' : '') +
+      ((state.paperStats && state.paperStats.protection && state.paperStats.protection.active)
+        ? '<div class="ribbon cool">🔒 MI cooldown — ' + state.paperStats.protection.streak + ' straight losses; pausing new paper trades for ' + Math.max(1, Math.ceil(state.paperStats.protection.leftMs / 60000)) + 'm (protect the bankroll)</div>'
+        : '') +
       '<div class="signal-top">' +
       '<div class="signal-big ' + cls + '">' + sig.action + '</div>' +
       '<div class="signal-price"><div class="label">Live price</div><div class="val">' + fmtPrice(sig.price, sig) + '</div>' +
@@ -133,7 +264,7 @@
       '<div class="conf"><span class="conf-label">' + (sig.mode === 'pocket' ? 'Win Probability' : 'MI Confidence') + '</span>' +
       '<div class="conf-bar"><div class="conf-fill ' + cls + '" style="width:' + sig.confidence + '%"></div></div>' +
       '<span class="conf-pct">' + sig.confidence + '%</span></div>' +
-      '<div class="pb-time">⏱ Signal updated <b>' + esc(MI.fmt.time(sig.time)) + '</b> UTC · ⌛ Place your trade: <b>' + esc(entryWindowLabel(sig.symbol)) + '</b></div>' +
+      tradeClockHtml(sig, tradeSchedule(sig.symbol)) +
       '<div class="signal-grid">' +
       '<div class="sig-item"><div class="k">Entry</div><div class="v ' + colorClass + '">' + fmtPrice(sig.entry, sig) + '</div></div>' +
       '<div class="sig-item"><div class="k">Take Profit</div><div class="v green">' + (sig.takeProfit ? fmtPrice(sig.takeProfit, sig) : '—') + '</div></div>' +
@@ -155,6 +286,7 @@
       '<div class="sig-item"><div class="k">MACD</div><div class="v">' + esc(sig.macdState) + '</div></div>' +
       '<div class="sig-item"><div class="k">Vol vs avg</div><div class="v">' + (sig.volRatio ? sig.volRatio.toFixed(2) + 'x' : '—') + '</div></div>' +
       '<div class="sig-item"><div class="k">ADX</div><div class="v">' + (sig.adx != null ? sig.adx + ' · ' + (sig.adx >= 22 ? 'strong' : sig.adx <= 14 ? 'weak' : 'developing') : '—') + '</div></div>' +
+      (regime ? '<div class="sig-item"><div class="k">Regime</div><div class="v ' + (regime.cls === 'regime-high' ? 'gold' : regime.cls === 'regime-low' ? 'cyan' : '') + '">' + regime.label + '</div></div>' : '') +
       (sig.divergence ? '<div class="sig-item"><div class="k">Divergence</div><div class="v ' + (sig.divergence === 'bullish' ? 'green' : 'red') + '">' + esc(sig.divergence) + '</div></div>' : '') +
       '</div>' +
       '<div class="factors">' + sig.factors.map(f =>
@@ -164,6 +296,7 @@
       '<div class="signal-actions">' +
       '<button class="btn ghost sm" id="sigCopy">📋 Copy plan</button>' +
       '<button class="btn ghost sm" id="sigGoChart">📈 Show chart</button>' +
+      (sig.mode !== 'pocket' && sig.action !== 'HOLD' && sig.action !== 'NEUTRAL' ? '<button class="btn ghost sm" id="sigPaper">📥 Paper trade</button>' : '') +
       '</div>';
 
     $id('sigCopy').addEventListener('click', () => copySignal(sig));
@@ -176,6 +309,22 @@
     if (pbTp) pbTp.addEventListener('click', () => setQuickAlert(sig.symbol, sig.takeProfit, sig.action + ' take-profit'));
     const pbSl = $id('pbSlBtn');
     if (pbSl) pbSl.addEventListener('click', () => setQuickAlert(sig.symbol, sig.stopLoss, sig.action + ' stop-loss'));
+    const sigPaper = $id('sigPaper');
+    if (sigPaper) {
+      sigPaper.disabled = !!(state.paperStats && state.paperStats.protection && state.paperStats.protection.active);
+      sigPaper.addEventListener('click', async () => {
+        try {
+          const r = await MI.api.post('/api/paper', { symbol: sig.symbol });
+          if (r && r.ok) {
+            MI.toast('success', 'Paper trade opened', sig.asset + ' ' + sig.action + ' @ ' + fmtPrice(sig.entry, sig) + ' — tracked with TP/SL.');
+            loadPaper();
+          } else {
+            MI.toast('error', 'Could not open paper trade', r && r.error ? r.error : 'unknown');
+          }
+        } catch (e) { MI.toast('error', 'Paper trade failed', e.message); }
+      });
+    }
+    el.classList.toggle('stale', isStale(sig));
     // Load (cached) best entry window for the selected symbol.
     mtLoadTiming(sig.symbol);
   }
@@ -222,9 +371,11 @@
     const sl = sig.stopLoss ? fmtPrice(sig.stopLoss, sig) : '—';
     const riskUsd = 20; // 2% risk on a $1,000 reference
     let units = null;
+    let halfTarget = null;
     if (sig.stopLoss && !isHold) {
       const dist = Math.abs(sig.price - sig.stopLoss);
       if (dist > 0) units = (riskUsd / dist);
+      halfTarget = isBuyAction(sig.action) ? (sig.entry + dist) : (sig.entry - dist);
     }
     let steps = [];
 
@@ -242,6 +393,7 @@
           (sig.riskReward ? ', risking 1 to win <b>' + sig.riskReward + '</b>.' : '.'),
         '<b>Protect it:</b> place the <b class="sell-text">Stop-Loss at ' + sl + '</b>' + (sig.mode === 'forex' && sig.slPips != null ? ' (' + sig.slPips + ' pips)' : '') + '. If price gets here, the idea is wrong — take the loss, don’t argue with the market.',
         '<b>Secure the profit:</b> place the <b class="buy-text">Take-Profit at ' + tp + '</b>' + (sig.mode === 'forex' && sig.tpPips != null ? ' (' + sig.tpPips + ' pips)' : '') + '. Let it run to the target — exiting early on a retrace is how wins become tiny.',
+        (halfTarget ? '<b>Ladder it:</b> consider taking half near <b>' + fmtPrice(halfTarget, sig) + '</b> (1R) and letting the rest run to TP — locks in profit while keeping upside.' : ''),
         '<b>Size it:</b> with 2% risk ($' + riskUsd + ' on a $1,000 reference) trade ≈ <b>' + (units && units > 0 ? units.toFixed(4) : '—') + '</b> units at this stop distance.',
         (sig.mode === 'forex' && sig.sessionLabel ? 'Act during <b>' + esc(sig.sessionLabel) + '</b> for the deepest liquidity. ' : '') +
           'ADX <b>' + (sig.adx != null ? (sig.adx >= 22 ? 'strong — act promptly' : 'developing — keep size modest') : '—') + '</b>.',
@@ -286,12 +438,15 @@
       return;
     }
     state.signals.forEach(s => {
+      if (state.watchOnly && !isWatched(s.symbol)) return;
       const clsTag = tagClass(s.action);
       const tr = document.createElement('tr');
       tr.style.cursor = 'pointer';
+      if (isStale(s)) tr.classList.add('stale');
       tr.innerHTML =
-        '<td class="mono" style="font-weight:800">' + esc(s.asset) + '</td>' +
-        '<td><span class="tag ' + clsTag + '" title="Conviction: ' + (s.quality || 'LOW') + '">' + s.action + (s.quality === 'HIGH' ? ' 🔥' : s.quality === 'MEDIUM' ? ' ⚡' : '') + '</span></td>' +
+        '<td class="mono" style="font-weight:800">' + esc(s.asset) +
+        ' <button class="row-btn star' + (isWatched(s.symbol) ? ' on' : '') + '" data-star="' + s.symbol + '" title="Add/remove from watchlist">' + (isWatched(s.symbol) ? '★' : '☆') + '</button></td>' +
+        '<td><span class="tag ' + clsTag + '" title="Conviction: ' + (s.quality || 'LOW') + ' · valid ' + remainingLabel(s) + '">' + s.action + (s.quality === 'HIGH' ? ' 🔥' : s.quality === 'MEDIUM' ? ' ⚡' : '') + '</span></td>' +
         '<td>' + s.confidence + '%</td>' +
         '<td class="mono">' + fmtPrice(s.price, s) + '</td>' +
         '<td class="mono">' + fmtPrice(s.entry, s) + '</td>' +
@@ -308,6 +463,8 @@
         switchView('overview');
         if (window.MIChart) MIChart.setSymbol(s.symbol);
       });
+      const starBtn = tr.querySelector('[data-star]');
+      if (starBtn) starBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleWatch(s.symbol); });
       body.appendChild(tr);
     });
   }
@@ -441,12 +598,23 @@
     if (t) {
       const byTier = s.byTier || {};
       const keys = (s.byTier ? Object.keys(s.byTier) : []).sort();
-      t.innerHTML = keys.map(k => {
+      const tierHtml = keys.map(k => {
         const v = byTier[k] || { wins: 0, losses: 0 };
         const grad = v.wins + v.losses;
         const wr = grad ? Math.round((v.wins / grad) * 100) : 0;
         return '<div class="acc-tier"><b>' + esc(k) + '</b> — ' + v.wins + 'W / ' + v.losses + 'L · <span class="' + (wr >= 50 ? 'ok' : '') + '">' + wr + '%</span></div>';
       }).join('') || '<div class="empty">No graded signals yet — MI grades every emitted signal automatically.</div>';
+      const bs = s.bySymbol || {};
+      const bsKeys = Object.keys(bs).sort((a, b) => ((bs[b].wins + bs[b].losses) - (bs[a].wins + bs[a].losses))).slice(0, 8);
+      const bySymHtml = bsKeys.length
+        ? '<div class="acc-sub">By asset — graded:</div>' +
+          bsKeys.map(k => {
+            const v = bs[k]; const g = v.wins + v.losses;
+            const wr = g ? Math.round((v.wins / g) * 100) : 0;
+            return '<div class="acc-tier"><b>' + esc(k) + '</b> — ' + v.wins + 'W/' + v.losses + 'L · <span class="' + (wr >= 50 ? 'ok' : '') + '">' + wr + '%</span></div>';
+          }).join('')
+        : '';
+      t.innerHTML = tierHtml + bySymHtml;
     }
 
     const body = $id('accuracyBody');
@@ -514,8 +682,27 @@
       renderStatsBar();
       renderSignalPanel();
       renderTable();
+      renderTape();
       loadPaper();
     } catch { /* ignore */ }
+  }
+
+  // Live countdown to the next trade-placement window (updates every second).
+  let clockT = null;
+  function startClockTicker() {
+    if (clockT) return;
+    clockT = setInterval(() => {
+      const el = document.getElementById('tcCount');
+      if (!el) return;
+      const until = parseInt(el.dataset.until || '0', 10);
+      if (!until) return;
+      const left = Math.max(0, until - Date.now());
+      const m = Math.floor(left / 60000);
+      const s = Math.floor((left % 60000) / 1000);
+      el.textContent = m > 0
+        ? 'in ' + m + 'm ' + String(s).padStart(2, '0') + 's'
+        : (s > 0 ? 'in ' + s + 's' : 'now — place it');
+    }, 1000);
   }
 
   function init() {
@@ -557,9 +744,19 @@
       }
       switchView('alerts');
     });
+    startClockTicker();
     refreshSignals();
     refreshHistory();
     refreshAccuracy();
+    loadNewsZone();
+    setInterval(loadNewsZone, 5 * 60 * 1000);
+    const wt = $id('watchToggle');
+    if (wt) wt.addEventListener('click', () => {
+      state.watchOnly = !state.watchOnly;
+      wt.classList.toggle('active', state.watchOnly);
+      wt.textContent = state.watchOnly ? '★ Watchlist ON' : '☆ Watchlist';
+      renderTable();
+    });
     MINotify.onEvent('signals', () => {
       state.signals = MINotify.getSignals();
       state.summary = MINotify.getSummary();
@@ -567,6 +764,7 @@
       renderStatsBar();
       renderSignalPanel();
       renderTable();
+      renderTape();
       loadPaper();
     });
     MINotify.onEvent('market', () => { followChart(); renderStatsBar(); renderSignalPanel(); });

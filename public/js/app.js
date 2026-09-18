@@ -85,6 +85,18 @@
     setInterval(tickClock, 1000);
     initNav();
 
+    // compact "pro" layout toggle
+    const pro = $id('proToggle');
+    if (pro) {
+      pro.hidden = false;
+      if (localStorage.getItem('mi.pro') === '1') document.body.classList.add('pro-layout');
+      pro.addEventListener('click', () => {
+        const on = document.body.classList.toggle('pro-layout');
+        localStorage.setItem('mi.pro', on ? '1' : '0');
+        if (window.MIChart && MIChart.resize) MIChart.resize();
+      });
+    }
+
     // load server config first (symbols, model)
     try {
       MI.config = await MI.api.get('/api/config');

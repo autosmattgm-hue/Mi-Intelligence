@@ -292,11 +292,16 @@ router.get('/api/paper', async (ctx) => {
     stats: {
       openPositions: 0, closedTrades: 0, wins: 0, losses: 0, winRate: 0,
       realizedPnl: 0, floatingPnl: 0, totalPnl: 0, direction: 'positive', lastTrade: null,
+      protection: { active: false, until: 0, streak: 0, leftMs: 0 },
     },
     positions: [],
     history: [],
     note: 'Paper trading is fully persistent on the local server. On Vercel it resets per instance.',
   });
+});
+// Manual paper trade — accepted so the UI button never 404s (real engine runs on the local server).
+router.post('/api/paper', (ctx) => {
+  sendJson(ctx.res, 200, { ok: true, note: 'paper trading runs on the local server' });
 });
 // ---- alerts & notifications (in-memory per instance) ----
 let alertsStore = [];
@@ -398,6 +403,7 @@ router.post('/api/chat', async (ctx) => {
     ? ctx.body.images.filter(img => img && typeof img.dataUrl === 'string' && img.dataUrl.length < 3_000_000).slice(-3)
     : [];
   const audience = String(ctx.body && ctx.body.level || 'balanced');
+  const userProfile = (ctx.body && ctx.body.profile) || null;
   const timingSymbol = String(ctx.body && ctx.body.timingSymbol || 'BTCUSDT');
   const focusSymbol = history.length && typeof history[history.length - 1].content === 'string'
     ? (String(history[history.length - 1].content).match(/\b(BTCUSDT|ETHUSDT|SOLUSDT|XRPUSDT|ADAUSDT|DOGEUSDT|AVAXUSDT|LINKUSDT|DOTUSDT|LTCUSDT|BNBUSDT|POLUSDT)\b/) || [null, timingSymbol])[1]
@@ -426,6 +432,7 @@ router.post('/api/chat', async (ctx) => {
     audience,
     tradeTiming,
     sentiment: sSentiment,
+    userProfile,
     economicCalendar: sCalendar ? {
       source: sCalendar.source,
       high: (sCalendar.high || []).slice(0, 10).map(e => ({ title: e.title, country: e.country, time: e.time, impact: e.impact })),

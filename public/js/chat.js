@@ -267,6 +267,13 @@
           images: images.map(im => ({ dataUrl: im.dataUrl, name: im.name })),
           level,
           timingSymbol: (window.MIChart && MIChart.getSymbol()) || 'BTCUSDT',
+          profile: (function () {
+            try {
+              const g = JSON.parse(localStorage.getItem('mi.guard') || 'null');
+              const j = JSON.parse(localStorage.getItem('mi.journal') || '[]');
+              return g ? { guardrails: { riskPct: g.risk, dailyLossPct: g.day }, recentJournal: (j || []).slice(-2).map(x => x.note) } : null;
+            } catch { return null; }
+          })(),
         }),
       });
       if (!res.ok) {

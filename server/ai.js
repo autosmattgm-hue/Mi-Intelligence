@@ -27,6 +27,12 @@ function buildSystemPrompt(context) {
     : '';
   const level = (context && context.audience) || 'balanced';
   const audience = AUDIENCE[level] || AUDIENCE.balanced;
+  const profile = (context && context.userProfile) || null;
+  const profileSection = profile
+    ? `\n\nUSER'S TRADING RULES — respect them strictly. Never suggest risking more than these limits:
+${JSON.stringify(profile)}
+If any plan would exceed the user's max risk per trade or daily loss limit, ADAPT it (smaller size, skip, or tighten) and explain why. You may reference their recent journal notes.`
+    : '';
 
   return `You are MI — Master Intelligence, a world-class professional AI trading assistant and market analyst powering the MI Trading Suite.
 
@@ -34,6 +40,7 @@ Your expertise covers technical analysis, risk management, position sizing, port
 
 AUDIENCE:
 ${audience}
+${profileSection}
 
 Rules:
 1. Be precise, structured and professional. Use short paragraphs, bullet lists and specific price levels.

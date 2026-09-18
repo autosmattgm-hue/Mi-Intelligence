@@ -47,6 +47,7 @@
     <div class="topbar-right">
       <div class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Connecting…</span></div>
       <div class="mode-switcher" id="modeSwitcher" title="Market mode"></div>
+      <button class="icon-btn" id="proToggle" title="Compact pro layout" hidden>▤</button>
       <div class="clock" id="clock">--:--:-- UTC</div>
       <button class="icon-btn" id="installBtn" title="Install MI as an app" hidden>⬇️</button>
       <button class="icon-btn" id="logoutBtn" title="Log out" hidden>🚪</button>
@@ -76,6 +77,7 @@
 
     <!-- ============================ OVERVIEW ============================ -->
     <section class="view active" data-view="overview">
+      <div class="signal-tape-wrap"><div class="signal-tape" id="signalTape"></div></div>
       <div class="stats-bar" id="statsBar"><div class="stat-card">Loading live market data…</div></div>
 
       <div class="grid-2col">
@@ -212,6 +214,7 @@
             <span class="sub" id="signalsUpdated">—</span>
           </div>
           <button class="btn ghost sm" id="signalsRefresh">↻ Refresh</button>
+          <button class="btn ghost sm" id="watchToggle" title="Only show your starred assets">☆ Watchlist</button>
         </div>
         <div class="table-wrap">
           <table class="table">
@@ -453,7 +456,9 @@
           </div>
 
           <div class="chips" id="chatChips">
+            <button class="chip">☀️ Today's 60-second plan</button>
             <button class="chip">When should I trade today?</button>
+            <button class="chip">🧠 Check my risk rules</button>
             <button class="chip">Analyze BTC/USDT right now</button>
             <button class="chip">Best entry for ETH today?</button>
             <button class="chip">Explain the chart I uploaded</button>

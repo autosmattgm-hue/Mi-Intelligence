@@ -382,6 +382,23 @@ router.get('/api/paper', (ctx) => {
     history: paper.history.slice(-50),
   });
 });
+// One-click manual paper trade from the signal panel (BUY/SELL only).
+router.post('/api/paper', (ctx) => {
+  try {
+    const symbol = String((ctx.body && ctx.body.symbol) || '').toUpperCase();
+    const sig = market.signals.find(s => s.symbol === symbol);
+    if (!sig || sig.action === 'HOLD' || sig.action === 'NEUTRAL') {
+      return ctx.res.sendJson(400, { error: 'No actionable signal for ' + symbol });
+    }
+    if (market.health.dataSource === 'starting' || !market.prices[symbol]) {
+      return ctx.res.sendJson(400, { error: 'Live price not ready for ' + symbol });
+    }
+    const ok = paper.openManual(sig, Date.now());
+    ctx.res.sendJson(ok ? 200 : 409, ok ? { ok: true } : { error: 'A paper position is already open on ' + symbol });
+  } catch (err) {
+    ctx.res.sendJson(400, { error: err.message });
+  }
+});
 
 // ---------------------------------------------------------------- alerts API
 router.get('/api/alerts', (ctx) => {
@@ -482,6 +499,7 @@ router.post('/api/chat', async (ctx) => {
     ? ctx.body.images.filter(img => img && typeof img.dataUrl === 'string' && img.dataUrl.length < 3_000_000).slice(-3)
     : [];
   const audience = String(ctx.body && ctx.body.level || 'balanced');
+  const userProfile = (ctx.body && ctx.body.profile) || null;
   const timingSymbol = String(ctx.body && ctx.body.timingSymbol || 'BTCUSDT');
   const focusSymbol = history.length && typeof history[history.length - 1].content === 'string'
     ? (String(history[history.length - 1].content).match(/\b(BTCUSDT|ETHUSDT|SOLUSDT|XRPUSDT|ADAUSDT|DOGEUSDT|AVAXUSDT|LINKUSDT|DOTUSDT|LTCUSDT|BNBUSDT|POLUSDT)\b/) || [null, timingSymbol])[1]
@@ -511,6 +529,7 @@ router.post('/api/chat', async (ctx) => {
     audience,
     tradeTiming,
     sentiment,
+    userProfile,
     economicCalendar: calendar ? {
       source: calendar.source,
       high: (calendar.high || []).slice(0, 10).map(e => ({ title: e.title, country: e.country, time: e.time, impact: e.impact })),
