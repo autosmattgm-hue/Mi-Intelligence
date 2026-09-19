@@ -239,6 +239,14 @@
     const images = pendingImages.splice(0, pendingImages.length);
     renderPreviews();
 
+    // Users pay 1 coin per AI question.
+    let spentCoin = false;
+    if (window.MIAuth && window.MIAuth.role && window.MIAuth.role() === 'user') {
+      const ok = await window.MIAuth.spend('ai');
+      if (!ok) return;
+      spentCoin = true;
+    }
+
     history.push({ role: 'user', content: text || '(attached image — scan it)' });
 
     const thread = $id('chatThread');
@@ -315,6 +323,7 @@
       aiBubble.textContent = '';
       aiBubble.className = 'msg error';
       aiBubble.textContent = '⚠️ ' + err.message;
+      if (spentCoin && window.MIAuth && window.MIAuth.refund) window.MIAuth.refund('ai');
     } finally {
       streaming = false;
       $id('chatSend').disabled = false;

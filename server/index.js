@@ -670,12 +670,58 @@ router.get('/api/events', (ctx) => {
 });
 
 // ---------------------------------------------------------------- auth
+// Owner gate — the single password (this is the "owner page").
 router.post('/api/login', (ctx) => {
   const pass = String((ctx.body && ctx.body.password) || '');
   const expected = process.env.MI_PASSWORD || 'Admin2026';
-  if (pass === expected) return ctx.res.sendJson(200, { ok: true });
+  if (pass === expected) return ctx.res.sendJson(200, { ok: true, role: 'owner' });
   return ctx.res.sendJson(401, { error: 'Invalid password' });
 });
+
+// ---------------------------------------------------------------- user accounts + coins
+// Users register/sign-in and get FREE_COINS; 1 coin = 1 signal or 1 AI question.
+const usersApi = require('./users');
+
+function authToken(ctx) {
+  const h = String((ctx.req.headers && (ctx.req.headers.authorization || ctx.req.headers['x-mi-token'])) || '');
+  return h.startsWith('Bearer ') ? h.slice(7).trim() : h;
+}
+
+router.post('/api/auth/register', (ctx) => {
+  try { ctx.res.sendJson(201, usersApi.register(ctx.body || {})); }
+  catch (e) { ctx.res.sendJson(e.status || 400, { error: e.message }); }
+});
+router.post('/api/auth/login', (ctx) => {
+  try { ctx.res.sendJson(200, usersApi.login(ctx.body || {})); }
+  catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message }); }
+});
+router.post('/api/auth/logout', (ctx) => ctx.res.sendJson(200, usersApi.logout(authToken(ctx))));
+router.get('/api/auth/me', (ctx) => {
+  try { ctx.res.sendJson(200, { user: usersApi.me(authToken(ctx)) }); }
+  catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message }); }
+});
+router.get('/api/coins', (ctx) => {
+  try { ctx.res.sendJson(200, usersApi.wallet(authToken(ctx))); }
+  catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message }); }
+});
+router.post('/api/coins/spend', (ctx) => {
+  try {
+    const r = usersApi.spend(authToken(ctx), String((ctx.body && ctx.body.item) || 'signal'));
+    ctx.res.sendJson(200, r);
+  } catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message, code: e.code }); }
+});
+router.post('/api/coins/refund', (ctx) => {
+  try { ctx.res.sendJson(200, usersApi.refund(authToken(ctx), String((ctx.body && ctx.body.item) || 'signal'))); }
+  catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message }); }
+});
+router.post('/api/coins/buy', (ctx) => {
+  try { ctx.res.sendJson(200, usersApi.buy(authToken(ctx), String((ctx.body && ctx.body.plan) || 'pro'))); }
+  catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message }); }
+});
+router.get('/api/coins/plans', (ctx) => ctx.res.sendJson(200, {
+  plans: usersApi.PLANS, freeCoins: usersApi.FREE_COINS, coinPerItem: usersApi.COIN_PER_ITEM,
+  note: '1 coin = 1 signal analysis or 1 AI question',
+}));
 
 // ---------------------------------------------------------------- router
 const server = createServer(async (req, res) => {

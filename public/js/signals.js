@@ -57,6 +57,30 @@
     renderTable();
   }
 
+  // ---- coin-gated signal reveal: users see blurred signals until they pay 1 coin.
+  // Revealed symbols persist per-device (localStorage) so you don't pay twice.
+  const revealed = (() => { try { return JSON.parse(localStorage.getItem('mi.revealed') || '{}'); } catch { return {}; } })();
+  function saveRevealed() { try { localStorage.setItem('mi.revealed', JSON.stringify(revealed)); } catch {} }
+  function isLocked(sym) { return (window.MI && MI.role === 'user') && !revealed[sym]; }
+  function lockVeilHtml(sym) {
+    const coins = (window.MI && MI.coins != null) ? MI.coins : 0;
+    return '<div class="signal-lock-veil">' +
+      '<div class="lock-title">🔒 Signal locked</div>' +
+      '<div class="lock-sub">Reveal the full plan for <b>1 🪙</b> — balance: <b>' + coins + '</b></div>' +
+      '<button class="login-btn sm" data-unlock="' + esc(sym) + '">' + (coins > 0 ? '🔓 Show signal · 1 coin' : '🪙 Buy coins to reveal') + '</button>' +
+      '</div>';
+  }
+  async function unlockSignal(sym) {
+    if (window.MIAuth && window.MIAuth.role && window.MIAuth.role() === 'user') {
+      const ok = await window.MIAuth.spend('signal');
+      if (!ok) return;
+    }
+    revealed[sym] = true;
+    saveRevealed();
+    renderSignalPanel();
+    renderTable();
+  }
+
   // ---- economic-news zone (from /api/calendar) ----
   function loadNewsZone() {
     try {
@@ -251,7 +275,7 @@
     const colorClass = isBuyAction(sig.action) ? 'green' : isSellAction(sig.action) ? 'red' : 'gold';
     const regime = regimeLabel(sig);
 
-    el.innerHTML =
+    const inner =
       (state.newsZone ? '<div class="ribbon news">🕐 NEWS ZONE — ' + esc(state.newsZone.title) + ' in ~' + Math.max(1, Math.round((state.newsZone.time - Date.now()) / 60000)) + ' min — consider smaller size or waiting</div>' : '') +
       ((state.paperStats && state.paperStats.protection && state.paperStats.protection.active)
         ? '<div class="ribbon cool">🔒 MI cooldown — ' + state.paperStats.protection.streak + ' straight losses; pausing new paper trades for ' + Math.max(1, Math.ceil(state.paperStats.protection.leftMs / 60000)) + 'm (protect the bankroll)</div>'
@@ -298,6 +322,16 @@
       '<button class="btn ghost sm" id="sigGoChart">📈 Show chart</button>' +
       (sig.mode !== 'pocket' && sig.action !== 'HOLD' && sig.action !== 'NEUTRAL' ? '<button class="btn ghost sm" id="sigPaper">📥 Paper trade</button>' : '') +
       '</div>';
+
+    // Users see blurred signals until they pay 1 coin to reveal the plan.
+    if (isLocked(sig.symbol)) {
+      el.innerHTML = '<div class="signal-locked"><div class="blur-inner">' + inner + '</div>' +
+        lockVeilHtml(sig.symbol) + '</div>';
+      const ub = el.querySelector('[data-unlock]');
+      if (ub) ub.addEventListener('click', () => unlockSignal(sig.symbol));
+      return;
+    }
+    el.innerHTML = inner;
 
     $id('sigCopy').addEventListener('click', () => copySignal(sig));
     $id('sigGoChart').addEventListener('click', () => {
@@ -465,6 +499,13 @@
       });
       const starBtn = tr.querySelector('[data-star]');
       if (starBtn) starBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleWatch(s.symbol); });
+      // Users: locked rows are blurred until 1 coin unlocks them.
+      if (isLocked(s.symbol)) {
+        tr.classList.add('row-locked');
+        tr.innerHTML += '<td class="row-lock-cell"><button class="btn ghost sm" data-unlock="' + esc(s.symbol) + '">🔓 Show · 1 coin</button></td>';
+        const ub = tr.querySelector('[data-unlock]');
+        if (ub) ub.addEventListener('click', (e) => { e.stopPropagation(); unlockSignal(s.symbol); });
+      }
       body.appendChild(tr);
     });
   }
@@ -706,7 +747,15 @@
   }
 
   function init() {
-    $id('signalsRefresh').addEventListener('click', () => refreshSignals());
+    const sr = $id('signalsRefresh');
+    if (sr) sr.addEventListener('click', async () => {
+      // Users pay 1 coin per manual signal analysis run.
+      if (window.MIAuth && window.MIAuth.role && window.MIAuth.role() === 'user') {
+        const ok = await window.MIAuth.spend('signal');
+        if (!ok) return;
+      }
+      refreshSignals();
+    });
     const accRefresh = $id('accuracyRefresh');
     if (accRefresh) accRefresh.addEventListener('click', () => refreshAccuracy());
     const accClear = $id('accuracyClear');
@@ -781,6 +830,20 @@
     }
   }
 
+  // User-driven symbol reveal — users pay 1 coin per new analysis. Called by
+  // the chart symbol dropdown (not by auto SSE refreshes) so background live
+  // updates never drain coins.
+  async function revealSymbol(v) {
+    if (!v) return;
+    if (v === state.selected) { renderSignalPanel(); return; }
+    if (window.MIAuth && window.MIAuth.role && window.MIAuth.role() === 'user') {
+      const ok = await window.MIAuth.spend('signal');
+      if (!ok) return;
+    }
+    state.selected = v;
+    renderSignalPanel();
+  }
+
   // Runs on market-mode switch: pull fresh signals for the new mode.
   function handleModeChange() {
     refreshSignals();
@@ -788,6 +851,6 @@
   }
 
   window.MISignals = {
-    state, init, refreshSignals, handleModeChange, followChart, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView,
+    state, init, refreshSignals, handleModeChange, followChart, revealSymbol, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView,
   };
 })();

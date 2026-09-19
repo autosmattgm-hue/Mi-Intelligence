@@ -541,6 +541,53 @@ label { display: flex; flex-direction: column; gap: 5px; font-size: .74rem; colo
 .login-loading { opacity: .6; pointer-events: none; }
 @keyframes loginPop { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: none; } }
 
+/* ============ auth tabs (Owner / User) ============ */
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--bg2); border: 1px solid var(--line2); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+.auth-tab { padding: 9px 8px; border-radius: 9px; border: 0; background: transparent; color: var(--text2); font-weight: 700; font-size: .8rem; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.auth-tab.active { background: linear-gradient(135deg, rgba(6,182,212,.28), rgba(52,211,153,.22)); color: var(--text); box-shadow: inset 0 0 0 1px rgba(6,182,212,.4); }
+.auth-form .login-field { margin-bottom: 10px; }
+.login-btn.alt { background: linear-gradient(135deg, #34d399, #059669); color: #04120b; }
+.login-btn.ghost { background: transparent; border: 1px solid var(--line2); color: var(--text2); font-weight: 700; }
+.login-btn.sm { margin-top: 8px; padding: 9px; font-size: .82rem; }
+.login-switch { margin-top: 14px; background: none; border: 0; color: var(--cyan); font-size: .76rem; font-weight: 700; cursor: pointer; text-decoration: underline dotted; }
+
+/* ============ coin pill (top bar) ============ */
+.coin-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(245,158,11,.18), rgba(6,182,212,.14));
+  border: 1px solid rgba(245,158,11,.45); color: var(--text); font-size: .78rem; font-weight: 800; cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease; }
+.coin-pill:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(245,158,11,.25); }
+.coin-pill b { color: var(--gold); font-size: .9rem; }
+.coin-pill .coin-buy { font-size: .62rem; color: var(--muted); font-weight: 700; letter-spacing: .3px; }
+
+/* ============ upgrade / buy coins ============ */
+.plans { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; max-height: 52vh; overflow: auto; }
+.plan-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px;
+  padding: 12px 14px; border-radius: 12px; background: var(--bg2); border: 1px solid var(--line2); text-align: left; }
+.plan-card .plan-name { font-size: .82rem; font-weight: 800; }
+.plan-card .plan-coins { font-size: .72rem; color: var(--text2); }
+.plan-card .plan-price { font-size: .9rem; font-weight: 800; color: var(--green); grid-column: 1; }
+.plan-card .login-btn { margin-top: 0; grid-column: 2; grid-row: 1 / span 2; width: auto; padding: 9px 16px; }
+
+/* ============ blurred signal lock (users pay 1 coin to reveal) ============ */
+.signal-locked { position: relative; border-radius: 14px; overflow: hidden; }
+.signal-locked .blur-inner { filter: blur(8px); pointer-events: none; user-select: none; opacity: .5; transform: scale(1.01); }
+.signal-lock-veil { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 8px; text-align: center; padding: 18px;
+  background: radial-gradient(600px 240px at 50% 0%, rgba(6,182,212,.12), transparent 70%), rgba(5,8,15,.6); }
+.signal-lock-veil .lock-title { font-size: .92rem; font-weight: 800; }
+.signal-lock-veil .lock-sub { font-size: .72rem; color: var(--text2); line-height: 1.5; }
+.signal-lock-veil .lock-sub b { color: var(--gold); }
+.signal-lock-veil .login-btn { width: auto; padding: 11px 22px; }
+.signal-lock-veil .login-btn.sm { margin-top: 2px; }
+.signal-table-locked { filter: blur(6px); pointer-events: none; user-select: none; opacity: .55; }
+tr.row-locked td:not(.row-lock-cell) { filter: blur(5px); user-select: none; opacity: .6; }
+tr.row-locked .row-lock-cell { min-width: 108px; text-align: center; }
+.coin-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(245,158,11,.16), rgba(6,182,212,.12));
+  border: 1px solid rgba(245,158,11,.4); font-size: .72rem; font-weight: 800; color: var(--text); }
+.coin-chip b { color: var(--gold); }
+
 /* ============ actionable playbook ============ */
 .playbook { margin-top: 12px; padding: 12px 14px; border-radius: 12px; background: rgba(6,182,212,.05); border: 1px solid var(--line2); }
 .playbook-wait { background: rgba(154,164,181,.06); border-color: var(--line); }

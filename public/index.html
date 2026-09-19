@@ -20,15 +20,47 @@
 
 <!-- ==================== LOGIN (auth gate) ==================== -->
 <div class="login-overlay" id="loginOverlay">
-  <form class="login-card" id="loginForm" autocomplete="on">
+  <div class="login-card" id="loginCard">
     <div class="login-logo">🧠</div>
     <div class="login-title">MI — <span class="accent">Master Intelligence</span></div>
     <div class="login-sub">Advanced Trading AI Suite · Secure Access</div>
-    <input class="login-field" id="loginPass" type="password" placeholder="Enter access password" autocomplete="current-password" autofocus>
-    <button class="login-btn" type="submit" id="loginBtn">🔓 Unlock MI</button>
-    <div class="login-error" id="loginError"></div>
-    <div class="login-hint">Protected trading terminal · authorized access only</div>
-  </form>
+
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" data-role="owner">🔐 Owner</button>
+      <button type="button" class="auth-tab" data-role="user">👤 User</button>
+    </div>
+
+    <!-- OWNER page (this is the original password login) -->
+    <form class="auth-form" id="ownerForm" autocomplete="on">
+      <input class="login-field" id="loginPass" type="password" placeholder="Owner password" autocomplete="current-password">
+      <button class="login-btn" type="submit">🔓 Unlock MI (Owner)</button>
+      <div class="login-error" id="ownerError"></div>
+      <div class="login-hint">Terminal owner · full access</div>
+    </form>
+
+    <!-- USER page (register / sign in · 5 free coins) -->
+    <form class="auth-form hidden" id="userForm" autocomplete="on">
+      <input class="login-field" id="regName" type="text" placeholder="Display name (optional)" autocomplete="name">
+      <input class="login-field" id="userEmail" type="email" placeholder="Email address" autocomplete="email" required>
+      <input class="login-field" id="userPass" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password" required>
+      <button class="login-btn alt" type="submit" id="userSubmitBtn">✍️ Register · get 5 free coins</button>
+      <div class="login-error" id="userError"></div>
+      <button type="button" class="login-switch" id="userSwitch">Already registered? Sign in</button>
+      <div class="login-hint">New users get <b>5 free coins</b> — 1 signal = 1 coin · 1 AI question = 1 coin.</div>
+    </form>
+  </div>
+</div>
+
+<!-- ==================== UPGRADE / BUY COINS (paywall) ==================== -->
+<div class="login-overlay hidden" id="upgradeOverlay">
+  <div class="login-card">
+    <div class="login-logo">🪙</div>
+    <div class="login-title">MI Coins — <span class="accent">Upgrade</span></div>
+    <div class="login-sub" id="coinBalanceLine">You are out of coins. Choose a package:</div>
+    <div class="plans" id="coinPlans"></div>
+    <div class="login-hint" style="margin-top:8px">Payment integration (Stripe / PayPal) plugs in here — coins are added instantly on this server.</div>
+    <button class="login-btn ghost" type="button" id="upgradeClose">⏳ Maybe later</button>
+  </div>
 </div>
 
 <div class="toast-wrap" id="toastWrap"></div>
@@ -49,6 +81,7 @@
       <div class="mode-switcher" id="modeSwitcher" title="Market mode"></div>
       <button class="icon-btn" id="proToggle" title="Compact pro layout" hidden>▤</button>
       <div class="clock" id="clock">--:--:-- UTC</div>
+      <button class="coin-pill hidden" id="coinBtn" title="MI Coins — buy more">🪙 <b id="coinCount">0</b><span class="coin-buy">＋</span></button>
       <button class="icon-btn" id="installBtn" title="Install MI as an app" hidden>⬇️</button>
       <button class="icon-btn" id="logoutBtn" title="Log out" hidden>🚪</button>
       <button class="icon-btn" id="soundToggle" title="Toggle notification sound">🔊</button>
@@ -215,6 +248,7 @@
           </div>
           <button class="btn ghost sm" id="signalsRefresh">↻ Refresh</button>
           <button class="btn ghost sm" id="watchToggle" title="Only show your starred assets">☆ Watchlist</button>
+          <span class="coin-chip hidden" id="signalsCoinChip" title="Your MI coin balance">🪙 <b>0</b></span>
         </div>
         <div class="table-wrap">
           <table class="table">

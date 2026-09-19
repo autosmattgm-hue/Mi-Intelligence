@@ -1,0 +1,77 @@
+[
+  {
+    "id": "2555102ab8a9b710",
+    "name": "Smoke",
+    "email": "smoke1789763258590@mi.io",
+    "salt": "d540bd2ba78701be96732f5f9e7c7e4d",
+    "hash": "4afc16e6525b45fc6deee598afd2cfac4059d2293f4ec309ecdec2ea094c32f03ae3c663a9e0f2cc6d444eb4a52de22434d3c5ea4470247d805c79346a699e97",
+    "token": "16cda69d184ac581e5b91003dfaa89d2dc24095bf360eab0",
+    "createdAt": 1789763258989,
+    "expiresAt": 1792355258989,
+    "coins": 50,
+    "spent": 5,
+    "orders": [
+      {
+        "ref": "ORD-1789763268410-181",
+        "plan": "basic",
+        "planName": "Starter",
+        "coins": 50,
+        "price": 19,
+        "ts": 1789763268410,
+        "paid": true
+      }
+    ],
+    "ledger": [
+      {
+        "ts": 1789763260211,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789763261480,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789763264125,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789763267386,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789763267964,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "86ebf7c88764b2d7",
+    "name": "EBUBE OKOYE",
+    "email": "zgifantasy@gmail.com",
+    "salt": "aaf48a67f6582e4af039f8fa4bd780bc",
+    "hash": "c5753ef4a74ebcd8c828b6032561b4e14a7980c101dc3bd35cd43863439c0093b831161b0d80b550296ee5669ff580d2d59a4e1cfb66418ccd07ae2b5d864352",
+    "token": "4755f1ac49aaa8b2c9a74e65f93a06cc2181b2f6ba2ddec3",
+    "createdAt": 1789764617070,
+    "expiresAt": 1792356617070,
+    "coins": 3,
+    "spent": 2,
+    "orders": [],
+    "ledger": [
+      {
+        "ts": 1789764636398,
+        "item": "ai",
+        "cost": -1
+      },
+      {
+        "ts": 1789764763769,
+        "item": "ai",
+        "cost": -1
+      }
+    ]
+  }
+]

@@ -828,8 +828,10 @@ const lh = m.hist[m.hist.length - 1];
       if (v && v !== state.symbol) {
         state.symbol = v;
         loadCandles();
-        // Keep the primary signal panel in sync with the chosen currency.
-        if (window.MISignals && typeof MISignals.followChart === 'function') MISignals.followChart(v);
+        // Keep the primary signal panel in sync with the chosen currency
+        // (users pay 1 coin for each new analysis reveal).
+        if (window.MISignals && typeof MISignals.revealSymbol === 'function') MISignals.revealSymbol(v);
+        else if (window.MISignals && typeof MISignals.followChart === 'function') MISignals.followChart(v);
       }
     };
     sel.addEventListener('change', pick);
