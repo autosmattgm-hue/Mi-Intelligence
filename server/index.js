@@ -703,6 +703,7 @@ router.post('/api/login', (ctx) => {
 
 // ---------------------------------------------------------------- user accounts + coins
 // Users register/sign-in and get FREE_COINS; 1 coin = 1 signal or 1 AI question.
+// Google Sign-In: verified ID token → find-or-create user (same coin rules).
 const usersApi = require('./users');
 
 function authToken(ctx) {
@@ -710,6 +711,19 @@ function authToken(ctx) {
   return h.startsWith('Bearer ') ? h.slice(7).trim() : h;
 }
 
+router.get('/api/auth/google/status', (ctx) => {
+  ctx.res.sendJson(200, { configured: !!process.env.GOOGLE_CLIENT_ID, clientId: process.env.GOOGLE_CLIENT_ID || null });
+});
+router.post('/api/auth/google', async (ctx) => {
+  try {
+    const idToken = (ctx.body && (ctx.body.idToken || ctx.body.credential)) || '';
+    if (!idToken) return ctx.res.sendJson(400, { error: 'Missing Google credential.' });
+    const googleAuth = require('./googleAuth');
+    const profile = await googleAuth.verifyIdToken(String(idToken));
+    const out = usersApi.googleLogin(profile);
+    ctx.res.sendJson(out.freeCoins ? 201 : 200, out);
+  } catch (e) { ctx.res.sendJson(e.status || 401, { error: e.message, code: e.code }); }
+});
 router.post('/api/auth/register', (ctx) => {
   try { ctx.res.sendJson(201, usersApi.register(ctx.body || {})); }
   catch (e) { ctx.res.sendJson(e.status || 400, { error: e.message }); }

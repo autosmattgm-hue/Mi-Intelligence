@@ -40,6 +40,8 @@
 
     <!-- USER page (register / sign in · 5 free coins) -->
     <form class="auth-form hidden" id="userForm" autocomplete="on">
+      <button type="button" class="login-btn google" id="googleBtn">G&nbsp;&nbsp;Continue with Google</button>
+      <div class="auth-div"><span>or</span></div>
       <input class="login-field" id="regName" type="text" placeholder="Display name (optional)" autocomplete="name">
       <input class="login-field" id="userEmail" type="email" placeholder="Email address" autocomplete="email" required>
       <input class="login-field" id="userPass" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password" required>
@@ -253,9 +255,23 @@
           <button class="btn ghost sm" id="watchToggle" title="Only show your starred assets">☆ Watchlist</button>
           <span class="coin-chip hidden" id="signalsCoinChip" title="Your MI coin balance">🪙 <b>0</b></span>
         </div>
-        <div class="sig-search-row">
-          <input id="signalSearch" class="input sig-search" type="search" placeholder="🔍 Search signals — BTC, EUR/USD, OTC, BUY…" autocomplete="off">
-          <button class="btn ghost sm" id="signalSearchClear" title="Clear search">✕</button>
+        <div class="sig-search-card">
+          <div class="sig-search-row">
+            <span class="sig-search-ico">🔍</span>
+            <input id="signalSearch" class="input sig-search" type="search" placeholder="Search signals or currencies — BTC, EUR/USD, AUD/CAD OTC, BUY…" autocomplete="off" enterkeyhint="search">
+            <button class="btn ghost sm hidden" id="signalSearchClear" title="Clear search">✕</button>
+          </div>
+          <div class="sig-chips" id="signalChips">
+            <button class="chip on" data-q="">All</button>
+            <button class="chip" data-q="BUY">🟢 BUY</button>
+            <button class="chip" data-q="SELL">🔴 SELL</button>
+            <button class="chip" data-q="OTC">💜 OTC</button>
+            <button class="chip" data-q="FOREX">💱 Forex</button>
+            <button class="chip" data-q="CRYPTO">💠 Crypto</button>
+            <button class="chip" data-q="HIGH">🔥 HIGH</button>
+          </div>
+          <div class="sig-count muted" id="signalCount"></div>
+          <div class="sig-suggest hidden" id="signalSuggest"></div>
         </div>
         <div class="table-wrap">
           <table class="table">

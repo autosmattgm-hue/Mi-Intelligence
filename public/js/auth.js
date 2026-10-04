@@ -95,6 +95,81 @@
     afterLogin('owner');
   }
 
+  // ---------------------------------------------------------------- Google Sign-In
+  // Official Google Identity Services button-less flow (zero extra deps).
+  // Needs GOOGLE_CLIENT_ID in server .env (see .env.example). Verified
+  // server-side via RS256 (server/googleAuth.js) — never trust client claims.
+  let googleClientId = null, googleReady = false;
+  function loadGoogleScript() {
+    return new Promise((resolve) => {
+      if (window.google && window.google.accounts && window.google.accounts.id) return resolve(true);
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.async = true; s.defer = true;
+      s.onload = () => resolve(true);
+      s.onerror = () => resolve(false);
+      document.head.appendChild(s);
+    });
+  }
+  async function initGoogle() {
+    const btn = $id('googleBtn');
+    if (!btn) return;
+    let status = null;
+    try {
+      const r = await fetch('/api/auth/google/status');
+      status = await r.json();
+    } catch { status = null; }
+    googleClientId = status && status.clientId ? status.clientId : null;
+    if (!googleClientId) {
+      btn.disabled = true;
+      btn.title = 'Ask the site owner to set GOOGLE_CLIENT_ID (see .env.example)';
+      btn.innerHTML = 'G&nbsp;&nbsp;Google sign-in not configured';
+      return;
+    }
+    const ok = await loadGoogleScript();
+    if (!ok || !window.google || !window.google.accounts) return;
+    try {
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: onGoogleCredential,
+        auto_select: false,
+        ux_mode: 'popup',
+      });
+      googleReady = true;
+    } catch { /* leave button; click will retry */ }
+  }
+  async function onGoogleCredential(resp) {
+    const err = $id('userError');
+    const btn = $id('googleBtn');
+    if (err) err.textContent = '';
+    const idToken = resp && resp.credential ? resp.credential : null;
+    if (!idToken) { if (err) err.textContent = 'Google sign-in failed — try again.'; return; }
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Signing in with Google…'; }
+    try {
+      const r = await apiPost('/api/auth/google', { idToken });
+      persistUser(r);
+      afterLogin('user', r.freeCoins || null);
+    } catch (x) {
+      if (err) err.textContent = x.message || 'Google sign-in failed.';
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = 'G&nbsp;&nbsp;Continue with Google'; }
+    }
+  }
+  function googleClick() {
+    if (googleReady && window.google && window.google.accounts) {
+      try { window.google.accounts.id.prompt(); return; } catch { /* fall through */ }
+    }
+    // Fallback: OAuth2 redirect flow works everywhere (phones included).
+    if (googleClientId) {
+      const redir = location.origin + location.pathname;
+      const url = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=' + encodeURIComponent(googleClientId) +
+        '&redirect_uri=' + encodeURIComponent(redir) +
+        '&response_type=id_token&scope=' + encodeURIComponent('openid email profile') +
+        '&nonce=' + Math.random().toString(36).slice(2) + '&prompt=select_account';
+      location.href = url;
+    }
+  }
+
   // ---------------------------------------------------------------- users
   async function userRegister(fields) {
     // v6 local-first: validate, then try server; on ANY network failure create
@@ -348,16 +423,27 @@
       } catch (x) { if (err) err.textContent = x.message || 'Authentication failed.'; }
     });
 
-    // Logout + coin pill + upgrade modal
+    // Logout + coin pill + upgrade modal + Google button
     const lo = $id('logoutBtn');
     if (lo) lo.addEventListener('click', logout);
     const pill = $id('coinBtn');
     if (pill) pill.addEventListener('click', () => openUpgrade());
     const uc = $id('upgradeClose');
     if (uc) uc.addEventListener('click', closeUpgrade);
+    const gb = $id('googleBtn');
+    if (gb) gb.addEventListener('click', googleClick);
 
     setRole();
     showOverlay(!isAuthed());
+    initGoogle();
+    // OAuth2 redirect fallback: token arrives in the URL hash.
+    try {
+      if (location.hash && location.hash.includes('id_token=')) {
+        const m = location.hash.match(/id_token=([^&]+)/);
+        if (m && m[1]) { onGoogleCredential({ credential: decodeURIComponent(m[1]) }); }
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    } catch { /* ignore */ }
   }
 
   document.addEventListener('DOMContentLoaded', init);

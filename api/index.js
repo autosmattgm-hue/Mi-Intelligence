@@ -506,6 +506,19 @@ function authTok(ctx) {
   const h = String((ctx.req.headers && (ctx.req.headers.authorization || ctx.req.headers['x-mi-token'])) || '');
   return h.startsWith('Bearer ') ? h.slice(7).trim() : h;
 }
+router.get('/api/auth/google/status', (ctx) => {
+  sendJson(ctx.res, 200, { configured: !!process.env.GOOGLE_CLIENT_ID, clientId: process.env.GOOGLE_CLIENT_ID || null });
+});
+router.post('/api/auth/google', async (ctx) => {
+  try {
+    const idToken = (ctx.body && (ctx.body.idToken || ctx.body.credential)) || '';
+    if (!idToken) return sendJson(ctx.res, 400, { error: 'Missing Google credential.' });
+    const googleAuth = require('../server/googleAuth');
+    const profile = await googleAuth.verifyIdToken(String(idToken));
+    const out = usersApi.googleLogin(profile);
+    sendJson(ctx.res, out.freeCoins ? 201 : 200, out);
+  } catch (e) { sendJson(ctx.res, e.status || 401, { error: e.message, code: e.code }); }
+});
 router.post('/api/auth/register', (ctx) => {
   try { sendJson(ctx.res, 201, usersApi.register(ctx.body || {})); }
   catch (e) { sendJson(ctx.res, e.status || 400, { error: e.message }); }

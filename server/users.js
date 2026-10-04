@@ -210,6 +210,6 @@ function buy(token, planId) {
 }
 
 module.exports = {
-  register, login, logout, me, spend, refund, wallet, buy,
+  register, login, googleLogin, logout, me, spend, refund, wallet, buy,
   PLANS, FREE_COINS, COIN_PER_ITEM,
 };

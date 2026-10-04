@@ -615,6 +615,7 @@
       if (ao !== bo) return ao - bo;
       return (b.confidence || 0) - (a.confidence || 0);
     });
+    let shown = 0;
     rows.forEach(s => {
       if (!showOtc && s.otc) return;
       const isHold = s.action === 'HOLD' || s.action === 'NEUTRAL';
@@ -623,10 +624,18 @@
       if (onlyTrend && (s.adx == null || s.adx < 22) && !isHold) return;
       if (minConf && !isHold && (s.confidence || 0) < minConf) return;
       if (state.watchOnly && !isWatched(s.symbol)) return;
-      // Search bar: match asset, symbol, action, trend, quality, OTC/LIVE.
+      // Search: tokens must ALL match somewhere (asset/symbol/action/trend/
+      // quality/market/mode/desk). "EUR USD" finds EURUSD + EURUSD_OTC, etc.
       if (state.search) {
-        const hay = ((s.asset || '') + ' ' + (s.symbol || '') + ' ' + (s.action || '') + ' ' + (s.trend || '') + ' ' + (s.quality || '') + ' ' + (s.otc ? 'OTC' : 'LIVE')).toUpperCase();
-        if (!hay.includes(state.search)) return;
+        const toks = state.search.split(/\s+/).filter(Boolean);
+        const modeTag = (s.mode === 'forex' || s.mode === 'pocket') ? 'FOREX' : 'CRYPTO';
+        const hay = ((s.asset || '') + ' ' + (s.symbol || '') + ' ' + ((s.symbol || '').replace(/_OTC$/, '')) + ' ' +
+          (s.action || '') + ' ' + (s.trend || '') + ' ' + (s.quality || '') + ' ' +
+          (s.otc ? 'OTC OVER THE COUNTER' : 'LIVE') + ' ' + modeTag + ' ' + (s.mode || '') + ' ' +
+          ((s.desk && s.desk.regime) || '') + ' ' + ((s.desk && s.desk.session) || '')).toUpperCase();
+        const hayNospace = hay.replace(/[\s/_-]+/g, '');
+        const ok = toks.every(t => hay.includes(t) || hayNospace.includes(t.replace(/[\s/_-]+/g, '')));
+        if (!ok) return;
       }
       const clsTag = tagClass(s.action);
       const locked = isLocked(s.symbol);
@@ -634,8 +643,17 @@
       tr.style.cursor = 'pointer';
       if (isStale(s)) tr.classList.add('stale');
       const mktTag = s.otc ? '<span class="otc-tag">OTC · adj</span>' : '<span class="live-tag">LIVE</span>';
+      const hl = (txt) => {
+        if (!state.search) return esc(txt);
+        let out = esc(txt);
+        state.search.split(/\s+/).filter(Boolean).forEach(t => {
+          if (t.length < 2) return;
+          try { out = out.replace(new RegExp('(' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark class="hl">$1</mark>'); } catch (e) {}
+        });
+        return out;
+      };
       tr.innerHTML =
-        '<td class="mono' + (locked ? ' lock-clear' : '') + '" style="font-weight:800">' + esc(s.asset) + mktTag +
+        '<td class="mono' + (locked ? ' lock-clear' : '') + '" style="font-weight:800">' + hl(s.asset) + mktTag +
         ' <button class="row-btn star' + (isWatched(s.symbol) ? ' on' : '') + '" data-star="' + s.symbol + '" title="Add/remove from watchlist">' + (isWatched(s.symbol) ? '★' : '☆') + '</button></td>' +
         '<td><span class="tag ' + clsTag + '" title="Conviction: ' + (s.quality || 'LOW') + ' · valid ' + remainingLabel(s) + '">' + s.action + (s.quality === 'HIGH' ? ' 🔥' : s.quality === 'MEDIUM' ? ' ⚡' : '') + '</span></td>' +
         '<td' + (locked ? ' class="lock-clear"' : '') + '>' + s.confidence + '%</td>' +
@@ -674,7 +692,15 @@
         tr.appendChild(td);
       }
       body.appendChild(tr);
+      shown += 1;
     });
+    // empty + count line (fixes "blank table, no feedback" complaint)
+    if (!shown) {
+      body.innerHTML = '<tr><td colspan="14"><div class="empty">' +
+        (state.search ? ('No signals match "' + esc($id('signalSearch').value.trim()) + '" — try BTC, EUR/USD, OTC, BUY…') : 'No signals under current filters — loosen Settings filters.') +
+        '</div></td></tr>';
+    }
+    if (window.MISearchCount) { try { window.MISearchCount(shown, state.signals.length); } catch (e) {} }
   }
 
   function switchView(name) {
@@ -982,20 +1008,76 @@
     });
     const btForm = $id('backtestForm');
     if (btForm) btForm.addEventListener('submit', (e) => { e.preventDefault(); runBacktest(); });
-    // Search bar: live-filter the signals table as you type.
+    // Search bar: live-filter + chips + count + suggestions + highlight.
     const sInput = $id('signalSearch');
     const sClear = $id('signalSearchClear');
+    const sCount = $id('signalCount');
+    const sSugg = $id('signalSuggest');
+    const sChips = $id('signalChips');
+    window.MISearchCount = (shown, total) => {
+      if (sCount) sCount.textContent = state.search ? (shown + ' of ' + total + ' match "' + $id('signalSearch').value.trim() + '"') : (total + ' live signals');
+      if (sClear) sClear.classList.toggle('hidden', !state.search);
+      if (sSugg) {
+        if (!state.search || shown > 0) { sSugg.classList.add('hidden'); sSugg.innerHTML = ''; }
+        else {
+          // no hits → suggest closest assets (currencies) to tap
+          const q = state.search.slice(0, 3);
+          const cands = (state.signals || []).filter(s => (s.symbol || '').includes(q)).slice(0, 6);
+          const picks = (cands.length ? cands : (state.signals || []).slice(0, 6));
+          sSugg.innerHTML = '';
+          sSugg.classList.remove('hidden');
+          picks.forEach(p => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = (p.asset || p.symbol) + ' ' + (p.action || '');
+            b.addEventListener('click', () => {
+              if (sInput) sInput.value = (p.asset || p.symbol);
+              state.search = ((p.asset || p.symbol) || '').toUpperCase();
+              syncChips();
+              renderTable();
+            });
+            sSugg.appendChild(b);
+          });
+        }
+      }
+    };
+    function syncChips() {
+      if (!sChips) return;
+      sChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', (c.dataset.q || '') === (state.search || '')));
+    }
     if (sInput) {
-      try { sInput.value = state.search || ''; } catch (e) {}
+      try { sInput.value = ''; } catch (e) {}
+      let deb = null;
       sInput.addEventListener('input', () => {
-        state.search = (sInput.value || '').trim().toUpperCase();
-        renderTable();
+        clearTimeout(deb);
+        deb = setTimeout(() => {
+          state.search = (sInput.value || '').trim().toUpperCase();
+          syncChips();
+          renderTable();
+        }, 120);
       });
-      sInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { sInput.value = ''; state.search = ''; renderTable(); } });
+      sInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { sInput.value = ''; state.search = ''; syncChips(); renderTable(); }
+        if (e.key === 'Enter') {
+          // jump to first match on Overview
+          const first = document.querySelector('#signalsBody tr');
+          if (first) first.click();
+          try { sInput.blur(); } catch (ex) {}
+        }
+      });
     }
     if (sClear) sClear.addEventListener('click', () => {
       state.search = '';
       if (sInput) { sInput.value = ''; sInput.focus(); }
+      syncChips();
+      renderTable();
+    });
+    if (sChips) sChips.addEventListener('click', (e) => {
+      const c = e.target && e.target.closest ? e.target.closest('.chip') : null;
+      if (!c) return;
+      state.search = (c.dataset.q || '').toUpperCase();
+      if (sInput) sInput.value = c.dataset.q || '';
+      syncChips();
       renderTable();
     });
     const histClear = $id('signalsHistoryClear');
