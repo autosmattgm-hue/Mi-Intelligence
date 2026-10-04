@@ -5,7 +5,7 @@
    MIBrokers (Pocket/MT5/MT4/Exness + Binance for crypto). */
 (function () {
   'use strict';
-  var timer = null, left = 35, cur = null, srcBtn = null;
+  var timer = null, left = 35, cur = null, curSym = null, srcBtn = null;
   var SHOW_SECS = 35;
   function el(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -21,21 +21,25 @@
     var l = Math.max(0, total - Math.floor(age / 1000));
     return { total: total, left: l, txt: Math.floor(l / 60) + 'm ' + String(l % 60).padStart(2, '0') };
   }
-  function open(sig, btn) {
-    // SHOW button: fixed 35s countdown, then closes back again.
-    // (Settings auto-close still overrides if the user changed it.)
-    left = SHOW_SECS;
+  function open(sig, btn, sym) {
+    // 1-coin SHOW button: fixed 35s countdown, then closes back + re-locks.
+    var key = sym || (sig && sig.symbol) || null;
+    var paid = false;
     try {
-      var pref = localStorage.getItem('mi.viewer.autoclose');
-      if (pref !== null && pref !== undefined && String(pref) !== '35') {
-        var n = Number(pref) || 0;
-        left = n > 0 ? n : (String(pref) === '0' ? 3600 : SHOW_SECS);
-      }
-    } catch (e) { left = SHOW_SECS; }
-    cur = sig; var total = left;
+      var saved = null;
+      try { saved = JSON.parse(localStorage.getItem('mi.revealed') || '{}'); } catch (e) {}
+      paid = !!(key && saved && saved[key] && window.MISignals && typeof window.MISignals.revealLeft === 'function');
+    } catch (e) { paid = false; }
+    if (paid) {
+      try { left = Math.max(1, window.MISignals.revealLeft(key)); } catch (e) { left = SHOW_SECS; }
+    } else {
+      left = SHOW_SECS;
+    }
+    cur = sig; curSym = paid ? key : null; var total = left;
     // countdown lives IN the clicked button: disable + live label + bar
     if (btn && btn.isConnected) {
       srcBtn = btn;
+      try { if (key) srcBtn.setAttribute('data-cd', key); } catch (e) {}
       if (!srcBtn.dataset.orig) srcBtn.dataset.orig = srcBtn.innerHTML;
       srcBtn.disabled = true;
       srcBtn.classList.add('counting');
@@ -44,13 +48,23 @@
     ov.classList.remove('hidden');
     paint();
     if (timer) clearInterval(timer);
-    timer = setInterval(function () {
-      left -= 1;
-      var n = el('svCount'); if (n) n.textContent = left + 's';
-      var bar = el('svBar'); if (bar) bar.style.width = (left / total * 100) + '%';
-      paintBtn();
-      if (left <= 0) close();
-    }, 1000);
+    if (paid) {
+      // paid 1-coin view: mirror the reveal ticker (single source of truth)
+      timer = setInterval(function () {
+        try { left = Math.max(0, window.MISignals.revealLeft(curSym)); } catch (e) {}
+        var n = el('svCount'); if (n) n.textContent = left + 's';
+        var bar = el('svBar'); if (bar) bar.style.width = (left / total * 100) + '%';
+        paintBtn();
+      }, 500);
+    } else {
+      timer = setInterval(function () {
+        left -= 1;
+        var n2 = el('svCount'); if (n2) n2.textContent = left + 's';
+        var bar2 = el('svBar'); if (bar2) bar2.style.width = (left / total * 100) + '%';
+        paintBtn();
+        if (left <= 0) close();
+      }, 1000);
+    }
     paintBtn();
   }
   function paintBtn() {
@@ -59,26 +73,29 @@
     var pct = Math.max(0, Math.round(left / SHOW_SECS * 100));
     srcBtn.innerHTML = '<span class="show-cd">⏳ ' + left + 's closing…</span><span class="show-bar"><span style="width:' + pct + '%"></span></span>';
   }
-  function restoreBtn() {
-    if (srcBtn && srcBtn.isConnected) {
+  function restoreBtn(silent) {
+    // silent = closed by the 35s reveal expiry (button already re-rendered
+    // as locked by renderTable) — don't restore stale "counting" HTML.
+    if (srcBtn && srcBtn.isConnected && !silent) {
       srcBtn.disabled = false;
       srcBtn.classList.remove('counting');
       if (srcBtn.dataset.orig) srcBtn.innerHTML = srcBtn.dataset.orig;
     }
     srcBtn = null;
   }
-  function close() {
+  function close(silent) {
     if (timer) clearInterval(timer); timer = null;
     var ov = el('signalViewer'); if (ov) ov.classList.add('hidden');
-    cur = null;
-    restoreBtn();
+    cur = null; curSym = null;
+    restoreBtn(silent);
   }
   function paint() {
     if (!cur) return;
     var t = tpLeft(cur);
-    el('svTitle').textContent = (cur.asset || cur.symbol) + ' ' + cur.action;
+    var desk = cur.desk || null;
+    el('svTitle').textContent = (cur.asset || cur.symbol) + ' ' + cur.action + (cur.otc ? ' · OTC' : '');
     el('svTitle').className = 'sv-title ' + (String(cur.action).indexOf('BUY') === 0 || cur.action === 'CALL' ? 'buy' : String(cur.action).indexOf('SELL') === 0 || cur.action === 'PUT' ? 'sell' : 'hold');
-    el('svMeta').textContent = 'Conf ' + cur.confidence + '% | ' + (cur.quality || '') + ' | Entry ' + fmtP(cur.entry || cur.price, cur);
+    el('svMeta').textContent = 'Conf ' + cur.confidence + '% | ' + (cur.quality || '') + ' | Entry ' + fmtP(cur.entry || cur.price, cur) + (desk ? ' | ' + desk.regime + ' · ' + desk.session : '');
     el('svLevels').innerHTML = '<div><span>Entry</span><b>' + fmtP(cur.entry || cur.price, cur) + '</b></div>'
       + '<div><span>Take profit</span><b class="g">' + fmtP(cur.takeProfit, cur) + '</b></div>'
       + '<div><span>Stop loss</span><b class="r">' + fmtP(cur.stopLoss, cur) + '</b></div>'

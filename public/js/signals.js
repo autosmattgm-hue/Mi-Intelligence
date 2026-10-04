@@ -7,6 +7,7 @@
     summary: null,
     selected: 'BTCUSDT',
     solo: null,
+    search: '',
     paperStats: null,
     history: [],
     accuracy: null,
@@ -60,26 +61,88 @@
 
   // ---- coin-gated signal reveal: users see blurred signals until they pay 1 coin.
   // Revealed symbols persist per-device (localStorage) so you don't pay twice.
+  // After paying, the unlocked signal runs a 35s in-button countdown, then
+  // re-locks (user can re-reveal). Timers are tracked per symbol.
   const revealed = (() => { try { return JSON.parse(localStorage.getItem('mi.revealed') || '{}'); } catch { return {}; } })();
+  const revealTimers = {};
   function saveRevealed() { try { localStorage.setItem('mi.revealed', JSON.stringify(revealed)); } catch {} }
   function isLocked(sym) { return (window.MI && MI.role === 'user') && !revealed[sym]; }
+  function revealLeft(sym) {
+    const t = revealTimers[sym];
+    if (!t) return 0;
+    return Math.max(0, Math.ceil((t.until - Date.now()) / 1000));
+  }
+  function clearRevealTimer(sym) {
+    const t = revealTimers[sym];
+    if (t && t.timer) { try { clearInterval(t.timer); } catch (e) {} }
+    delete revealTimers[sym];
+  }
+  function armRevealTimer(sym) {
+    clearRevealTimer(sym);
+    revealTimers[sym] = { until: Date.now() + 35 * 1000, timer: null };
+    revealTimers[sym].timer = setInterval(() => {
+      const left = revealLeft(sym);
+      // 1) table-row unlock buttons for this symbol
+      document.querySelectorAll('[data-cd="' + sym + '"]').forEach(b => {
+        const pct = Math.max(0, Math.round(left / 35 * 100));
+        b.innerHTML = '<span class="show-cd">⏳ ' + left + 's</span><span class="show-bar"><span style="width:' + pct + '%"></span></span>';
+      });
+      // 2) Overview SHOW button — countdown INSIDE it after redirect
+      try {
+        const ovBtn = document.getElementById('sigDetails');
+        const ovCd = document.getElementById('sigDetailsCd');
+        if (ovBtn && state.selected === sym) {
+          ovBtn.classList.add('counting');
+          ovBtn.disabled = true;
+          if (ovCd) ovCd.textContent = left > 0 ? ('⏳ ' + left + 's') : '';
+        }
+      } catch (e) {}
+      const ov = document.getElementById('signalViewer');
+      if (ov && !ov.classList.contains('hidden')) {
+        const c = document.getElementById('svCount');
+        if (c && window.MISignalViewer) { try { c.textContent = left + 's'; } catch (e) {} }
+      }
+      if (left <= 0) {
+        clearRevealTimer(sym);
+        delete revealed[sym];
+        saveRevealed();
+        if (window.MISignalViewer) { try { window.MISignalViewer.close(true); } catch (e) {} }
+        // trade blurs back on Overview too — full re-render re-locks it
+        renderSignalPanel();
+        renderTable();
+        if (window.MI && MI.toast) MI.toast('info', '⏳ Reveal expired', sym + ' re-locked after 35s — spend 1 coin to view again.');
+      }
+    }, 1000);
+  }
   function lockVeilHtml(sym) {
     const coins = (window.MI && MI.coins != null) ? MI.coins : 0;
     return '<div class="signal-lock-veil">' +
       '<div class="lock-title">🔒 Signal locked</div>' +
       '<div class="lock-sub">Reveal the full plan for <b>1 🪙</b> — balance: <b>' + coins + '</b></div>' +
-      '<button class="login-btn sm" data-unlock="' + esc(sym) + '">' + (coins > 0 ? '🔓 Show signal · 1 coin' : '🪙 Buy coins to reveal') + '</button>' +
+      '<button class="login-btn sm show-btn" data-unlock="' + esc(sym) + '">' + (coins > 0 ? '🔓 Show signal · 1 coin' : '🪙 Buy coins to reveal') + '</button>' +
       '</div>';
   }
-  async function unlockSignal(sym) {
+  async function unlockSignal(sym, btn, toOverview) {
     if (window.MIAuth && window.MIAuth.role && window.MIAuth.role() === 'user') {
       const ok = await window.MIAuth.spend('signal');
       if (!ok) return;
     }
     revealed[sym] = true;
     saveRevealed();
+    // Always land on the Overview panel — the 35s countdown lives INSIDE the
+    // Overview SHOW button (sigDetails), not in the modal or table row.
+    state.selected = sym;
+    state.solo = sym;
+    try { localStorage.setItem('mi.solo.v1', sym); } catch (e) {}
     renderSignalPanel();
     renderTable();
+    try { switchView('overview'); } catch (e) {}
+    armRevealTimer(sym);
+    const target = document.getElementById('sigDetails');
+    if (window.MISignalViewer) {
+      const sig = findSignal(sym) || (state.signals || []).find(s => s.symbol === sym) || null;
+      if (sig) window.MISignalViewer.open(sig, target, sym);
+    }
   }
 
   // ---- economic-news zone (from /api/calendar) ----
@@ -293,9 +356,11 @@
       riskPct = Number(localStorage.getItem('mi.risk.pct') || 2) || 2;
       riskNoteOn = (localStorage.getItem('mi.risk.note') || 'on') !== 'off';
     } catch (e) {}
-    const mktTag2 = sig.otc ? '<span class="otc-tag">OTC</span>' : '<span class="live-tag">LIVE</span>';
+    const mktTag2 = sig.otc ? '<span class="otc-tag">OTC · spread-adjusted</span>' : '<span class="live-tag">LIVE</span>';
+    const desk = sig.desk || null;
+    const deskLine = desk ? '<div class="desk-line">🏦 Desk: ' + esc(desk.feed || '') + ' · ' + esc(desk.session || '') + ' (' + (desk.liquidity != null ? desk.liquidity : '—') + '/100) · Vol ' + esc(desk.regime || '') + '<br><span class="muted">' + esc(desk.spreadNote || '') + ' — ' + esc(desk.planNote || '') + '</span></div>' : '';
     const riskLine = (riskNoteOn && sig.action !== 'HOLD' && sig.action !== 'NEUTRAL')
-      ? '<div class="tp-note">🛡 Risk ' + riskPct + '%/trade · ' + esc(sig.asset) + mktTag2 + ' · TP ' + fmtTpCountdown(sig) + '</div>' : '';
+      ? '<div class="tp-note">🛡 Risk ' + riskPct + '%/trade · ' + esc(sig.asset) + mktTag2 + ' · TP ' + fmtTpCountdown(sig) + '</div>' + deskLine : deskLine;
 
     const inner =
       soloBar +
@@ -343,7 +408,7 @@
       playbookHtml(sig) +
       '<div class="signal-actions">' +
       '<button class="btn ghost sm" id="sigCopy">📋 Copy plan</button>' +
-      '<button class="btn ghost sm show-btn" id="sigDetails">👁 SHOW</button>' +
+      '<button class="btn ghost sm show-btn" id="sigDetails" data-cd-btn>👁 SHOW <span class="show-cd-inline" id="sigDetailsCd"></span></button>' +
       '<button class="btn ghost sm" id="sigGoChart">📈 Show chart</button>' +
       '<button class="btn ghost sm" id="sigTrade">🚀 Trade this</button>' +
       (sig.mode !== 'pocket' && sig.action !== 'HOLD' && sig.action !== 'NEUTRAL' ? '<button class="btn ghost sm" id="sigPaper">📥 Paper trade</button>' : '') +
@@ -359,11 +424,13 @@
       '</div>';
 
     // Users see blurred signals until they pay 1 coin to reveal the plan.
+    // Tap → 1 coin spent → redirect to Overview panel → 35s counts INSIDE the
+    // Overview SHOW button → trade blurs back when done.
     if (isLocked(sig.symbol)) {
       el.innerHTML = '<div class="signal-locked"><div class="blur-inner">' + inner + '</div>' +
         lockVeilHtml(sig.symbol) + '</div>';
       const ub = el.querySelector('[data-unlock]');
-      if (ub) ub.addEventListener('click', () => unlockSignal(sig.symbol));
+      if (ub) ub.addEventListener('click', () => unlockSignal(sig.symbol, ub, true));
       return;
     }
     el.innerHTML = inner;
@@ -531,7 +598,7 @@
 
     body.innerHTML = '';
     if (!state.signals.length) {
-      body.innerHTML = '<tr><td colspan="12"><div class="empty">Loading live signals…</div></td></tr>';
+      body.innerHTML = '<tr><td colspan="13"><div class="empty">Loading live signals…</div></td></tr>';
       return;
     }
     // Settings: minimum-confidence filter + OTC/LIVE grouping + show/hide toggles.
@@ -556,12 +623,17 @@
       if (onlyTrend && (s.adx == null || s.adx < 22) && !isHold) return;
       if (minConf && !isHold && (s.confidence || 0) < minConf) return;
       if (state.watchOnly && !isWatched(s.symbol)) return;
+      // Search bar: match asset, symbol, action, trend, quality, OTC/LIVE.
+      if (state.search) {
+        const hay = ((s.asset || '') + ' ' + (s.symbol || '') + ' ' + (s.action || '') + ' ' + (s.trend || '') + ' ' + (s.quality || '') + ' ' + (s.otc ? 'OTC' : 'LIVE')).toUpperCase();
+        if (!hay.includes(state.search)) return;
+      }
       const clsTag = tagClass(s.action);
       const locked = isLocked(s.symbol);
       const tr = document.createElement('tr');
       tr.style.cursor = 'pointer';
       if (isStale(s)) tr.classList.add('stale');
-      const mktTag = s.otc ? '<span class="otc-tag">OTC</span>' : '<span class="live-tag">LIVE</span>';
+      const mktTag = s.otc ? '<span class="otc-tag">OTC · adj</span>' : '<span class="live-tag">LIVE</span>';
       tr.innerHTML =
         '<td class="mono' + (locked ? ' lock-clear' : '') + '" style="font-weight:800">' + esc(s.asset) + mktTag +
         ' <button class="row-btn star' + (isWatched(s.symbol) ? ' on' : '') + '" data-star="' + s.symbol + '" title="Add/remove from watchlist">' + (isWatched(s.symbol) ? '★' : '☆') + '</button></td>' +
@@ -572,6 +644,7 @@
         '<td class="mono" style="color:var(--green)">' + (s.takeProfit ? fmtPrice(s.takeProfit, s) : '—') + '</td>' +
         '<td class="mono" style="color:var(--red)">' + (s.stopLoss ? fmtPrice(s.stopLoss, s) : '—') + '</td>' +
         '<td class="mono">' + (s.riskReward ? '1:' + s.riskReward : '—') + '</td>' +
+        '<td class="mono desk-cell" title="' + esc((s.desk && s.desk.feed) || '') + ' · ' + esc((s.desk && s.desk.session) || '') + ' · Vol ' + esc((s.desk && s.desk.regime) || '') + '">' + (s.otc ? '💜 OTC' : '🟢 LIVE') + ' <span class="muted">' + esc((s.desk && s.desk.regime) || '') + '</span></td>' +
         '<td>' + esc(s.trend) + '</td>' +
         '<td class="mono">' + (s.rsi !== null ? s.rsi : '—') + '</td>' +
         '<td>' + esc(s.macdState) + '</td>' +
@@ -593,10 +666,10 @@
         const td = document.createElement('td');
         td.className = 'row-lock-cell';
         const ub = document.createElement('button');
-        ub.className = 'btn ghost sm';
+        ub.className = 'btn ghost sm show-btn';
         ub.dataset.unlock = s.symbol;
         ub.textContent = '🔓 Show · 1 coin';
-        ub.addEventListener('click', (e) => { e.stopPropagation(); unlockSignal(s.symbol); });
+        ub.addEventListener('click', (e) => { e.stopPropagation(); unlockSignal(s.symbol, ub, true); });
         td.appendChild(ub);
         tr.appendChild(td);
       }
@@ -909,6 +982,22 @@
     });
     const btForm = $id('backtestForm');
     if (btForm) btForm.addEventListener('submit', (e) => { e.preventDefault(); runBacktest(); });
+    // Search bar: live-filter the signals table as you type.
+    const sInput = $id('signalSearch');
+    const sClear = $id('signalSearchClear');
+    if (sInput) {
+      try { sInput.value = state.search || ''; } catch (e) {}
+      sInput.addEventListener('input', () => {
+        state.search = (sInput.value || '').trim().toUpperCase();
+        renderTable();
+      });
+      sInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { sInput.value = ''; state.search = ''; renderTable(); } });
+    }
+    if (sClear) sClear.addEventListener('click', () => {
+      state.search = '';
+      if (sInput) { sInput.value = ''; sInput.focus(); }
+      renderTable();
+    });
     const histClear = $id('signalsHistoryClear');
     if (histClear) histClear.addEventListener('click', async () => {
       if (!confirm('Delete all saved signal history? This cannot be undone.')) return;
@@ -1002,6 +1091,6 @@
   } catch (e) {}
 
   window.MISignals = {
-    state, init, refreshSignals, handleModeChange, followChart, revealSymbol, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView, setRefresh,
+    state, init, refreshSignals, handleModeChange, followChart, revealSymbol, revealLeft, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView, setRefresh,
   };
 })();

@@ -46,6 +46,45 @@ function wilders(values, p) {
   return out;
 }
 
+// OTC spread model (Pocket Option OTC desk): synthetic contracts carry a
+// wider effective spread + weekend/low-liquidity chop. We model it as an
+// extra cost in ATR units + a chop penalty so OTC signals are STRICTER:
+// fewer, higher-quality CALL/PUT verdicts with wider SL and honest confidence.
+function otcProfile(symbol, atrPct, adxV) {
+  const isOtc = /_OTC$/.test(String(symbol || '').toUpperCase());
+  if (!isOtc) return { isOtc: false, spreadAtr: 0, chopPenalty: 0, minScore: 25, label: 'LIVE feed' };
+  const spreadAtr = 0.35 + Math.min(0.45, (atrPct || 0.4) * 0.18);
+  const chopPenalty = (adxV === null || adxV === undefined || adxV < 20) ? 10 : 4;
+  return { isOtc: true, spreadAtr, chopPenalty, minScore: 34, label: 'OTC desk · spread-adjusted' };
+}
+
+// Session Liquidity Index 0-100 — London/NY overlap is prime, Asian/closed is thin.
+// OTC trades 24/7 but thin sessions get penalised like a real desk would.
+function sessionLiquidity(t) {
+  const h = new Date(t).getUTCHours();
+  if ((h >= 12 && h < 16)) return { score: 100, label: 'London/NY overlap · prime' };
+  if ((h >= 7 && h < 12) || (h >= 16 && h < 21)) return { score: 80, label: 'London / NY · liquid' };
+  if ((h >= 0 && h < 7)) return { score: 55, label: 'Asian · thinner' };
+  if (h >= 21 || h < 0) return { score: 45, label: 'Sydney · thin' };
+  return { score: 60, label: 'Off-peak' };
+}
+
+// Realised-volatility regime from candle ranges (annualised proxy, robust).
+function volRegime(klines) {
+  const rets = [];
+  for (let i = 1; i < klines.length; i++) {
+    const a = klines[i - 1].close, b = klines[i].close;
+    if (a > 0 && b > 0) rets.push(Math.log(b / a));
+  }
+  if (rets.length < 20) return { sigma: 0, label: 'unknown', mult: 1 };
+  const mean = rets.reduce((s, x) => s + x, 0) / rets.length;
+  const variance = rets.reduce((s, x) => s + (x - mean) * (x - mean), 0) / rets.length;
+  const sigma = Math.sqrt(variance) * Math.sqrt(96 * 365) * 100; // ~15m bars annualised %
+  if (sigma < 25) return { sigma, label: 'QUIET', mult: 0.85 };
+  if (sigma < 70) return { sigma, label: 'NORMAL', mult: 1 };
+  return { sigma, label: 'WILD', mult: 1.35 };
+}
+
 // Average Directional Index (14) — tells a REAL trend from chop.
 function adxArr(klines, p = 14) {
   const n = klines.length;
@@ -351,7 +390,28 @@ function analyzeSymbol(symbol, klines, opts) {
   // ----------------------------------------------------------------------
   // Verdict — confluence score transformed into an actionable signal.
   const mode = (opts && opts.mode) || 'crypto';
-  const dir = score >= 25 ? 1 : score <= -25 ? -1 : 0;
+  // Professional desk calculation:
+  //  1) volatility regime scales targets (WILD markets need wider TP/SL),
+  //  2) session liquidity gates weak signals in thin hours,
+  //  3) OTC desk model: higher bar + chop penalty + spread-adjusted SL.
+  const regime = volRegime(klines);
+  const sess = sessionLiquidity(Date.now());
+  const adxForOtc = last(adxArr(klines));
+  const otc = otcProfile(symbol, atrPct, adxForOtc);
+  if (otc.isOtc) {
+    score -= otc.chopPenalty;
+    factors.push({ name: 'OTC desk', value: otc.label + ' · -' + otc.chopPenalty + ' chop guard', impact: score >= 0 ? 'neutral' : 'bear' });
+  }
+  factors.push({ name: 'Vol regime', value: regime.label + (regime.sigma ? ' σ' + regime.sigma.toFixed(0) + '%' : ''), impact: 'neutral' });
+  factors.push({ name: 'Session', value: sess.label + ' ' + sess.score + '/100', impact: 'neutral' });
+  const minScore = otc.minScore;
+  const thinSession = sess.score < 60;
+  const dirRaw = score >= minScore ? 1 : score <= -minScore ? -1 : 0;
+  // Thin-session veto: weak scores in thin hours stay flat (desk discipline).
+  const dir = (thinSession && Math.abs(score) < minScore + 8) ? 0 : dirRaw;
+  if (thinSession && dirRaw !== 0 && dir === 0) {
+    factors.push({ name: 'Session veto', value: 'thin liquidity — standing aside', impact: 'neutral' });
+  }
   // Pocket Option mode: direction is a CALL (up) or PUT (down) for short
   // expiries. Forex/Crypto: classic BUY / SELL / HOLD.
   let action;
@@ -397,14 +457,17 @@ function analyzeSymbol(symbol, klines, opts) {
   const confidence = isNeutral ? rawConf : Math.min(effectiveCap, rawConf);
 
   // Trade plan (only when a directional signal exists)
+  // Professional sizing: ATR multiples scaled by realised-vol regime; OTC gets
+  // spread-widened SL so the desk doesn't get stopped by synthetic spread.
   let entry = price, tp = null, sl = null, rr = null;
   if (!isNeutral && atrV > 0) {
     const isBuy = dir === 1;
-    // Calibrated so real forward win-rates are achievable: TP = 2.0 ATR,
-    // SL = 1.4 ATR (≈1.4R). The accuracy tracker showed the previous
-    // 2.6/1.6 target was too ambitious — losses dominated.
-    sl = isBuy ? price - atrV * 1.4 : price + atrV * 1.4;
-    tp = isBuy ? price + atrV * 2.0 : price - atrV * 2.0;
+    const k = (typeof regime !== 'undefined' ? regime.mult : 1) || 1;
+    const tpMult = 2.0 * k;
+    let slMult = 1.4 * k;
+    if (typeof otc !== 'undefined' && otc.isOtc) slMult += otc.spreadAtr;
+    sl = isBuy ? price - atrV * slMult : price + atrV * slMult;
+    tp = isBuy ? price + atrV * tpMult : price - atrV * tpMult;
     rr = round2(Math.abs(tp - price) / Math.abs(price - sl));
   }
 
@@ -488,6 +551,17 @@ function analyzeSymbol(symbol, klines, opts) {
         ('TP check in ' + Math.floor(_timerTotal / 60) + 'm'),
       tpDeadline: new Date(Date.now() + _timerTotal * 1000).toISOString(),
     } : {}),
+    // Professional statement block: every signal carries its desk reasoning,
+    // session/vol context and OTC transparency so the site reads institutional.
+    desk: {
+      regime: regime.label,
+      session: sess.label,
+      liquidity: sess.score,
+      feed: otc.label,
+      spreadNote: otc.isOtc ? ('OTC spread ≈ ' + otc.spreadAtr.toFixed(2) + '×ATR widened into SL') : 'Live interbank spread',
+      planNote: isNeutral ? 'No edge — standing aside is the professional call.'
+        : (dir === 1 ? 'Long ' : 'Short ') + asset + ' · TP ' + (tp ? rPrec(tp) : '—') + ' / SL ' + (sl ? rPrec(sl) : '—') + ' · R:R ' + (rr != null ? rr : '—'),
+    },
     // OTC contract tag (Pocket Option OTC): priced from live underlying
     ...(_isOtc ? { otc: true, market: 'OTC', underlying: _base } : { otc: false, market: 'LIVE' }),
     factors,

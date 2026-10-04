@@ -111,6 +111,41 @@ function login(body) {
   return { token: u.token, user: publicUser(u) };
 }
 
+// Google Sign-In: verified Google profile → find-or-create user.
+// First Google login grants FREE_COINS like email registration.
+function googleLogin(profile) {
+  load();
+  const email = String((profile && profile.email) || '').trim().toLowerCase();
+  if (!email) throw err('Google account has no email.', 401);
+  const name = String((profile && profile.name) || '').trim() || email.split('@')[0] || 'Trader';
+  let u = users.find(x => x.email === email);
+  let isNew = false;
+  if (!u) {
+    u = {
+      id: crypto.randomBytes(8).toString('hex'),
+      name, email,
+      salt: null, hash: null,              // passwordless (Google-managed)
+      googleId: profile.googleId || null,
+      avatar: profile.avatar || null,
+      token: crypto.randomBytes(24).toString('hex'),
+      createdAt: Date.now(), expiresAt: Date.now() + SESSION_MS,
+      coins: FREE_COINS, spent: 0, orders: [], ledger: [{ ts: Date.now(), item: 'google_signup_bonus', cost: '+' + FREE_COINS }],
+    };
+    users.push(u);
+    isNew = true;
+  } else {
+    if (profile.googleId) u.googleId = profile.googleId;
+    if (profile.avatar) u.avatar = profile.avatar;
+    if (!u.name || u.name === u.email.split('@')[0]) u.name = name;
+    u.token = crypto.randomBytes(24).toString('hex');
+    u.expiresAt = Date.now() + SESSION_MS;
+  }
+  save();
+  const out = { token: u.token, user: publicUser(u) };
+  if (isNew) out.freeCoins = FREE_COINS;
+  return out;
+}
+
 function logout(token) {
   load();
   const i = users.findIndex(u => u.token === token);

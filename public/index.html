@@ -253,13 +253,17 @@
           <button class="btn ghost sm" id="watchToggle" title="Only show your starred assets">☆ Watchlist</button>
           <span class="coin-chip hidden" id="signalsCoinChip" title="Your MI coin balance">🪙 <b>0</b></span>
         </div>
+        <div class="sig-search-row">
+          <input id="signalSearch" class="input sig-search" type="search" placeholder="🔍 Search signals — BTC, EUR/USD, OTC, BUY…" autocomplete="off">
+          <button class="btn ghost sm" id="signalSearchClear" title="Clear search">✕</button>
+        </div>
         <div class="table-wrap">
           <table class="table">
             <thead>
               <tr>
                 <th>Asset</th><th>Signal</th><th>Confidence</th><th>Price</th>
                 <th>Entry</th><th>Take Profit</th><th>Stop Loss</th><th>R/R</th>
-                <th>Trend</th><th>RSI</th><th>MACD</th><th>Rating</th>
+                <th>Desk</th><th>Trend</th><th>RSI</th><th>MACD</th><th>Rating</th>
               </tr>
             </thead>
             <tbody id="signalsBody"></tbody>
@@ -565,7 +569,7 @@
     <!-- ============================ SETTINGS ============================ -->
     <section class="view" data-view="settings">
       <div class="set-hero panel">
-        <div class="set-hero-l"><div class="set-avatar" id="setAvatar">👤</div><div><strong id="setHeroName">Trader</strong><span class="sub" id="setHeroSub">MI v6.2 · set up your desk</span></div></div>
+        <div class="set-hero-l"><div class="set-avatar" id="setAvatar">👤</div><div><strong id="setHeroName">Trader</strong><span class="sub" id="setHeroSub">MI Pro Desk · set up your terminal</span></div></div>
         <div class="set-hero-r"><span class="coin-pill" id="setCoinPill">🪙 <b id="setCoinCount">—</b></span><button class="btn ghost sm" id="setBuyCoins">Top up</button><button class="btn ghost sm" id="setLogoutTop">Log out</button></div>
       </div>
       <div class="grid-2col">
@@ -617,7 +621,6 @@
             <label class="set-row"><span>📲 Install MI as app + enable closed-app alarms</span><button class="btn ghost sm" id="setInstallPush">Install & enable</button></label>
             <label class="set-row"><span>⏳ TP warning</span><select class="select" id="setTpWarn"><option value="60">1 minute before</option><option value="300">5 minutes before</option><option value="900">15 minutes before</option></select></label>
             <label class="set-row"><span>⭐ Minimum confidence</span><select class="select" id="setMinConf"><option value="0">All signals</option><option value="60">60%+</option><option value="70">70%+</option><option value="80">80%+ HIGH only</option></select></label>
-            <label class="set-row"><span>⏱ Auto-close signal view</span><select class="select" id="setAutoClose"><option value="35" selected>35 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="0">Never</option></select></label>
             <label class="set-row"><span>📳 Watchlist-only signals table</span><button class="os-toggle" id="setWatchOnly">OFF</button></label>
             <label class="set-row"><span>🔁 Auto-refresh signals</span><select class="select" id="setRefresh"><option value="30">30s</option><option value="60" selected>60s</option><option value="120">2 min</option><option value="0">Manual</option></select></label>
             <label class="set-row"><span>🔔 Alert sound</span><button class="os-toggle" id="setSound">ON</button></label>

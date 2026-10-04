@@ -27,7 +27,7 @@
     var voice = gid('setVoice'), push = gid('setPush'), news = gid('setNews');
     var sound = gid('setSound'), otc = gid('setOtc'), hold = gid('setHold');
     var riskNote = gid('setRiskNote'), vibrate = gid('setVibrate'), logout = gid('setLogout');
-    var tpWarn = gid('setTpWarn'), minConf = gid('setMinConf'), autoClose = gid('setAutoClose');
+    var tpWarn = gid('setTpWarn'), minConf = gid('setMinConf');
     var mode = gid('setMode'), tf = gid('setTf'), risk = gid('setRisk');
     if (!voice) return;
     paintToggle(voice, get('mi.voice', 'on') !== 'off');
@@ -44,7 +44,6 @@
     } catch (e) {}
     if (tpWarn) tpWarn.value = get('mi.tp.warn', '60');
     if (minConf) minConf.value = get('mi.min.conf', '0');
-    if (autoClose) autoClose.value = get('mi.viewer.autoclose', '35');
     if (mode) mode.value = get('mi.mode', 'crypto');
     if (tf) tf.value = get('mi.tf', '15m');
     if (risk) risk.value = get('mi.risk.pct', '2');
@@ -85,7 +84,6 @@
       set('mi.min.conf', minConf.value);
       if (window.MISignals) { try { window.MISignals.renderTable(); } catch (e) {} }
     });
-    if (autoClose) autoClose.addEventListener('change', function () { set('mi.viewer.autoclose', autoClose.value); });
     if (mode) mode.addEventListener('change', function () { set('mi.mode', mode.value); if (window.MIMode) window.MIMode.switchTo(mode.value); });
     if (tf) tf.addEventListener('change', function () {
       set('mi.tf', tf.value);
