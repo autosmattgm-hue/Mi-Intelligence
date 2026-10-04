@@ -409,13 +409,24 @@ function analyzeSymbol(symbol, klines, opts) {
   }
 
   const fxPip = (opts && opts.pip) || 0.0001;
+  const _isOtc = /_OTC$/.test(String(symbol).toUpperCase());
+  const _base = _isOtc ? String(symbol).toUpperCase().replace(/_OTC$/, '') : symbol;
   // Forex prices need their market precision (5 dp majors / 2-3 dp JPY & metals) —
   // not the 2-dp crypto rounding.
-  const fpx = Math.pow(10, mode === 'forex' ? ((opts && opts.precision) || 5) : 2);
+  const fpx = Math.pow(10, mode === 'forex' ? ((opts && opts.precision) || 5) : (mode === 'pocket' && opts && opts.precision ? opts.precision : 2));
   const rPrec = (v) => (v === null || v === undefined || isNaN(v)) ? v : Math.round(v * fpx) / fpx;
-  const asset = (mode === 'forex' || (mode === 'pocket' && !symbol.endsWith('USDT')))
+  const asset = _isOtc
+    ? (_base.replace(/^(.{3})(.{3})$/, '$1/$2') + ' OTC')
+    : (mode === 'forex' || (mode === 'pocket' && !symbol.endsWith('USDT')))
     ? symbol.replace(/^(.{3})(.{3})$/, '$1/$2')
     : symbol.replace(/USDT$/, '') + '/USDT';
+
+  // TP countdown window (professional timer so users know when to secure profit)
+  const _expForTimer = chooseExpiry(atrPct, absS, adxV);
+  const _timerTotal = mode === 'pocket'
+    ? (_expForTimer === '1m' ? 60 : _expForTimer === '15m' ? 900 : 300)
+    : mode === 'forex' ? (30 * 60 + Math.round(((isNeutral ? 50 : confidence) / 100) * 90 * 60))
+    : (30 * 60 + Math.round(((isNeutral ? 50 : confidence) / 100) * 60 * 60));
 
   return {
     symbol,
@@ -463,15 +474,50 @@ function analyzeSymbol(symbol, klines, opts) {
     } : {}),
     // Pocket Option mode: expiry, payout estimate (typical 80-94% digital-option payouts), win probability
     ...(mode === 'pocket' ? {
-      expiry: chooseExpiry(atrPct, absS, adxV),
+      expiry: _expForTimer,
       payout: Math.max(80, Math.min(94, Math.round(78 + atrPct * 4))),
       winProbability: confidence,
       directionUp: dir === 1,
       // FX / index / metals keep their own quote precision & pip size
       ...(opts && opts.precision ? { precision: opts.precision, pipValue: (opts && opts.pip) || (mode === 'pocket' ? 1 : 0.0001) } : {}),
     } : {}),
+    // TP countdown timer — alert user to secure profit before window elapses
+    ...(!isNeutral ? {
+      tpTimerSec: _timerTotal,
+      tpTimerLabel: mode === 'pocket' ? ('Take profit in ' + _expForTimer) :
+        ('TP check in ' + Math.floor(_timerTotal / 60) + 'm'),
+      tpDeadline: new Date(Date.now() + _timerTotal * 1000).toISOString(),
+    } : {}),
+    // OTC contract tag (Pocket Option OTC): priced from live underlying
+    ...(_isOtc ? { otc: true, market: 'OTC', underlying: _base } : { otc: false, market: 'LIVE' }),
     factors,
     score,
+  };
+}
+
+// Add a take-profit countdown timer to directional signals so the app can
+// alert the user ("take profit in MM:SS") while the trade is running.
+// Duration scales with conviction + mode: crypto 30–90 min, forex 30–120 min,
+// pocket = option expiry window (1m / 5m / 15m).
+function tpTimerFor(sig) {
+  if (!sig || (sig.action !== 'BUY' && sig.action !== 'SELL' && sig.action !== 'CALL' && sig.action !== 'PUT')) return null;
+  let totalSec = 45 * 60;
+  if (sig.mode === 'pocket') {
+    totalSec = sig.expiry === '1m' ? 60 : sig.expiry === '15m' ? 15 * 60 : 5 * 60;
+  } else if (sig.mode === 'forex') {
+    totalSec = 30 * 60 + Math.round(((sig.confidence || 50) / 100) * 90 * 60);
+  } else {
+    totalSec = 30 * 60 + Math.round(((sig.confidence || 50) / 100) * 60 * 60);
+  }
+  const ageMs = Date.now() - new Date(sig.time || Date.now()).getTime();
+  const leftSec = Math.max(0, totalSec - Math.floor(ageMs / 1000));
+  return {
+    totalSec,
+    leftSec,
+    label: leftSec <= 0 ? 'TP window elapsed — secure profit' :
+      (Math.floor(leftSec / 60) + 'm ' + String(leftSec % 60).padStart(2, '0') + ' to TP check'),
+    urgent: leftSec > 0 && leftSec <= 5 * 60,
+    done: leftSec <= 0,
   };
 }
 
@@ -506,4 +552,4 @@ function summarize(analyses) {
   };
 }
 
-module.exports = { analyzeSymbol, summarize };
+module.exports = { analyzeSymbol, summarize, tpTimerFor };

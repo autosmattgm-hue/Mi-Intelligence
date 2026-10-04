@@ -166,6 +166,27 @@
     } catch { /* ignore */ }
   }
 
+  // Background push for TP/signal alerts even when the tab is hidden/closed:
+  // server does the delivery — client just keeps the subscription warm and pings
+  // the service worker to retry when connectivity returns.
+  function warmBackground() {
+    try {
+      if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then((reg) => {
+          try { reg.sync.register('mi-push-resync'); } catch (e) {}
+        }).catch(() => {});
+      }
+    } catch (e) {}
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') resync();
+    });
+    try {
+      navigator.serviceWorker.addEventListener('message', (ev) => {
+        if (ev.data && ev.data.type === 'MI_RESYNC_PUSH') resync();
+      });
+    } catch (e) {}
+  }
+
   async function init() {
     state.supported = isSupported();
     const row = $('noticeOsRow');
@@ -176,6 +197,7 @@
     if (tb) tb.addEventListener('click', sendTest);
     renderToggle();
     resync();
+    warmBackground();
   }
 
   window.MIPush = { isSupported, enable, disable, sendTest, getState: () => ({ enabled: state.enabled, supported: state.supported }) };

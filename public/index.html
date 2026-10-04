@@ -84,6 +84,7 @@
       <button class="coin-pill hidden" id="coinBtn" title="MI Coins — buy more">🪙 <b id="coinCount">0</b><span class="coin-buy">＋</span></button>
       <button class="icon-btn" id="installBtn" title="Install MI as an app" hidden>⬇️</button>
       <button class="icon-btn" id="logoutBtn" title="Log out" hidden>🚪</button>
+      <button class="icon-btn" id="voiceBtn" title="Voice guidance">🎙️</button>
       <button class="icon-btn" id="soundToggle" title="Toggle notification sound">🔊</button>
       <button class="icon-btn" id="bellBtn" title="Notifications">
         🔔<span class="badge hidden" id="bellBadge">0</span>
@@ -96,10 +97,12 @@
     <button class="nav-tab active" data-view="overview">📊 Overview</button>
     <button class="nav-tab" data-view="market">🌐 Market</button>
     <button class="nav-tab" data-view="signals">🎯 Signals</button>
+    <button class="nav-tab" data-view="trade">🚀 Trade</button>
     <button class="nav-tab" data-view="portfolio">💰 Portfolio</button>
     <button class="nav-tab" data-view="risk">🛡️ Risk Manager</button>
     <button class="nav-tab" data-view="alerts">🔔 Alerts</button>
     <button class="nav-tab" data-view="ai">🤖 MI Assistant</button>
+    <button class="nav-tab" data-view="settings">⚙️ Settings</button>
   </nav>
 
   <div class="banner hidden" id="banner">
@@ -159,7 +162,7 @@
             <canvas id="chart"></canvas>
             <div class="chart-tooltip hidden" id="chartTooltip"></div>
           </div>
-          <div class="chart-hint">🖱️ Scroll to zoom · Drag to pan · Hover for OHLCV &amp; indicators</div>
+          <div class="chart-hint">👆 Drag to scroll · pinch / scroll to zoom · tap-hold for OHLC · works on Android + iPhone</div>
         </div>
 
         <!-- Signal -->
@@ -320,6 +323,59 @@
             <thead><tr><th>Time</th><th>Asset</th><th>Signal</th><th>Conf.</th><th>Tier</th><th>Entry</th><th>TP</th><th>SL</th><th>Result</th></tr></thead>
             <tbody id="accuracyBody"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ TRADE (guided trade + voice) ============================ -->
+    <section class="view" data-view="trade">
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head wrap">
+            <div>
+              <strong>🚀 MI Trade Console</strong>
+              <span class="sub">Pick the currency you want to trade → tap TRADE → MI tells you when to place it, when to stop it, and voices the countdown to take profit.</span>
+            </div>
+            <button class="btn ghost sm" id="tradeVoice">🎙️ Voice: ON</button>
+          </div>
+
+          <div class="trade-setup">
+            <label class="ts-lbl">Asset to trade
+              <select id="tradeSymbol" class="input select"></select>
+            </label>
+            <button class="btn primary trade-btn" id="tradePlaceBtn">🚀 TRADE</button>
+            <button class="btn ghost" id="tradeArmBtn">🧭 Prepare plan only</button>
+            <button class="btn ghost danger" id="tradeCancelBtn" hidden>✋ Cancel / Close trade</button>
+          </div>
+
+          <div id="tradeReadiness" class="trade-ready"></div>
+          <div id="tradePlan" class="trade-plan"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head wrap">
+            <div>
+              <strong>📡 Live Trade Monitor</strong>
+              <span class="sub" id="tradeMonSub">No active trade. Tap 🚀 TRADE to start monitoring.</span>
+            </div>
+          </div>
+          <div id="tradeMonitor" class="trade-monitor"></div>
+          <div class="trade-loghead">🧠 MI watch log <button class="link-btn" id="tradeLogClear">clear</button></div>
+          <div class="list sm" id="tradeLog"></div>
+        </div>
+      </div>
+
+      <div class="info-card" style="margin-top:14px">
+        <div class="info-card-head">🔊 How the voice trader works</div>
+        <div class="info-card-body">
+          <strong>1 · Pick &amp; trade.</strong> Choose the pair, then tap <strong>🚀 TRADE</strong>. MI reads the live
+          signal and the timing engine and tells you <strong>when to place</strong> the trade (immediately, or at the
+          next high-volatility window) and <strong>when to stop it</strong> (expiry for binary options, a time-stop for spot).
+          <br><strong>2 · Voice + countdown.</strong> MI speaks the plan out loud. Once you're in the trade it watches every
+          price tick; if the chart starts <strong>acting suspicious</strong> (momentum flips, profit gives back, MACD turns)
+          it alarms you and runs a <strong>countdown to take your profit</strong>.
+          <br><strong>3 · Sure trades.</strong> When the setup is <strong>high conviction</strong> MI marks it
+          <strong>✅ SURE</strong> and speaks the exact entry window and exit time. Toggle voice any time with the 🎙️ button in the top bar.
         </div>
       </div>
     </section>
@@ -506,12 +562,111 @@
       </div>
     </section>
 
+    <!-- ============================ SETTINGS ============================ -->
+    <section class="view" data-view="settings">
+      <div class="set-hero panel">
+        <div class="set-hero-l"><div class="set-avatar" id="setAvatar">👤</div><div><strong id="setHeroName">Trader</strong><span class="sub" id="setHeroSub">MI v6.2 · set up your desk</span></div></div>
+        <div class="set-hero-r"><span class="coin-pill" id="setCoinPill">🪙 <b id="setCoinCount">—</b></span><button class="btn ghost sm" id="setBuyCoins">Top up</button><button class="btn ghost sm" id="setLogoutTop">Log out</button></div>
+      </div>
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head"><div><strong>⚙️ Settings — broker</strong><span class="sub">Choose where BUY / SELL buttons send you. Saved on this phone.</span></div></div>
+          <div id="settingsBroker" class="broker-hub"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><strong>👤 Account & coins</strong><span class="sub" id="settingsAccountSub">Signed-in user</span></div></div>
+          <div class="list">
+            <div class="gu-line" id="settingsAccount">—</div>
+            <label class="set-row"><span>✏️ Display name</span><span class="set-inline"><input id="setName" class="input sm" type="text" placeholder="Trader" autocomplete="off"><button class="btn ghost sm" id="setNameSave">Save</button></span></label>
+            <label class="set-row"><span>🔑 Change password (server accounts)</span><span class="set-inline"><input id="setPw" class="input sm" type="password" placeholder="New password" autocomplete="new-password"><button class="btn ghost sm" id="setPwSave">Set</button></span></label>
+            <label class="set-row"><span>🪙 Coin ledger (last activity)</span><button class="btn ghost sm" id="setLedger">View</button></label>
+            <div class="list sm" id="setLedgerList"></div>
+          </div>
+          <div class="login-hint">Coins are stored on this phone and sync when online. 1 signal = 1 coin · 1 AI question = 1 coin.</div>
+        </div>
+      </div>
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head"><div><strong>🌙 Appearance & language</strong><span class="sub">Make MI yours</span></div></div>
+          <div class="list">
+            <label class="set-row"><span>🌙 Theme</span><select class="select" id="setTheme"><option value="dark">Dark (pro)</option><option value="light">Light</option></select></label>
+            <label class="set-row"><span>🌍 Language</span><select class="select" id="setLang"><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option></select></label>
+            <label class="set-row"><span>🕒 Clock</span><select class="select" id="setClock"><option value="utc">UTC</option><option value="local">Phone local</option></select></label>
+            <label class="set-row"><span>💵 Currency display</span><select class="select" id="setCur"><option value="USD">USD $</option><option value="EUR">EUR €</option><option value="NGN">NGN ₦</option><option value="GHS">GHS ₵</option></select></label>
+            <label class="set-row"><span>📳 Compact pro layout</span><button class="os-toggle" id="setCompact">OFF</button></label>
+            <label class="set-row"><span>🔔 In-app banner for every signal</span><button class="os-toggle" id="setBanner">ON</button></label>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><strong>🛡 Safety & privacy</strong><span class="sub">Your phone, your data</span></div></div>
+          <div class="list">
+            <label class="set-row"><span>🔒 Lock app with PIN</span><span class="set-inline"><input id="setPin" class="input sm" type="password" inputmode="numeric" placeholder="4-digit PIN" maxlength="8"><button class="btn ghost sm" id="setPinSave">Set</button></span></label>
+            <label class="set-row"><span>🧹 Clear watchlist + solo focus</span><button class="btn ghost sm" id="setClearWatch">Clear</button></label>
+            <label class="set-row"><span>🗑 Delete signal history (this phone)</span><button class="btn ghost sm" id="setClearHist">Delete</button></label>
+            <label class="set-row"><span>📤 Export my data (JSON)</span><button class="btn ghost sm" id="setExport">Export</button></label>
+            <label class="set-row"><span>☠️ Delete account from this phone</span><button class="btn ghost sm danger" id="setWipe">Wipe</button></label>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2col">
+        <div class="panel">
+          <div class="panel-head"><div><strong>🔔 Signal alerts</strong><span class="sub">How MI pings you</span></div></div>
+          <div class="list">
+            <label class="set-row"><span>🔊 Voice alerts (TP countdown spoken)</span><button class="os-toggle" id="setVoice">ON</button></label>
+            <label class="set-row"><span>📳 App-installed alerts (works when app closed)</span><button class="os-toggle" id="setPush">OFF</button></label>
+            <label class="set-row"><span>📲 Install MI as app + enable closed-app alarms</span><button class="btn ghost sm" id="setInstallPush">Install & enable</button></label>
+            <label class="set-row"><span>⏳ TP warning</span><select class="select" id="setTpWarn"><option value="60">1 minute before</option><option value="300">5 minutes before</option><option value="900">15 minutes before</option></select></label>
+            <label class="set-row"><span>⭐ Minimum confidence</span><select class="select" id="setMinConf"><option value="0">All signals</option><option value="60">60%+</option><option value="70">70%+</option><option value="80">80%+ HIGH only</option></select></label>
+            <label class="set-row"><span>⏱ Auto-close signal view</span><select class="select" id="setAutoClose"><option value="35" selected>35 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option><option value="60">60 seconds</option><option value="0">Never</option></select></label>
+            <label class="set-row"><span>📳 Watchlist-only signals table</span><button class="os-toggle" id="setWatchOnly">OFF</button></label>
+            <label class="set-row"><span>🔁 Auto-refresh signals</span><select class="select" id="setRefresh"><option value="30">30s</option><option value="60" selected>60s</option><option value="120">2 min</option><option value="0">Manual</option></select></label>
+            <label class="set-row"><span>🔔 Alert sound</span><button class="os-toggle" id="setSound">ON</button></label>
+            <label class="set-row"><span>💜 Show OTC contracts</span><button class="os-toggle" id="setOtc">ON</button></label>
+            <label class="set-row"><span>⏸ Show WAIT / HOLD rows</span><button class="os-toggle" id="setHold">ON</button></label>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><strong>📊 Trading preferences</strong><span class="sub">Defaults + safety</span></div></div>
+          <div class="list">
+            <label class="set-row"><span>💱 Default market</span><select class="select" id="setMode"><option value="crypto">Crypto</option><option value="forex">Forex</option><option value="pocket">Pocket Option</option></select></label>
+            <label class="set-row"><span>🕯 Default chart interval</span><select class="select" id="setTf"><option>1m</option><option>5m</option><option selected>15m</option><option>1h</option><option>4h</option><option>1d</option></select></label>
+            <label class="set-row"><span>⚠️ Risk per trade</span><select class="select" id="setRisk"><option value="1">1%</option><option value="2" selected>2%</option><option value="3">3%</option><option value="5">5%</option></select></label>
+            <label class="set-row"><span>📰 Block signals near high-impact news</span><button class="os-toggle" id="setNews">ON</button></label>
+            <label class="set-row"><span>📈 Only strong trends (ADX ≥ 22)</span><button class="os-toggle" id="setTrend">OFF</button></label>
+            <label class="set-row"><span>🔥 HIGH conviction only</span><button class="os-toggle" id="setHigh">OFF</button></label>
+            <label class="set-row"><span>🛡 Auto risk-note on every signal</span><button class="os-toggle" id="setRiskNote">ON</button></label>
+            <label class="set-row"><span>📳 Vibrate on TP alert (phone)</span><button class="os-toggle" id="setVibrate">ON</button></label>
+            <label class="set-row"><span>🚪 Log out this phone</span><button class="btn ghost sm" id="setLogout">Log out</button></label>
+            <label class="set-row"><span>🧹 Clear revealed signals (re-lock, spend coins again)</span><button class="btn ghost sm" id="setClearRevealed">Clear</button></label>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><strong>ℹ️ About</strong><span class="sub">MI v6.1 · real data: CoinMarketCap + Binance + Yahoo Finance</span></div></div>
+        <div class="login-hint">OTC contracts are priced from their live underlying (standard OTC practice) and tagged OTC. Not financial advice.</div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="footer">
     <span class="mi-name">MI — Master Intelligence</span> · Real data + OpenRouter AI · v5.0 · Market data: CoinMarketCap + Binance public API ·
     Not financial advice · <span id="footerTime"></span>
   </footer>
+</div>
+
+<!-- ==================== MI TRADE ALARM (voice + countdown) ==================== -->
+<div class="trade-alarm hidden" id="tradeAlarm">
+  <div class="ta-card" id="tradeAlarmCard">
+    <div class="ta-icon" id="taIcon">🔔</div>
+    <div class="ta-title" id="taTitle">Alarm</div>
+    <div class="ta-msg" id="taMsg"></div>
+    <div class="ta-count" id="taCount">—</div>
+    <div class="ta-actions">
+      <button class="btn primary" id="taPrimary">✅ TAKE PROFIT NOW</button>
+      <button class="btn ghost" id="taDismiss">Dismiss</button>
+    </div>
+  </div>
 </div>
 
 <!-- ==================== NOTIFICATION PERMISSION MODAL ==================== -->
@@ -552,8 +707,28 @@
   <div class="notice-body" id="noticeBody"></div>
 </div>
 
+<!-- ==================== SIGNAL FOCUS VIEWER (35s auto-close) ==================== -->
+<div class="modal-backdrop hidden" id="signalViewer">
+  <div class="modal sv-modal">
+    <div class="sv-top"><span class="sv-badge">SIGNAL · auto-closes in <b id="svCount">35s</b></span><button class="icon-btn" id="svClose">✕</button></div>
+    <div class="sv-bar-wrap"><div class="sv-bar" id="svBar"></div></div>
+    <div class="sv-title" id="svTitle">—</div>
+    <div class="sv-meta" id="svMeta">—</div>
+    <div class="sv-levels" id="svLevels"></div>
+    <div class="sv-broker" id="svBroker"></div>
+    <div class="modal-actions sv-actions">
+      <button class="btn primary" id="svBuy">BUY / CALL ↗</button>
+      <button class="btn ghost" id="svSell">SELL / PUT ↗</button>
+    </div>
+  </div>
+</div>
+
 <script src="/js/api.js"></script>
 <script src="/js/auth.js"></script>
+<script src="/js/localWallet.js"></script>
+<script src="/js/brokers.js"></script>
+<script src="/js/brokersHub.js"></script>
+<script src="/js/signalViewer.js"></script>
 <script src="/js/notifications.js"></script>
 <script src="/js/chart.js"></script>
 <script src="/js/signals.js"></script>
@@ -564,6 +739,9 @@
 <script src="/js/pwa.js"></script>
 <script src="/js/push.js"></script>
 <script src="/js/mode.js"></script>
+<script src="/js/voice.js"></script>
+<script src="/js/trade.js"></script>
+<script src="/js/settings.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>

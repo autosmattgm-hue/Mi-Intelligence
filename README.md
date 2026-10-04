@@ -33,6 +33,9 @@ into every message.
 | **💠 Crypto mode** | Default — CoinMarketCap + Binance **spot** dashboard: top-100 rankings, global metrics, BUY/SELL signals with TP/SL |
 | **⏱️ Pocket Option mode** | Short-expiry **digital-option** signals on crypto + FX: instant **CALL / PUT** verdicts with recommended **expiry** (1m/5m/15m), **payout estimate** (80–94%) and win probability, scanned on 5m momentum |
 | **💱 Forex mode** | FX majors + **XAU/USD & XAG/USD** (live Yahoo Finance data): **pip-based** trade plans (TP/SL in pips), per-pair precision, and the **active trading sessions** (Tokyo / London / New York / Sydney) |
+| **🚀 Voice Trade Console** | Pick the currency → tap **🚀 TRADE**: MI builds the plan from the live signal + real timing engine and tells you **when to place** the trade (now, or the exact local clock time + countdown) and **when to stop it** (expiry for digital options / time-stop for spot). It **speaks** the instructions out loud and marks high-conviction setups **✅ SURE** |
+| **⚠️ Suspicion alarm + profit countdown** | While a trade is live MI watches every price tick. If the chart starts **acting suspicious** (momentum flips, profit gives back from the peak, MACD rotates, the live signal reverses) it fires a **voice alarm** and runs an on-screen **countdown to take your profit** — plus a stop-loss / time-stop exit warning |
+| **🎙️ Voice guidance** | Web-Speech announcements + WebAudio alarm tones for place-time, exit-time, entry-setup turning sure, and the take-profit countdown. Own ON/OFF toggle in the top bar (🎙️) and in the Trade Console |
 | **Mode switcher** | One tap in the top bar — every view (chart, signals, stats, portfolio, assistant) instantly re-works for the active mode; local server keeps per-mode state, Vercel uses `?mode=` |
 | **🔐 Login page** | Password-protected entry (`Admin2026` by default, change via `MI_PASSWORD`). Session lasts 7 days; 🚪 button in the top bar logs you out |
 | **📱 Fully responsive** | Optimized for phones & tablets — scrollable tables, stacked panels, mobile-bottom notification drawer, touch-friendly nav |
@@ -55,6 +58,18 @@ npm start            # or: node server/index.js
 ```
 
 Then open **http://localhost:3009** in your browser.
+
+### 🌍 Go LIVE (public link — anyone can open it)
+
+Want to show MI to someone on another device / share a link? Double-click **`LIVE.bat`** (or run `npm run live`). It:
+
+1. Starts the MI server if it isn't running yet.
+2. Opens a **public `https://*.loca.lt`** tunnel — free, **no account needed**.
+3. Prints the LIVE URL and opens it in your browser.
+
+> Keep the window open while you want the link live; close it to bring the server back to local-only.
+> First run downloads the small tunnel client (a few seconds).
+> For a permanent public URL, deploy to **Vercel** (see `DEPLOY.md`).
 
 ---
 
@@ -148,7 +163,7 @@ f:\Mi Trading
 ├── public/                  # Frontend (vanilla JS, no build step)
 │   ├── index.html
 │   ├── css/style.css
-│   └── js/ (api, app, chart, chat, market, notifications, portfolio, signals)
+│   └── js/ (api, app, auth, chart, chat, market, mode, notifications, portfolio, push, pwa, risk, signals, trade, voice)
 ├── data/db.json             # Runtime state (auto-created)
 ├── .env                     # Secrets (git-ignored)
 └── package.json

@@ -4,11 +4,16 @@
 // Source: Binance public market data API (no API key required).
 const BASE = 'https://data-api.binance.vision';
 
-// Symbols tracked by the MI engine.
+// Symbols tracked by the MI engine — 32 professional assets (expanded v6).
 const DEFAULT_SYMBOLS = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT',
   'DOGEUSDT', 'AVAXUSDT', 'LINKUSDT', 'DOTUSDT', 'LTCUSDT',
   'BNBUSDT', 'POLUSDT',
+  // --- expansion: 20 more high-liquidity assets ---
+  'TONUSDT', 'TRXUSDT', 'NEARUSDT', 'APTUSDT', 'ARBUSDT',
+  'OPUSDT', 'INJUSDT', 'SUIUSDT', 'SEIUSDT', 'FILUSDT',
+  'ETCUSDT', 'ATOMUSDT', 'TIAUSDT', 'UNIUSDT', 'PEPEUSDT',
+  'SHIBUSDT', 'RENDERUSDT', 'FETUSDT', 'SANDUSDT', 'MANAUSDT',
 ];
 
 const INTERVALS = {

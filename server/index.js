@@ -59,12 +59,35 @@ function broadcast(event, data) {
 
 // ---- signal history — persisted locally until the user deletes it ----
 const lastSignalState = new Map();
+// Server-side closed-app push: every NEW directional verdict is pushed to the
+// user's phone even when the app/website is closed (installed PWA + enabled).
+function pushSignalToDevices(a) {
+  try {
+    const subs = store.data.pushSubscriptions || [];
+    if (!subs.length) return;
+    const dir = a.action === 'BUY' || a.action === 'CALL' ? '🟢 BUY' : '🔴 SELL';
+    push.notifyAll(subs, {
+      title: dir + ' ' + (a.asset || a.symbol) + ' @ ' + a.confidence + '%',
+      body: 'Entry ' + a.entry + ' · TP ' + a.takeProfit + ' · SL ' + a.stopLoss + ' — tap to open MI.',
+      url: '/?view=signals',
+      tag: 'mi-sig-' + a.symbol,
+      kind: 'signal',
+    }).then((r) => {
+      if (r.dead && r.dead.length) {
+        const deadSet = new Set(r.dead);
+        store.data.pushSubscriptions = subs.filter(s => !deadSet.has(s.endpoint));
+        store.save(true);
+      }
+    }).catch((e) => console.error('[push-signal]', e.message));
+  } catch (e) { /* never break the engine */ }
+}
 function recordSignalHistory(analyses) {
   for (const a of analyses) {
     if (!a || a.action === 'HOLD' || a.action === 'NEUTRAL') continue;
     const stateKey = a.action + '|' + a.quality + '|' + a.confidence;
     if (lastSignalState.get(a.symbol) === stateKey) continue; // unchanged verdict
     lastSignalState.set(a.symbol, stateKey);
+    pushSignalToDevices(a);
     store.data.signalHistory.push({
       id: a.symbol + '-' + Date.now() + '-' + Math.floor(Math.random() * 1e4),
       ts: Date.now(),

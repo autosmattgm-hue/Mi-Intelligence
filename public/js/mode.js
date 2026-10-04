@@ -18,6 +18,7 @@
     if (window.MI) window.MI.mode = state.current;
     highlight();
     updateStatusText();
+    try { document.dispatchEvent(new CustomEvent('mi:mode', { detail: { mode: state.current } })); } catch (e) {}
   }
 
   function highlight() {
@@ -76,6 +77,7 @@
     if (!state.serverless) {
       try { if (window.MI && MI.api) await MI.api.post('/api/mode', { mode }); } catch { /* ignore */ }
     }
+    if (window.MIBrokersHub && typeof window.MIBrokersHub.ensure === 'function') try { window.MIBrokersHub.ensure(); } catch (e) {}
     // Reconnect the live feed on the new mode and force a full refresh.
     if (window.MINotify && typeof MINotify.switchMode === 'function') MINotify.switchMode(mode);
     if (window.MISignals && typeof MISignals.handleModeChange === 'function') MISignals.handleModeChange(mode);

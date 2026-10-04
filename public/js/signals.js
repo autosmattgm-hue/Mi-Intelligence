@@ -6,6 +6,7 @@
     signals: [],
     summary: null,
     selected: 'BTCUSDT',
+    solo: null,
     paperStats: null,
     history: [],
     accuracy: null,
@@ -259,23 +260,45 @@
       '<div class="stat-sub">' + c.sub + '</div></div>').join('');
   }
 // ------------------------------------------------ primary signal panel
+  function fmtTpCountdown(sig) {
+    if (!sig || sig.action === 'HOLD' || sig.action === 'NEUTRAL') return '';
+    var total = sig.tpTimerSec || 2700;
+    var age = Date.now() - new Date(sig.time || Date.now()).getTime();
+    var left = Math.max(0, total - Math.floor(age / 1000));
+    var mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, '0');
+    var urg = left <= 300 ? ' urgent' : '';
+    var txt = left <= 0 ? 'TP window elapsed — secure profit' : ('⏳ TP in ' + mm + 'm ' + ss);
+    return '<span class="tp-pill' + urg + '" data-tp="' + sig.symbol + '">' + txt + '</span>';
+  }
   function renderSignalPanel() {
     const el = $id('signalPanel');
     if (!el) return;
-    const sig = findSignal(state.selected) || state.signals[0] || null;
+    // Solo focus: Signals-page tap shows ONLY that symbol on Overview.
+    if (!state.solo) { try { state.solo = localStorage.getItem('mi.solo.v1') || null; } catch (e) {} }
+    const sig = (state.solo && findSignal(state.solo)) || findSignal(state.selected) || state.signals[0] || null;
     if (!sig) {
       el.innerHTML = '<div class="empty">Signal engine warming up…</div>';
       return;
     }
     state.selected = sig.symbol;
+    const soloBar = state.solo ? '<div class="solo-bar">👁 Showing <b>' + esc(sig.asset || sig.symbol) + '</b> only (tapped on Signals page) <button class="link-btn" id="soloClear">Show all</button></div>' : '';
     const subEl = $id('signalSub');
     if (subEl) subEl.textContent = sig.asset + ' · updated ' + MI.fmt.shortTime(sig.time);
 
     const cls = sig.action.toLowerCase();
     const colorClass = isBuyAction(sig.action) ? 'green' : isSellAction(sig.action) ? 'red' : 'gold';
     const regime = regimeLabel(sig);
+    let riskPct = 2, riskNoteOn = true;
+    try {
+      riskPct = Number(localStorage.getItem('mi.risk.pct') || 2) || 2;
+      riskNoteOn = (localStorage.getItem('mi.risk.note') || 'on') !== 'off';
+    } catch (e) {}
+    const mktTag2 = sig.otc ? '<span class="otc-tag">OTC</span>' : '<span class="live-tag">LIVE</span>';
+    const riskLine = (riskNoteOn && sig.action !== 'HOLD' && sig.action !== 'NEUTRAL')
+      ? '<div class="tp-note">🛡 Risk ' + riskPct + '%/trade · ' + esc(sig.asset) + mktTag2 + ' · TP ' + fmtTpCountdown(sig) + '</div>' : '';
 
     const inner =
+      soloBar +
       (state.newsZone ? '<div class="ribbon news">🕐 NEWS ZONE — ' + esc(state.newsZone.title) + ' in ~' + Math.max(1, Math.round((state.newsZone.time - Date.now()) / 60000)) + ' min — consider smaller size or waiting</div>' : '') +
       ((state.paperStats && state.paperStats.protection && state.paperStats.protection.active)
         ? '<div class="ribbon cool">🔒 MI cooldown — ' + state.paperStats.protection.streak + ' straight losses; pausing new paper trades for ' + Math.max(1, Math.ceil(state.paperStats.protection.leftMs / 60000)) + 'm (protect the bankroll)</div>'
@@ -288,6 +311,7 @@
       '<div class="conf"><span class="conf-label">' + (sig.mode === 'pocket' ? 'Win Probability' : 'MI Confidence') + '</span>' +
       '<div class="conf-bar"><div class="conf-fill ' + cls + '" style="width:' + sig.confidence + '%"></div></div>' +
       '<span class="conf-pct">' + sig.confidence + '%</span></div>' +
+      '<div class="tp-row">' + fmtTpCountdown(sig) + '</div>' +
       tradeClockHtml(sig, tradeSchedule(sig.symbol)) +
       '<div class="signal-grid">' +
       '<div class="sig-item"><div class="k">Entry</div><div class="v ' + colorClass + '">' + fmtPrice(sig.entry, sig) + '</div></div>' +
@@ -319,8 +343,19 @@
       playbookHtml(sig) +
       '<div class="signal-actions">' +
       '<button class="btn ghost sm" id="sigCopy">📋 Copy plan</button>' +
+      '<button class="btn ghost sm show-btn" id="sigDetails">👁 SHOW</button>' +
       '<button class="btn ghost sm" id="sigGoChart">📈 Show chart</button>' +
+      '<button class="btn ghost sm" id="sigTrade">🚀 Trade this</button>' +
       (sig.mode !== 'pocket' && sig.action !== 'HOLD' && sig.action !== 'NEUTRAL' ? '<button class="btn ghost sm" id="sigPaper">📥 Paper trade</button>' : '') +
+      '</div>' +
+      '<div class="signal-exec">' +
+      '<div class="exec-label">⚡ One-tap broker execution <span id="sigBrkBadge"></span></div>' +
+      riskLine +
+      '<div class="exec-row">' +
+      '<button class="exec-btn buy" id="sigBuy">🟢 BUY' + (sig.mode === 'pocket' ? ' / CALL' : '') + ' ↗</button>' +
+      '<button class="exec-btn sell" id="sigSell">🔴 SELL' + (sig.mode === 'pocket' ? ' / PUT' : '') + ' ↗</button>' +
+      '</div>' +
+      '<div class="exec-hint">Opens your broker in a new tab + auto-copies the Entry/TP/SL ticket. Counts down in the trade timer.</div>' +
       '</div>';
 
     // Users see blurred signals until they pay 1 coin to reveal the plan.
@@ -333,10 +368,38 @@
     }
     el.innerHTML = inner;
 
+    const soloClear = $id('soloClear');
+    if (soloClear) soloClear.addEventListener('click', () => {
+      state.solo = null;
+      try { localStorage.removeItem('mi.solo.v1'); } catch (e) {}
+      renderSignalPanel();
+    });
     $id('sigCopy').addEventListener('click', () => copySignal(sig));
+    const sigDet = $id('sigDetails');
+    if (sigDet) sigDet.addEventListener('click', () => { if (window.MISignalViewer) window.MISignalViewer.open(sig, sigDet); });
+    const brkBadge = $id('sigBrkBadge');
+    if (brkBadge && window.MIBrokers) brkBadge.textContent = '· ' + window.MIBrokers.label();
+    const sigBuy = $id('sigBuy');
+    if (sigBuy) {
+      const rec = (sig.action === 'SELL' || sig.action === 'PUT') ? 'rec' : 'hot';
+      sigBuy.classList.add(rec);
+      // v6.1: no broker popup here — broker chosen once at sign-up / Settings.
+      sigBuy.addEventListener('click', () => { if (window.MIBrokers) window.MIBrokers.execute(sig, sig.mode === 'pocket' ? 'CALL' : 'BUY'); });
+    }
+    const sigSell = $id('sigSell');
+    if (sigSell) {
+      const rec2 = (sig.action === 'BUY' || sig.action === 'CALL') ? 'rec' : 'hot';
+      sigSell.classList.add(rec2);
+      sigSell.addEventListener('click', () => { if (window.MIBrokers) window.MIBrokers.execute(sig, sig.mode === 'pocket' ? 'PUT' : 'SELL'); });
+    }
     $id('sigGoChart').addEventListener('click', () => {
       if (window.MIChart) MIChart.setSymbol(sig.symbol);
       switchView('overview');
+    });
+    const sigTradeBtn = $id('sigTrade');
+    if (sigTradeBtn) sigTradeBtn.addEventListener('click', () => {
+      if (window.MITrade) { MITrade.setSymbol(sig.symbol); MITrade.armPlan(false); }
+      switchView('trade');
     });
     // one-tap TP / SL alerts from the playbook
     const pbTp = $id('pbTpBtn');
@@ -471,17 +534,39 @@
       body.innerHTML = '<tr><td colspan="12"><div class="empty">Loading live signals…</div></td></tr>';
       return;
     }
-    state.signals.forEach(s => {
+    // Settings: minimum-confidence filter + OTC/LIVE grouping + show/hide toggles.
+    let minConf = 0, showOtc = true, showHold = true, onlyTrend = false, onlyHigh = false;
+    try {
+      minConf = Number(localStorage.getItem('mi.min.conf') || 0) || 0;
+      showOtc = (localStorage.getItem('mi.show.otc') || 'on') !== 'off';
+      showHold = (localStorage.getItem('mi.show.hold') || 'on') !== 'off';
+      onlyTrend = (localStorage.getItem('mi.only.trend') || 'off') === 'on';
+      onlyHigh = (localStorage.getItem('mi.only.high') || 'off') === 'on';
+    } catch (e) {}
+    const rows = state.signals.slice().sort((a, b) => {
+      const ao = a.otc ? 0 : 1, bo = b.otc ? 0 : 1;
+      if (ao !== bo) return ao - bo;
+      return (b.confidence || 0) - (a.confidence || 0);
+    });
+    rows.forEach(s => {
+      if (!showOtc && s.otc) return;
+      const isHold = s.action === 'HOLD' || s.action === 'NEUTRAL';
+      if (!showHold && isHold) return;
+      if (onlyHigh && s.quality !== 'HIGH' && !isHold) return;
+      if (onlyTrend && (s.adx == null || s.adx < 22) && !isHold) return;
+      if (minConf && !isHold && (s.confidence || 0) < minConf) return;
       if (state.watchOnly && !isWatched(s.symbol)) return;
       const clsTag = tagClass(s.action);
+      const locked = isLocked(s.symbol);
       const tr = document.createElement('tr');
       tr.style.cursor = 'pointer';
       if (isStale(s)) tr.classList.add('stale');
+      const mktTag = s.otc ? '<span class="otc-tag">OTC</span>' : '<span class="live-tag">LIVE</span>';
       tr.innerHTML =
-        '<td class="mono" style="font-weight:800">' + esc(s.asset) +
+        '<td class="mono' + (locked ? ' lock-clear' : '') + '" style="font-weight:800">' + esc(s.asset) + mktTag +
         ' <button class="row-btn star' + (isWatched(s.symbol) ? ' on' : '') + '" data-star="' + s.symbol + '" title="Add/remove from watchlist">' + (isWatched(s.symbol) ? '★' : '☆') + '</button></td>' +
         '<td><span class="tag ' + clsTag + '" title="Conviction: ' + (s.quality || 'LOW') + ' · valid ' + remainingLabel(s) + '">' + s.action + (s.quality === 'HIGH' ? ' 🔥' : s.quality === 'MEDIUM' ? ' ⚡' : '') + '</span></td>' +
-        '<td>' + s.confidence + '%</td>' +
+        '<td' + (locked ? ' class="lock-clear"' : '') + '>' + s.confidence + '%</td>' +
         '<td class="mono">' + fmtPrice(s.price, s) + '</td>' +
         '<td class="mono">' + fmtPrice(s.entry, s) + '</td>' +
         '<td class="mono" style="color:var(--green)">' + (s.takeProfit ? fmtPrice(s.takeProfit, s) : '—') + '</td>' +
@@ -492,7 +577,10 @@
         '<td>' + esc(s.macdState) + '</td>' +
         '<td>' + esc(s.rating) + '</td>';
       tr.addEventListener('click', () => {
+        if (locked) { unlockSignal(s.symbol); return; }
         state.selected = s.symbol;
+        state.solo = s.symbol;
+        try { localStorage.setItem('mi.solo.v1', s.symbol); } catch (e) {}
         renderSignalPanel();
         switchView('overview');
         if (window.MIChart) MIChart.setSymbol(s.symbol);
@@ -500,11 +588,17 @@
       const starBtn = tr.querySelector('[data-star]');
       if (starBtn) starBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleWatch(s.symbol); });
       // Users: locked rows are blurred until 1 coin unlocks them.
-      if (isLocked(s.symbol)) {
+      if (locked) {
         tr.classList.add('row-locked');
-        tr.innerHTML += '<td class="row-lock-cell"><button class="btn ghost sm" data-unlock="' + esc(s.symbol) + '">🔓 Show · 1 coin</button></td>';
-        const ub = tr.querySelector('[data-unlock]');
-        if (ub) ub.addEventListener('click', (e) => { e.stopPropagation(); unlockSignal(s.symbol); });
+        const td = document.createElement('td');
+        td.className = 'row-lock-cell';
+        const ub = document.createElement('button');
+        ub.className = 'btn ghost sm';
+        ub.dataset.unlock = s.symbol;
+        ub.textContent = '🔓 Show · 1 coin';
+        ub.addEventListener('click', (e) => { e.stopPropagation(); unlockSignal(s.symbol); });
+        td.appendChild(ub);
+        tr.appendChild(td);
       }
       body.appendChild(tr);
     });
@@ -730,9 +824,54 @@
 
   // Live countdown to the next trade-placement window (updates every second).
   let clockT = null;
+  // v6: urgent TP timers → voice + toast alert ("take your profit now")
+  const tpAlerted = {};
+  function tpWarnSec() {
+    try { return Number(localStorage.getItem('mi.tp.warn') || 60) || 60; } catch (e) { return 60; }
+  }
+  function checkTpAlerts() {
+    const warnAt = tpWarnSec();
+    for (const sig of (state.signals || [])) {
+      if (!sig || sig.action === 'HOLD' || sig.action === 'NEUTRAL') continue;
+      const total = sig.tpTimerSec || 0;
+      if (!total) continue;
+      const age = Date.now() - new Date(sig.time || Date.now()).getTime();
+      const left = total - Math.floor(age / 1000);
+      const key = sig.symbol + '|' + sig.action + '|' + sig.time;
+      // Fire once at the Settings warning time, and once at 0s.
+      if (!tpAlerted[key + ':w'] && left <= warnAt && left > 0) {
+        tpAlerted[key + ':w'] = 1;
+        if (window.MI && MI.toast) MI.toast('info', '⏳ TP soon', (sig.asset || sig.symbol) + ' ' + sig.action + ' — get ready to take profit.');
+        try { if (window.MIVoice && (localStorage.getItem('mi.voice') || 'on') !== 'off') MIVoice.say((sig.asset || sig.symbol) + ' take profit soon.'); } catch (e) {}
+      }
+      if (!tpAlerted[key + ':0'] && left <= 0) {
+        tpAlerted[key + ':0'] = 1;
+        if (window.MI && MI.toast) MI.toast('success', '✅ Take profit now', (sig.asset || sig.symbol) + ' ' + sig.action + ' — TP window reached. Secure it.');
+        try { if (window.MIVoice && (localStorage.getItem('mi.voice') || 'on') !== 'off') MIVoice.say('Take profit now on ' + (sig.asset || sig.symbol)); } catch (e) {}
+        try { if ((localStorage.getItem('mi.vibrate') || 'on') !== 'off' && navigator.vibrate) navigator.vibrate([120, 60, 120]); } catch (e) {}
+      }
+    }
+    // keep memory bounded
+    const keys = Object.keys(tpAlerted);
+    if (keys.length > 200) keys.slice(0, keys.length - 200).forEach(k => delete tpAlerted[k]);
+  }
   function startClockTicker() {
     if (clockT) return;
     clockT = setInterval(() => {
+      checkTpAlerts();
+      // refresh visible TP pills every 15s so countdowns stay live
+      try {
+        document.querySelectorAll('[data-tp]').forEach(pill => {
+          const sym = pill.dataset.tp;
+          const sig = (state.signals || []).find(s => s.symbol === sym);
+          if (!sig) return;
+          const total = sig.tpTimerSec || 0; if (!total) return;
+          const left = Math.max(0, total - Math.floor((Date.now() - new Date(sig.time || Date.now()).getTime()) / 1000));
+          const mm = Math.floor(left / 60), ss = String(left % 60).padStart(2, '0');
+          pill.textContent = left <= 0 ? 'TP window elapsed — secure profit' : ('⏳ TP in ' + mm + 'm ' + ss);
+          pill.classList.toggle('urgent', left <= 300);
+        });
+      } catch (e) {}
       const el = document.getElementById('tcCount');
       if (!el) return;
       const until = parseInt(el.dataset.until || '0', 10);
@@ -850,7 +989,19 @@
     refreshHistory();
   }
 
+  // Settings: adjustable auto-refresh interval (default 60s).
+  let refreshT = null;
+  function setRefresh(secs) {
+    secs = Number(secs) || 0;
+    if (refreshT) { try { clearInterval(refreshT); } catch (e) {} refreshT = null; }
+    if (secs > 0) refreshT = setInterval(() => { try { refreshSignals(); } catch (e) {} }, secs * 1000);
+  }
+  try {
+    const rs = Number(localStorage.getItem('mi.refresh') || 60) || 0;
+    if (rs > 0) refreshT = setInterval(() => { try { refreshSignals(); } catch (e) {} }, rs * 1000);
+  } catch (e) {}
+
   window.MISignals = {
-    state, init, refreshSignals, handleModeChange, followChart, revealSymbol, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView,
+    state, init, refreshSignals, handleModeChange, followChart, revealSymbol, refreshAccuracy, renderStatsBar, renderSignalPanel, renderTable, switchView, setRefresh,
   };
 })();

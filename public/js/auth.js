@@ -55,8 +55,20 @@
     syncSignalChip();
   }
 
-  function persistUser(session) {
+   function persistUser(session) {
     localStorage.setItem(LS_USER, JSON.stringify({ token: session.token, user: session.user, coins: session.user.coins, at: Date.now() }));
+    // v6: mirror account into on-phone vault so sign-in + coins survive offline
+    try {
+      var em = String((session.user && session.user.email) || '').toLowerCase();
+      if (em) {
+        var v = {};
+        try { v = JSON.parse(localStorage.getItem('mi.device.users.v1') || '{}'); } catch (e) {}
+        v[em] = v[em] || {};
+        v[em].name = session.user.name; v[em].email = em;
+        v[em].coins = session.user.coins; v[em].updatedAt = Date.now();
+        try { localStorage.setItem('mi.device.users.v1', JSON.stringify(v)); } catch (e) {}
+      }
+    } catch (e) {}
     setRole();
   }
 
@@ -85,14 +97,63 @@
 
   // ---------------------------------------------------------------- users
   async function userRegister(fields) {
-    const r = await apiPost('/api/auth/register', fields);
-    persistUser(r);
-    afterLogin('user', r.freeCoins || 5);
+    // v6 local-first: validate, then try server; on ANY network failure create
+    // the account instantly on the phone (5 free coins, zero errors).
+    var email = String((fields && fields.email) || '').trim();
+    var name = String((fields && fields.name) || '').trim();
+    var password = String((fields && fields.password) || '');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Enter a valid email address.');
+    if (password.length < 6) throw new Error('Password must be at least 6 characters.');
+    try {
+      var ctl = new AbortController();
+      var to = setTimeout(function () { try { ctl.abort(); } catch (e) {} }, 9000);
+      var r = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, email: email, password: password }), signal: ctl.signal });
+      clearTimeout(to);
+      var j = null; try { j = await r.json(); } catch (e) {}
+      if (!r.ok) {
+        var ee = new Error((j && j.error) || ('HTTP ' + r.status));
+        ee.status = r.status; if (j && j.code) ee.code = j.code;
+        throw ee;
+      }
+      persistUser(j);
+      afterLogin('user', j.freeCoins || 5);
+      return;
+    } catch (e) {
+      if (e && e.status === 409) throw new Error('That email is already registered — sign in instead.');
+      if (e && (e.status === 400 || e.status === 401)) throw e;
+      // network/server down → local registration on this phone
+      var sess = { token: 'local-' + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36), user: { id: 'local-' + email, name: name || email.split('@')[0], email: email, coins: 5, spent: 0, createdAt: Date.now() } };
+      persistUser(sess);
+      try {
+        var q = []; try { q = JSON.parse(localStorage.getItem('mi.device.syncQueue.v1') || '[]'); } catch (eq) {}
+        q.push({ op: 'register', name: sess.user.name, email: email, ts: Date.now() });
+        try { localStorage.setItem('mi.device.syncQueue.v1', JSON.stringify(q.slice(-100))); } catch (eq) {}
+      } catch (eq) {}
+      afterLogin('user', 5);
+      if (window.MI && MI.toast) MI.toast('info', '📱 Saved on this phone', 'No connection — account + 5 coins stored locally. Will sync when online.');
+    }
   }
   async function userLogin(fields) {
-    const r = await apiPost('/api/auth/login', fields);
-    persistUser(r);
-    afterLogin('user');
+    var em = String((fields && fields.email) || '').trim().toLowerCase();
+    try {
+      const r = await apiPost('/api/auth/login', fields);
+      persistUser(r);
+      afterLogin('user');
+    } catch (e) {
+      // v6: offline unlock from the on-phone vault (same email, any state)
+      if (e && e.status === 401) throw new Error('Incorrect email or password.');
+      try {
+        var v = {}; try { v = JSON.parse(localStorage.getItem('mi.device.users.v1') || '{}'); } catch (ev) {}
+        var rec = v[em] || v[String((fields && fields.email) || '').trim()];
+        if (rec) {
+          persistUser({ token: 'local-' + Date.now().toString(36), user: { id: 'local-' + em, name: rec.name || em.split('@')[0], email: em, coins: rec.coins != null ? rec.coins : 5 } });
+          afterLogin('user');
+          if (window.MI && MI.toast) MI.toast('info', '📱 Offline sign-in', 'Unlocked from this phone. Coins work offline.');
+          return;
+        }
+      } catch (ev) {}
+      throw new Error('No connection — connect once to sync, then you can use MI offline.');
+    }
   }
 
   function afterLogin(which, freeCoins) {
@@ -103,6 +164,18 @@
       else MI.toast('success', 'Welcome, ' + ((MI.user && MI.user.name) || 'trader'),
         freeCoins ? ('You got ' + freeCoins + ' free coins — 1 signal or 1 AI question = 1 coin.') : ('You have ' + MI.coins + ' coins left.'));
     }
+    // v6.1: broker popup ONLY at user sign-up (fresh register). Never on
+    // mode switch, never on BUY/SELL. Change later in Settings.
+    try {
+      if (which === 'user' && freeCoins && window.MIBrokersHub && typeof window.MIBrokersHub.ask === 'function') {
+        let asked = null;
+        try { asked = localStorage.getItem('mi.broker.asked.v1'); } catch (e) {}
+        if (!asked) setTimeout(() => { try { window.MIBrokersHub.ask({ source: 'signup' }); } catch (e) {} }, 900);
+      }
+      if (window.MIBrokersHub && typeof window.MIBrokersHub.ensure === 'function') {
+        setTimeout(() => { try { window.MIBrokersHub.ensure(); } catch (e) {} }, 1200);
+      }
+    } catch (e) {}
   }
 
   function logout() {
@@ -118,14 +191,34 @@
   async function trySpend(item) {
     if (role() !== 'user') return true;
     const tok = userToken();
+    // v6: local-token accounts debit the phone instantly, never error
+    if (!tok || String(tok).indexOf('local-') === 0) {
+      var sess = current();
+      var coins = sess && sess.coins != null ? sess.coins : 5;
+      if (coins < 1) { openUpgrade('You are out of coins on this phone — top up (instant, works offline).'); return false; }
+      updateCoins(coins - 1);
+      try {
+        var em2 = String(sess && sess.user && sess.user.email || '').toLowerCase();
+        var vv = {}; try { vv = JSON.parse(localStorage.getItem('mi.device.users.v1') || '{}'); } catch (e) {}
+        if (em2 && vv[em2]) { vv[em2].coins = coins - 1; try { localStorage.setItem('mi.device.users.v1', JSON.stringify(vv)); } catch (e) {} }
+        var qq = []; try { qq = JSON.parse(localStorage.getItem('mi.device.syncQueue.v1') || '[]'); } catch (e) {}
+        qq.push({ op: 'spend', item: item || 'signal', ts: Date.now() });
+        try { localStorage.setItem('mi.device.syncQueue.v1', JSON.stringify(qq.slice(-100))); } catch (e) {}
+      } catch (e) {}
+      return true;
+    }
     let r;
     try {
       r = await apiPost('/api/coins/spend', { item }, tok);
     } catch (e) {
       if (e.status === 402 || e.code === 'insufficient_coins') {
         openUpgrade(item === 'ai' ? 'You are out of coins — top up to keep asking MI.' : 'You are out of coins — top up to keep reading signals.');
+      } else if (e.status === 401) {
+        // Session/account was invalidated server-side — cleanly return to login.
+        expireSession();
       } else {
-        if (window.MI && MI.toast) MI.toast('error', 'Coin error', e.message);
+        if (window.MI && MI.toast) MI.toast('error', 'Cannot reach MI server',
+          (e.status ? (e.message || ('HTTP ' + e.status)) : 'Check that the server is running, then refresh the page.'));
       }
       return false;
     }
@@ -134,6 +227,13 @@
       MI.toast('info', '🪙 ' + (r.cost || 1) + ' coin used', (item === 'ai' ? 'AI question' : 'Signal analysis') + ' · ' + r.coins + ' coins left.');
     }
     return true;
+  }
+  // User session is no longer valid on the server — drop it and show the login screen.
+  function expireSession() {
+    localStorage.removeItem(LS_USER);
+    setRole();
+    showOverlay(true);
+    if (window.MI && MI.toast) MI.toast('error', 'Session expired', 'Please sign in again to continue.');
   }
   async function refund(item) {
     if (role() !== 'user') return;

@@ -20,6 +20,11 @@ const BASE = 'https://pro-api.coinmarketcap.com';
 const TRACKED = [
   'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'XRPUSDT', 'ADAUSDT', 'DOGEUSDT',
   'AVAXUSDT', 'LINKUSDT', 'DOTUSDT', 'LTCUSDT', 'BNBUSDT', 'POLUSDT',
+  // --- v6 expansion: 20 more assets (must exist on Binance spot) ---
+  'TONUSDT', 'TRXUSDT', 'NEARUSDT', 'APTUSDT', 'ARBUSDT',
+  'OPUSDT', 'INJUSDT', 'SUIUSDT', 'SEIUSDT', 'FILUSDT',
+  'ETCUSDT', 'ATOMUSDT', 'TIAUSDT', 'UNIUSDT', 'PEPEUSDT',
+  'SHIBUSDT', 'RENDERUSDT', 'FETUSDT', 'SANDUSDT', 'MANAUSDT',
 ];
 
 const API_KEY = process.env.CMC_API_KEY || '';

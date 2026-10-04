@@ -55,12 +55,22 @@
     "email": "zgifantasy@gmail.com",
     "salt": "aaf48a67f6582e4af039f8fa4bd780bc",
     "hash": "c5753ef4a74ebcd8c828b6032561b4e14a7980c101dc3bd35cd43863439c0093b831161b0d80b550296ee5669ff580d2d59a4e1cfb66418ccd07ae2b5d864352",
-    "token": "4755f1ac49aaa8b2c9a74e65f93a06cc2181b2f6ba2ddec3",
+    "token": null,
     "createdAt": 1789764617070,
     "expiresAt": 1792356617070,
-    "coins": 3,
-    "spent": 2,
-    "orders": [],
+    "coins": 47,
+    "spent": 8,
+    "orders": [
+      {
+        "ref": "ORD-1789850287386-744",
+        "plan": "basic",
+        "planName": "Starter",
+        "coins": 50,
+        "price": 19,
+        "ts": 1789850287386,
+        "paid": true
+      }
+    ],
     "ledger": [
       {
         "ts": 1789764636398,
@@ -70,6 +80,423 @@
       {
         "ts": 1789764763769,
         "item": "ai",
+        "cost": -1
+      },
+      {
+        "ts": 1789849450306,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789849498306,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789850191491,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789850291951,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789850297566,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789850302159,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "19f85b87622244d2",
+    "name": "Probe",
+    "email": "probe1789848806003@mi.io",
+    "salt": "c06986f188b86abdce45292d45edf05a",
+    "hash": "da1527f6a3e73667782fad26303013f64e5bfe5910649b0e170893cb4c6ebc3206cef21c72843ec263e42b29454de5a6f22898b6b0cc0bd61a8a6a042c3c4abe",
+    "token": "12a611e40fe32375ac1249d2ae5ecc598d93fb9d0d7b7ffd",
+    "createdAt": 1789848806447,
+    "expiresAt": 1792440806447,
+    "coins": 4,
+    "spent": 1,
+    "orders": [],
+    "ledger": [
+      {
+        "ts": 1789848809176,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "7eaca5f0bb736252",
+    "name": "John daniel",
+    "email": "jd0447754@gmail.com",
+    "salt": "5d16d8cd7d7e98b5ca771c5a52b1c74c",
+    "hash": "d53c4f87e96b529cf45c1ecad6c82044ef9de87e501e886f7235897ac1177a189ba689a5d2cbd39b6c0b9c82769ae933361e12f0a691a1a06f80ff9a914a3a5d",
+    "token": "bece6d6b37d26815178141b58e4f1e508397c7fad5725942",
+    "createdAt": 1789850326297,
+    "expiresAt": 1792442326297,
+    "coins": 5,
+    "spent": 0,
+    "orders": [],
+    "ledger": []
+  },
+  {
+    "id": "668bb42591a40d53",
+    "name": "mat autos",
+    "email": "autosmattgm@gmail.com",
+    "salt": "06b670d7bf8e5576664eedd7a4b35ce5",
+    "hash": "ce132f17cfee539a7624123b121477dbbdc36f02fbf5502273d17d50788e65a612a0e628ce7a670dab889247d9e36d5b2e1a435c24b87c89ffb82fff02af94b5",
+    "token": "4244e4e967c2f0632e4432c00cf476eda4d1883a77f959fb",
+    "createdAt": 1789887330696,
+    "expiresAt": 1792479330696,
+    "coins": 3,
+    "spent": 2,
+    "orders": [],
+    "ledger": [
+      {
+        "ts": 1789887423014,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1789887478159,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "cdd9603cc006e4ee",
+    "name": "EBUBE OKOYE",
+    "email": "zgifantasyy@gmail.com",
+    "salt": "a5a7984cb80d33a20b23c0bed2771b88",
+    "hash": "126acb6e76dad192b3ffe331cd290a45dd38a64b8f98c367bff738cb51e55188917524fffffa1aab3911ec81d4673d22b086f6af3c8eeb081380512cecce9582",
+    "token": "e7e5b0efa3039c6181063706b4e7a4e8ee5e10c054529009",
+    "createdAt": 1791060497001,
+    "expiresAt": 1793652497001,
+    "coins": 478,
+    "spent": 28,
+    "orders": [
+      {
+        "ref": "ORD-1791060523980-128",
+        "plan": "elite",
+        "planName": "Elite Desk",
+        "coins": 500,
+        "price": 99,
+        "ts": 1791060523980,
+        "paid": true
+      }
+    ],
+    "ledger": [
+      {
+        "ts": 1791060501565,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060507410,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060509579,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060512442,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060516608,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060526536,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060620069,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060626807,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060629778,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060633203,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060638096,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060641375,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060643489,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060647713,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060648716,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060650312,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060653118,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060656304,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060703056,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060704234,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060738390,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060739364,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060740282,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060741013,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791060741772,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791062343533,
+        "item": "ai",
+        "cost": -1
+      },
+      {
+        "ts": 1791062348066,
+        "item": "ai_refund",
+        "cost": 1
+      },
+      {
+        "ts": 1791062660985,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791062664076,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "2c5a58ce4cefe0a3",
+    "name": "mat autos",
+    "email": "autosmattgm1122@gmail.com",
+    "salt": "9fde06d8de230a6e5d1336dc3ad01247",
+    "hash": "3e75c8494e1b845acc4d1ee8c1ad56b8276f374de98342519cdfcfd03bda7cf22651eb02e94b4c34e5a244159d65a3a725a0256ef4c3ad5802d208ed8d5452c1",
+    "token": null,
+    "createdAt": 1791110625868,
+    "expiresAt": 1793702625868,
+    "coins": 5,
+    "spent": 0,
+    "orders": [],
+    "ledger": []
+  },
+  {
+    "id": "5a9922796afcd2d7",
+    "name": "mat autos",
+    "email": "autosmattgm1123@gmail.com",
+    "salt": "482bbe2b7aed99679e1e1c49097fe3bf",
+    "hash": "114aa8327a0ef16eb0e9648098fadc67e1a064c8e3f1e0d3855ee05647a8d18840b4e93bdc9c5b161c3e78e638db737f0f289873b2fc9d13c096f252b16e85e3",
+    "token": "a38d5d9dce506ba8cbb357810ac0714817eb8cfbdf39f274",
+    "createdAt": 1791110707488,
+    "expiresAt": 1793702707488,
+    "coins": 996,
+    "spent": 9,
+    "orders": [
+      {
+        "ref": "ORD-1791110863342-921",
+        "plan": "elite",
+        "planName": "Elite Desk",
+        "coins": 500,
+        "price": 99,
+        "ts": 1791110863343,
+        "paid": true
+      },
+      {
+        "ref": "ORD-1791110883159-192",
+        "plan": "elite",
+        "planName": "Elite Desk",
+        "coins": 500,
+        "price": 99,
+        "ts": 1791110883159,
+        "paid": true
+      }
+    ],
+    "ledger": [
+      {
+        "ts": 1791110723597,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791110729268,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791110733497,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791110737841,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791110765024,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791110867537,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791110869921,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791111062194,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791111144827,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "e131295e80771234",
+    "name": "mat autos",
+    "email": "autosmattgm11233@gmail.com",
+    "salt": "5e3188985fb259a6fe568257352b45b3",
+    "hash": "c2d4f0e945d620a527e995cec6d463ec768fd7b1ab80a6e1c8abb78be2e3f634dfa2b5052ca11abb690fd65ffdefd88f20b41e9e0fe75b88c3889ff37bcc5aea",
+    "token": null,
+    "createdAt": 1791111261116,
+    "expiresAt": 1793703261116,
+    "coins": 3,
+    "spent": 3,
+    "orders": [],
+    "ledger": [
+      {
+        "ts": 1791111353341,
+        "item": "ai",
+        "cost": -1
+      },
+      {
+        "ts": 1791111361123,
+        "item": "ai_refund",
+        "cost": 1
+      },
+      {
+        "ts": 1791111367545,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791111462179,
+        "item": "signal",
+        "cost": -1
+      }
+    ]
+  },
+  {
+    "id": "8ad8a4dcee2a13f3",
+    "name": "mat autos",
+    "email": "autosmattgmm222@gmail.com",
+    "salt": "759a7d5b6bdbed791bedd0945a3ccb89",
+    "hash": "de6dc27a7fa091b03c2144143e2f5f806385cc22ed5b38302941b44d40538c2a18518fa426b8f9974f08975b65141a4e7d15c62d60c8a3c92de97e5657d4597d",
+    "token": "3a5ddd9cb3c1aa66954e1b90d097345917e6777d1a89fa9b",
+    "createdAt": 1791111934139,
+    "expiresAt": 1793703934139,
+    "coins": 2,
+    "spent": 3,
+    "orders": [],
+    "ledger": [
+      {
+        "ts": 1791111958009,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791112058503,
+        "item": "signal",
+        "cost": -1
+      },
+      {
+        "ts": 1791113667522,
+        "item": "signal",
         "cost": -1
       }
     ]

@@ -204,9 +204,15 @@
 
   // ============================================ data loading
   async function loadCandles() {
+    const infoEl = document.getElementById('ciSrc');
     try {
-      const res = await MI.api.get('/api/market/klines?symbol=' + state.symbol + '&interval=' + state.tf + '&limit=300');
-      state.candles = res.candles || [];
+      if (infoEl) infoEl.textContent = 'Data: loading…';
+      const res = await MI.api.get('/api/market/klines?symbol=' + encodeURIComponent(state.symbol) + '&interval=' + state.tf + '&limit=300');
+      const raw = res.candles || [];
+      // sanitize: drop malformed candles (NaN / missing OHLC) so one bad row
+      // can never blank the whole chart — the #1 "candles not showing" cause.
+      state.candles = raw.filter(c => c && isFinite(c.open) && isFinite(c.high) && isFinite(c.low) && isFinite(c.close) && c.high >= c.low);
+      if (!state.candles.length && raw.length) state.candles = raw.slice(-50); // last-resort fallback
       state.source = res.source || 'binance';
       const n = state.candles.length;
       state.view.count = Math.min(140, n || 140);
@@ -214,8 +220,12 @@
       state.stats = (window.MINotify && MINotify.getStats()) || {};
       updateInfo();
       doDraw();
+      if (!state.candles.length && infoEl) infoEl.textContent = 'Data: no candles for ' + state.symbol + ' — retrying…';
     } catch (err) {
-      MI.toast('error', 'Chart data error', err.message);
+      if (infoEl) infoEl.textContent = 'Data: offline — retrying…';
+      // auto-retry once after 4s (mobile networks drop often)
+      setTimeout(() => { if (!state.candles.length) loadCandles(); }, 4000);
+      if (window.MI && MI.toast) MI.toast('error', 'Chart data error', err.message);
     }
   }
 
@@ -657,7 +667,22 @@ const lh = m.hist[m.hist.length - 1];
   // ------------------------------------------------ full compose
   function doDraw() {
     const geo = draw();
-    if (!geo) return;
+    if (!geo) {
+      // empty-state message drawn ON the canvas so users never see a blank box
+      if (ctx && canvas) {
+        const W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = 'rgba(159,177,201,.85)';
+        ctx.font = '13px Segoe UI, system-ui';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const msg = state.candles.length ? 'Preparing candles…' : '⏳ Loading ' + state.symbol + ' candles…';
+        ctx.fillText(msg, W / 2, H / 2 - 8);
+        ctx.font = '11px Segoe UI, system-ui';
+        ctx.fillStyle = 'rgba(148,163,184,.7)';
+        ctx.fillText('drag = scroll · pinch/wheel = zoom', W / 2, H / 2 + 14);
+      }
+      return;
+    }
     drawCandles(geo);
     drawOverlays(geo);
     if (geo.show.rsi) drawRSI(geo);
@@ -759,13 +784,22 @@ const lh = m.hist[m.hist.length - 1];
   // ============================================ resize / events
   function resize() {
     if (!wrap || !canvas) return;
-    const rect = wrap.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    // wrap may report 0 width when hidden (other tab) — retry shortly so the
+    // chart never stays at 0×0 (blank) on phones switching tabs.
+    let rect = wrap.getBoundingClientRect();
+    if (!rect.width) { setTimeout(resize, 350); return; }
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
+    // CSS height comes from stylesheet (#chart height); fall back if missing.
+    let cssH = rect.height;
+    if (!cssH || cssH < 200) {
+      cssH = window.innerWidth < 480 ? 300 : window.innerWidth < 768 ? 340 : 420;
+      canvas.style.height = cssH + 'px';
+      rect = wrap.getBoundingClientRect();
+    }
     canvas.width = Math.round(rect.width * dpr);
     canvas.height = Math.round(rect.height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
     doDraw();
   }
 
@@ -781,6 +815,53 @@ const lh = m.hist[m.hist.length - 1];
     window.addEventListener('mouseup', onMouseUp);
     canvas.addEventListener('mouseleave', onMouseLeave);
     window.addEventListener('resize', resize);
+    // ---- touch: 1-finger drag = pan, 2-finger pinch = zoom (mobile + iPhone) ----
+    canvas.style.touchAction = 'none';
+    const touches = new Map();
+    let pinchD0 = 0, pinchC0 = 0;
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      for (const t of e.changedTouches) touches.set(t.identifier, { x: t.clientX, y: t.clientY });
+      if (touches.size === 1) {
+        const t = e.changedTouches[0];
+        state.drag.active = true; state.drag.startX = t.clientX;
+        state.drag.startEnd = state.view.end; state.drag.moved = false;
+      } else if (touches.size === 2) {
+        const p = [...touches.values()];
+        pinchD0 = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1;
+        pinchC0 = state.view.count;
+        state.drag.active = false;
+      }
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      for (const t of e.changedTouches) { if (touches.has(t.identifier)) touches.set(t.identifier, { x: t.clientX, y: t.clientY }); }
+      const n = state.candles.length;
+      if (touches.size === 2) {
+        const p = [...touches.values()];
+        const d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y) || 1;
+        const next = Math.max(20, Math.min(n, Math.round(pinchC0 * (pinchD0 / d))));
+        state.view.count = next;
+        state.view.end = Math.max(next, Math.min(n, state.view.end));
+        doDraw();
+      } else if (touches.size === 1 && state.drag.active) {
+        const t = e.changedTouches[0];
+        const dxPx = t.clientX - state.drag.startX;
+        if (Math.abs(dxPx) > 3) state.drag.moved = true;
+        const count = Math.min(state.view.count, n);
+        const cssW = (canvas.width / (window.devicePixelRatio || 1)) - 68;
+        const spacing = Math.max(1, cssW / Math.max(1, count));
+        const bars = Math.round(dxPx / spacing);
+        state.view.end = Math.max(count, Math.min(n, state.drag.startEnd - bars));
+        doDraw();
+      }
+    }, { passive: false });
+    const touchEnd = (e) => {
+      for (const t of e.changedTouches) touches.delete(t.identifier);
+      if (touches.size === 0) state.drag.active = false;
+    };
+    canvas.addEventListener('touchend', touchEnd);
+    canvas.addEventListener('touchcancel', touchEnd);
 
     bindSymbolChange();
 
@@ -832,6 +913,8 @@ const lh = m.hist[m.hist.length - 1];
         // (users pay 1 coin for each new analysis reveal).
         if (window.MISignals && typeof MISignals.revealSymbol === 'function') MISignals.revealSymbol(v);
         else if (window.MISignals && typeof MISignals.followChart === 'function') MISignals.followChart(v);
+        // Keep the Trade Console pointed at the same currency.
+        if (window.MITrade && typeof MITrade.setSymbol === 'function') MITrade.setSymbol(v);
       }
     };
     sel.addEventListener('change', pick);
@@ -840,13 +923,16 @@ const lh = m.hist[m.hist.length - 1];
 
   function populateSymbols(symbols) {
     state.symbols = (symbols || []).slice();
-    const label = (s) => String(s).endsWith('USDT')
-      ? String(s).replace(/USDT$/, '/USDT')
-      : String(s).replace(/^(.{3})(.{3})$/, '$1/$2');
+    const label = (s) => {
+      const u = String(s).toUpperCase();
+      if (u.endsWith('_OTC')) return u.replace(/_OTC$/, '').replace(/^(.{3})(.{3})$/, '$1/$2') + ' OTC';
+      return u.endsWith('USDT') ? u.replace(/USDT$/, '/USDT') : u.replace(/^(.{3})(.{3})$/, '$1/$2');
+    };
     const sel = document.getElementById('chartSymbol');
     const alertSel = document.getElementById('alertSymbol');
     const addSel = document.getElementById('addSymbol');
     const calcSel = document.getElementById('calcSymbol');
+    const tradeSel = document.getElementById('tradeSymbol');
     const opts = state.symbols.map(s =>
       '<option value="' + s + '">' + label(s) + '</option>').join('');
     if (sel) {
@@ -856,6 +942,10 @@ const lh = m.hist[m.hist.length - 1];
     if (alertSel) alertSel.innerHTML = opts;
     if (addSel) addSel.innerHTML = opts;
     if (calcSel) calcSel.innerHTML = opts;
+    if (tradeSel) {
+      tradeSel.innerHTML = opts;
+      if (state.symbols.includes(state.symbol)) tradeSel.value = state.symbol;
+    }
     bindSymbolChange();
   }
 
@@ -883,6 +973,7 @@ const lh = m.hist[m.hist.length - 1];
       state.symbol = s;
       loadCandles();
       if (window.MISignals && typeof MISignals.followChart === 'function') MISignals.followChart(s);
+      if (window.MITrade && typeof MITrade.setSymbol === 'function') MITrade.setSymbol(s);
     },
     getSymbol: function () { return state.symbol; },
   };

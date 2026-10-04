@@ -23,9 +23,27 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // ------------------------------------------------ settings page fill
+  function fillSettings() {
+    const acc = $id('settingsAccount');
+    if (acc) {
+      const role = (window.MIAuth && MIAuth.role && MIAuth.role()) || ((window.MI && MI.role) || '—');
+      const user = (window.MI && MI.user) || null;
+      const coins = (window.MI && MI.coins != null) ? MI.coins : '—';
+      acc.textContent = role === 'owner' ? 'Owner · full access (no coins needed)' :
+        user ? (user.name || user.email || 'User') + ' · ' + (user.email || '') + ' · 🪙 ' + coins + ' coins' : 'Not signed in';
+    }
+    if (window.MISettings && typeof window.MISettings.init === 'function') {
+      try { window.MISettings.init(); } catch (e) {}
+    }
+    if (window.MIBrokersHub && typeof window.MIBrokersHub.ensure === 'function') {
+      try { window.MIBrokersHub.ensure(); } catch (e) {}
+    }
+  }
+
   function initNav() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', () => showView(tab.dataset.view));
+      tab.addEventListener('click', () => { showView(tab.dataset.view); if (tab.dataset.view === 'settings') fillSettings(); });
     });
     // Support PWA shortcuts & deep links: /?view=signals|market|ai|...
     const urlView = new URLSearchParams(window.location.search).get('view');
@@ -117,6 +135,8 @@
     if (window.MIMarket) MIMarket.init();
     if (window.MIPortfolio) MIPortfolio.init();
     if (window.MIChat) MIChat.init();
+    // Guided trade console + voice (tells you when to place/close and alarms to TP).
+    if (window.MITrade) MITrade.init();
 
     // SSE signal graph → chart live updates
     if (window.MINotify && window.MIChart) {

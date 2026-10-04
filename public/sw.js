@@ -4,7 +4,7 @@
    to the network so live market data is never served stale from cache. */
 'use strict';
 
-const CACHE = 'mi-cache-v15';
+const CACHE = 'mi-cache-v18';
 const SHELL = [
   '/',
   '/index.html',
@@ -15,15 +15,23 @@ const SHELL = [
   '/icon-maskable-512.png',
   '/js/api.js',
   '/js/auth.js',
+  '/js/localWallet.js',
+  '/js/brokers.js',
+  '/js/brokersHub.js',
+  '/js/signalViewer.js',
   '/js/notifications.js',
   '/js/chart.js',
   '/js/signals.js',
   '/js/market.js',
   '/js/portfolio.js',
+  '/js/risk.js',
   '/js/chat.js',
   '/js/pwa.js',
   '/js/push.js',
   '/js/mode.js',
+  '/js/voice.js',
+  '/js/trade.js',
+  '/js/settings.js',
   '/js/app.js',
 ];
 
@@ -42,6 +50,7 @@ self.addEventListener('activate', (event) => {
 });
 
 // ---- Web Push: show a system notification when the app is closed. ----
+// LOUD on phones: vibration + sound + high-priority, reopenable actions.
 self.addEventListener('push', (event) => {
   let payload = {};
   try { payload = event.data ? event.data.json() : {}; } catch { payload = {}; }
@@ -50,15 +59,35 @@ self.addEventListener('push', (event) => {
     body: payload.body || 'New market update from MI.',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
+    image: payload.image,
     tag: payload.tag || 'mi-default',
-    renotify: !!payload.tag,
-    data: { url: payload.url || '/' },
+    renotify: true,
+    requireInteraction: true,
+    silent: false,
+    vibrate: [200, 100, 200, 100, 300],
+    sound: '/icon-192.png',
+    timestamp: Date.now(),
+    data: { url: payload.url || '/', kind: payload.kind || 'signal' },
+    actions: [
+      { action: 'open', title: '📈 Open MI' },
+      { action: 'dismiss', title: '✕ Dismiss' },
+    ],
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    (async () => {
+      try { await self.registration.showNotification(title, options); } catch (e) {}
+      // wake every open tab so the in-app badge/toast syncs too
+      try {
+        const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        list.forEach((c) => { try { c.postMessage({ type: 'MI_PUSH', payload }); } catch (e) {} });
+      } catch (e) {}
+    })()
+  );
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  if (event.action === 'dismiss') return;
   const url = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin).href;
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
@@ -71,6 +100,20 @@ self.addEventListener('notificationclick', (event) => {
       return self.clients.openWindow(url);
     })
   );
+});
+
+// ---- background sync: retry queued push resubscribes when back online ----
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'mi-push-resync') {
+    event.waitUntil(
+      (async () => {
+        try {
+          const list = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+          list.forEach((c) => { try { c.postMessage({ type: 'MI_RESYNC_PUSH' }); } catch (e) {} });
+        } catch (e) {}
+      })()
+    );
+  }
 });
 
 // ---- Static assets & app shell ----
