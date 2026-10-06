@@ -227,12 +227,63 @@
   }
 
   // ------------------------------------------------------------- send
+  // Trade-calc shortcuts: "calc BTCUSDT 1000 2" or "size EURUSD 500 1" —
+  // answered INSTANTLY on-device (no coin, no AI call) with full math.
+  function localCalc(text) {
+    const m = String(text || '').trim().match(/^(calc|size|lots?|position)\s+([A-Za-z0-9/_-]+)(?:\s+([\d.,]+))?(?:\s+([\d.,]+))?\s*$/i);
+    if (!m) return null;
+    const sym = String(m[2]).toUpperCase().replace(/[\s/_-]+/g, '');
+    const bal = parseFloat(String(m[3] || '').replace(/,/g, '')) || 1000;
+    const riskPct = parseFloat(String(m[4] || '').replace(/,/g, '')) || 2;
+    const sigs = (window.MINotify && MINotify.getSignals && MINotify.getSignals()) || [];
+    const sig = sigs.find(s => String(s.symbol || '').toUpperCase() === sym) ||
+      sigs.find(s => String(s.symbol || '').toUpperCase().replace(/_OTC$/, '') === sym);
+    if (!sig || sig.entry == null || sig.stopLoss == null) {
+      return '⚠️ No live engine signal for ' + sym + ' right now — open Signals and try again, or ask "analyze ' + sym + '".';
+    }
+    const riskMoney = bal * (riskPct / 100);
+    const stopDist = Math.abs(sig.entry - sig.stopLoss);
+    const tpDist = sig.takeProfit != null ? Math.abs(sig.takeProfit - sig.entry) : 0;
+    const rr = stopDist > 0 ? (tpDist / stopDist) : 0;
+    const isFx = sig.mode === 'forex' || (sig.precision && !String(sym).endsWith('USDT'));
+    let sizeLine = '';
+    if (isFx) {
+      const pips = sig.slPips != null ? sig.slPips : (stopDist / (sig.pipValue || 0.0001));
+      const lots = pips > 0 ? riskMoney / (pips * 10) : 0; // $10/pip standard lot
+      sizeLine = 'Stop ' + (pips ? pips.toFixed(1) : '—') + ' pips → **' + lots.toFixed(2) + ' lots** (std) / ' + (lots * 10).toFixed(1) + ' mini';
+    } else {
+      const qty = stopDist > 0 ? riskMoney / stopDist : 0;
+      sizeLine = 'Risk $' + riskMoney.toFixed(2) + ' ÷ $' + stopDist.toFixed(stopDist < 1 ? 4 : 2) + ' stop → **' + qty.toFixed(qty < 1 ? 5 : 3) + ' units** ≈ $' + (qty * sig.entry).toFixed(2) + ' notional';
+    }
+    return '## 🧮 ' + (sig.asset || sym) + ' ' + sig.action + ' — position math\n' +
+      '- Balance $' + bal.toFixed(2) + ' × ' + riskPct + '% = **$' + riskMoney.toFixed(2) + ' risk**\n' +
+      '- Entry ' + sig.entry + ' · SL ' + sig.stopLoss + ' · TP ' + (sig.takeProfit != null ? sig.takeProfit : '—') + '\n' +
+      '- ' + sizeLine + '\n' +
+      '- R:R **1:' + (rr ? rr.toFixed(2) : '—') + '** ' + (rr >= 1 ? '✅ valid' : '⚠️ below 1R — skip or re-plan') + '\n' +
+      '- Engine: ' + sig.confidence + '% ' + (sig.quality || '') + ' · ADX ' + (sig.adx != null ? sig.adx : '—') + ' · ' + ((sig.desk && sig.desk.session) || '') + '\n' +
+      '_Not financial advice._';
+  }
   async function send(overrideText) {
     if (streaming) return;
     const input = $id('chatInput');
     const text = (overrideText !== undefined ? overrideText : input.value).trim();
     if (!text && !pendingImages.length) {
       if (window.MI && MI.toast) MI.toast('info', 'Ask something or attach an image', 'Type a question or attach a chart screenshot.');
+      return;
+    }
+    // Instant on-device math — no coin spent, no network needed.
+    const calc = localCalc(text);
+    if (calc && !pendingImages.length) {
+      if (input) input.value = '';
+      const thread = $id('chatThread');
+      const userEl = document.createElement('div');
+      userEl.className = 'msg user';
+      userEl.textContent = text;
+      thread.appendChild(userEl);
+      addBubble('ai', calc);
+      history.push({ role: 'user', content: text });
+      history.push({ role: 'assistant', content: calc });
+      thread.scrollTop = thread.scrollHeight;
       return;
     }
     if (input) input.value = '';
@@ -322,7 +373,15 @@
     } catch (err) {
       aiBubble.textContent = '';
       aiBubble.className = 'msg error';
-      aiBubble.textContent = '⚠️ ' + err.message;
+      // Friendly, actionable errors instead of raw HTTP codes.
+      const raw = String(err.message || 'AI error');
+      let friendly = raw;
+      if (/503|not configured|API key/i.test(raw)) friendly = '🔑 AI key missing — add OPENROUTER_API_KEY to .env and restart the server. Your coin was refunded.';
+      else if (/429|rate|quota|insufficient/i.test(raw)) friendly = '⏳ AI is rate-limited right now — wait 30s and retry. Your coin was refunded. Tip: use "calc SYMBOL balance risk%" for instant math (free).';
+      else if (/timeout|timed out|network|fetch failed|502|503|504/i.test(raw)) friendly = '📡 AI timed out — connection hiccup. Retry once; your coin was refunded. Tip: "calc SYMBOL balance risk%" works offline and free.';
+      else if (/401|403/i.test(raw)) friendly = '🔐 AI auth failed — check the OpenRouter key. Your coin was refunded.';
+      aiBubble.textContent = '⚠️ ' + friendly;
+      if (window.MI && MI.toast) MI.toast('error', 'AI issue', friendly);
       if (spentCoin && window.MIAuth && window.MIAuth.refund) window.MIAuth.refund('ai');
     } finally {
       streaming = false;

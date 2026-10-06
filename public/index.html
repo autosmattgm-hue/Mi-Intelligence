@@ -570,8 +570,8 @@
             <button class="chip">When should I trade today?</button>
             <button class="chip">🧠 Check my risk rules</button>
             <button class="chip">Analyze BTC/USDT right now</button>
-            <button class="chip">Best entry for ETH today?</button>
-            <button class="chip">Explain the chart I uploaded</button>
+            <button class="chip">🧮 calc BTCUSDT 1000 2</button>
+            <button class="chip">🧮 calc EURUSD 500 1</button>
             <button class="chip">How should I size a 2% risk trade?</button>
           </div>
           <form class="chat-input-row" id="chatForm">
@@ -597,9 +597,9 @@
           <div class="panel-head"><div><strong>👤 Account & coins</strong><span class="sub" id="settingsAccountSub">Signed-in user</span></div></div>
           <div class="list">
             <div class="gu-line" id="settingsAccount">—</div>
-            <label class="set-row"><span>✏️ Display name</span><span class="set-inline"><input id="setName" class="input sm" type="text" placeholder="Trader" autocomplete="off"><button class="btn ghost sm" id="setNameSave">Save</button></span></label>
-            <label class="set-row"><span>🔑 Change password (server accounts)</span><span class="set-inline"><input id="setPw" class="input sm" type="password" placeholder="New password" autocomplete="new-password"><button class="btn ghost sm" id="setPwSave">Set</button></span></label>
-            <label class="set-row"><span>🪙 Coin ledger (last activity)</span><button class="btn ghost sm" id="setLedger">View</button></label>
+            <div class="set-row"><span>✏️ Display name</span><span class="set-inline"><input id="setName" class="input sm" type="text" placeholder="Trader" autocomplete="off"><button type="button" class="btn ghost sm" id="setNameSave">Save</button></span></div>
+            <div class="set-row"><span>🔑 Change password (server accounts)</span><span class="set-inline"><input id="setPw" class="input sm" type="password" placeholder="New password" autocomplete="new-password"><button type="button" class="btn ghost sm" id="setPwSave">Set</button></span></div>
+            <div class="set-row"><span>🪙 Coin ledger (last activity)</span><button type="button" class="btn ghost sm" id="setLedger">View</button></div>
             <div class="list sm" id="setLedgerList"></div>
           </div>
           <div class="login-hint">Coins are stored on this phone and sync when online. 1 signal = 1 coin · 1 AI question = 1 coin.</div>
@@ -609,22 +609,22 @@
         <div class="panel">
           <div class="panel-head"><div><strong>🌙 Appearance & language</strong><span class="sub">Make MI yours</span></div></div>
           <div class="list">
-            <label class="set-row"><span>🌙 Theme</span><select class="select" id="setTheme"><option value="dark">Dark (pro)</option><option value="light">Light</option></select></label>
-            <label class="set-row"><span>🌍 Language</span><select class="select" id="setLang"><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option></select></label>
-            <label class="set-row"><span>🕒 Clock</span><select class="select" id="setClock"><option value="utc">UTC</option><option value="local">Phone local</option></select></label>
-            <label class="set-row"><span>💵 Currency display</span><select class="select" id="setCur"><option value="USD">USD $</option><option value="EUR">EUR €</option><option value="NGN">NGN ₦</option><option value="GHS">GHS ₵</option></select></label>
-            <label class="set-row"><span>📳 Compact pro layout</span><button class="os-toggle" id="setCompact">OFF</button></label>
-            <label class="set-row"><span>🔔 In-app banner for every signal</span><button class="os-toggle" id="setBanner">ON</button></label>
+            <div class="set-row"><span>🌙 Theme</span><select class="select" id="setTheme"><option value="dark">Dark (pro)</option><option value="light">Light</option></select></div>
+            <div class="set-row"><span>🌍 Language</span><select class="select" id="setLang"><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="pt">Português</option><option value="ar">العربية</option></select></div>
+            <div class="set-row"><span>🕒 Clock</span><select class="select" id="setClock"><option value="utc">UTC</option><option value="local">Phone local</option></select></div>
+            <div class="set-row"><span>💵 Currency display</span><select class="select" id="setCur"><option value="USD">USD $</option><option value="EUR">EUR €</option><option value="NGN">NGN ₦</option><option value="GHS">GHS ₵</option></select></div>
+            <div class="set-row"><span>📳 Compact pro layout</span><button type="button" class="os-toggle" id="setCompact">OFF</button></div>
+            <div class="set-row"><span>🔔 In-app banner for every signal</span><button type="button" class="os-toggle" id="setBanner">ON</button></div>
           </div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><strong>🛡 Safety & privacy</strong><span class="sub">Your phone, your data</span></div></div>
           <div class="list">
-            <label class="set-row"><span>🔒 Lock app with PIN</span><span class="set-inline"><input id="setPin" class="input sm" type="password" inputmode="numeric" placeholder="4-digit PIN" maxlength="8"><button class="btn ghost sm" id="setPinSave">Set</button></span></label>
-            <label class="set-row"><span>🧹 Clear watchlist + solo focus</span><button class="btn ghost sm" id="setClearWatch">Clear</button></label>
-            <label class="set-row"><span>🗑 Delete signal history (this phone)</span><button class="btn ghost sm" id="setClearHist">Delete</button></label>
-            <label class="set-row"><span>📤 Export my data (JSON)</span><button class="btn ghost sm" id="setExport">Export</button></label>
-            <label class="set-row"><span>☠️ Delete account from this phone</span><button class="btn ghost sm danger" id="setWipe">Wipe</button></label>
+            <div class="set-row"><span>🔒 Lock app with PIN</span><span class="set-inline"><input id="setPin" class="input sm" type="password" inputmode="numeric" placeholder="4-digit PIN" maxlength="8"><button type="button" class="btn ghost sm" id="setPinSave">Set</button></span></div>
+            <div class="set-row"><span>🧹 Clear watchlist + solo focus</span><button type="button" class="btn ghost sm" id="setClearWatch">Clear</button></div>
+            <div class="set-row"><span>🗑 Delete signal history (this phone)</span><button type="button" class="btn ghost sm" id="setClearHist">Delete</button></div>
+            <div class="set-row"><span>📤 Export my data (JSON)</span><button type="button" class="btn ghost sm" id="setExport">Export</button></div>
+            <div class="set-row"><span>☠️ Delete account from this phone</span><button type="button" class="btn ghost sm danger" id="setWipe">Wipe</button></div>
           </div>
         </div>
       </div>
@@ -632,31 +632,31 @@
         <div class="panel">
           <div class="panel-head"><div><strong>🔔 Signal alerts</strong><span class="sub">How MI pings you</span></div></div>
           <div class="list">
-            <label class="set-row"><span>🔊 Voice alerts (TP countdown spoken)</span><button class="os-toggle" id="setVoice">ON</button></label>
-            <label class="set-row"><span>📳 App-installed alerts (works when app closed)</span><button class="os-toggle" id="setPush">OFF</button></label>
-            <label class="set-row"><span>📲 Install MI as app + enable closed-app alarms</span><button class="btn ghost sm" id="setInstallPush">Install & enable</button></label>
-            <label class="set-row"><span>⏳ TP warning</span><select class="select" id="setTpWarn"><option value="60">1 minute before</option><option value="300">5 minutes before</option><option value="900">15 minutes before</option></select></label>
-            <label class="set-row"><span>⭐ Minimum confidence</span><select class="select" id="setMinConf"><option value="0">All signals</option><option value="60">60%+</option><option value="70">70%+</option><option value="80">80%+ HIGH only</option></select></label>
-            <label class="set-row"><span>📳 Watchlist-only signals table</span><button class="os-toggle" id="setWatchOnly">OFF</button></label>
-            <label class="set-row"><span>🔁 Auto-refresh signals</span><select class="select" id="setRefresh"><option value="30">30s</option><option value="60" selected>60s</option><option value="120">2 min</option><option value="0">Manual</option></select></label>
-            <label class="set-row"><span>🔔 Alert sound</span><button class="os-toggle" id="setSound">ON</button></label>
-            <label class="set-row"><span>💜 Show OTC contracts</span><button class="os-toggle" id="setOtc">ON</button></label>
-            <label class="set-row"><span>⏸ Show WAIT / HOLD rows</span><button class="os-toggle" id="setHold">ON</button></label>
+            <div class="set-row"><span>🔊 Voice alerts (TP countdown spoken)</span><button type="button" class="os-toggle" id="setVoice">ON</button></div>
+            <div class="set-row"><span>📳 App-installed alerts (works when app closed)</span><button type="button" class="os-toggle" id="setPush">OFF</button></div>
+            <div class="set-row"><span>📲 Install MI as app + enable closed-app alarms</span><button type="button" class="btn ghost sm" id="setInstallPush">Install & enable</button></div>
+            <div class="set-row"><span>⏳ TP warning</span><select class="select" id="setTpWarn"><option value="60">1 minute before</option><option value="300">5 minutes before</option><option value="900">15 minutes before</option></select></div>
+            <div class="set-row"><span>⭐ Minimum confidence</span><select class="select" id="setMinConf"><option value="0">All signals</option><option value="60">60%+</option><option value="70">70%+</option><option value="80">80%+ HIGH only</option></select></div>
+            <div class="set-row"><span>📳 Watchlist-only signals table</span><button type="button" class="os-toggle" id="setWatchOnly">OFF</button></div>
+            <div class="set-row"><span>🔁 Auto-refresh signals</span><select class="select" id="setRefresh"><option value="30">30s</option><option value="60" selected>60s</option><option value="120">2 min</option><option value="0">Manual</option></select></div>
+            <div class="set-row"><span>🔔 Alert sound</span><button type="button" class="os-toggle" id="setSound">ON</button></div>
+            <div class="set-row"><span>💜 Show OTC contracts</span><button type="button" class="os-toggle" id="setOtc">ON</button></div>
+            <div class="set-row"><span>⏸ Show WAIT / HOLD rows</span><button type="button" class="os-toggle" id="setHold">ON</button></div>
           </div>
         </div>
         <div class="panel">
           <div class="panel-head"><div><strong>📊 Trading preferences</strong><span class="sub">Defaults + safety</span></div></div>
           <div class="list">
-            <label class="set-row"><span>💱 Default market</span><select class="select" id="setMode"><option value="crypto">Crypto</option><option value="forex">Forex</option><option value="pocket">Pocket Option</option></select></label>
-            <label class="set-row"><span>🕯 Default chart interval</span><select class="select" id="setTf"><option>1m</option><option>5m</option><option selected>15m</option><option>1h</option><option>4h</option><option>1d</option></select></label>
-            <label class="set-row"><span>⚠️ Risk per trade</span><select class="select" id="setRisk"><option value="1">1%</option><option value="2" selected>2%</option><option value="3">3%</option><option value="5">5%</option></select></label>
-            <label class="set-row"><span>📰 Block signals near high-impact news</span><button class="os-toggle" id="setNews">ON</button></label>
-            <label class="set-row"><span>📈 Only strong trends (ADX ≥ 22)</span><button class="os-toggle" id="setTrend">OFF</button></label>
-            <label class="set-row"><span>🔥 HIGH conviction only</span><button class="os-toggle" id="setHigh">OFF</button></label>
-            <label class="set-row"><span>🛡 Auto risk-note on every signal</span><button class="os-toggle" id="setRiskNote">ON</button></label>
-            <label class="set-row"><span>📳 Vibrate on TP alert (phone)</span><button class="os-toggle" id="setVibrate">ON</button></label>
-            <label class="set-row"><span>🚪 Log out this phone</span><button class="btn ghost sm" id="setLogout">Log out</button></label>
-            <label class="set-row"><span>🧹 Clear revealed signals (re-lock, spend coins again)</span><button class="btn ghost sm" id="setClearRevealed">Clear</button></label>
+            <div class="set-row"><span>💱 Default market</span><select class="select" id="setMode"><option value="crypto">Crypto</option><option value="forex">Forex</option><option value="pocket">Pocket Option</option></select></div>
+            <div class="set-row"><span>🕯 Default chart interval</span><select class="select" id="setTf"><option>1m</option><option>5m</option><option selected>15m</option><option>1h</option><option>4h</option><option>1d</option></select></div>
+            <div class="set-row"><span>⚠️ Risk per trade</span><select class="select" id="setRisk"><option value="1">1%</option><option value="2" selected>2%</option><option value="3">3%</option><option value="5">5%</option></select></div>
+            <div class="set-row"><span>📰 Block signals near high-impact news</span><button type="button" class="os-toggle" id="setNews">ON</button></div>
+            <div class="set-row"><span>📈 Only strong trends (ADX ≥ 22)</span><button type="button" class="os-toggle" id="setTrend">OFF</button></div>
+            <div class="set-row"><span>🔥 HIGH conviction only</span><button type="button" class="os-toggle" id="setHigh">OFF</button></div>
+            <div class="set-row"><span>🛡 Auto risk-note on every signal</span><button type="button" class="os-toggle" id="setRiskNote">ON</button></div>
+            <div class="set-row"><span>📳 Vibrate on TP alert (phone)</span><button type="button" class="os-toggle" id="setVibrate">ON</button></div>
+            <div class="set-row"><span>🚪 Log out this phone</span><button type="button" class="btn ghost sm" id="setLogout">Log out</button></div>
+            <div class="set-row"><span>🧹 Clear revealed signals (re-lock, spend coins again)</span><button type="button" class="btn ghost sm" id="setClearRevealed">Clear</button></div>
           </div>
         </div>
       </div>

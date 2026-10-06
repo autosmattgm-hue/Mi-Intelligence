@@ -436,7 +436,7 @@ function analyzeSymbol(symbol, klines, opts) {
     else if (absS >= 25 && dominant >= 3) quality = 'LOW';
   }
 
-  const cap = quality === 'HIGH' ? 97 : quality === 'MEDIUM' ? 90 : 82;
+  const cap = quality === 'HIGH' ? 89 : quality === 'MEDIUM' ? 82 : 74;
 
   // --- IQ gate: never over-promise against the higher-timeframe trend. ---
   // If the hourly trend clearly disagrees with the intraday direction, the
@@ -459,12 +459,15 @@ function analyzeSymbol(symbol, klines, opts) {
   // Trade plan (only when a directional signal exists)
   // Professional sizing: ATR multiples scaled by realised-vol regime; OTC gets
   // spread-widened SL so the desk doesn't get stopped by synthetic spread.
+  // Honesty fix: 1.4R plans need ~45%+ win-rate to profit — the engine now
+  // targets 1.0R (TP = 1.6 ATR, SL = 1.6 ATR) so a ~55% model stays green and
+  // 90%+ claims can never be printed.
   let entry = price, tp = null, sl = null, rr = null;
   if (!isNeutral && atrV > 0) {
     const isBuy = dir === 1;
     const k = (typeof regime !== 'undefined' ? regime.mult : 1) || 1;
-    const tpMult = 2.0 * k;
-    let slMult = 1.4 * k;
+    const tpMult = 1.6 * k;
+    let slMult = 1.6 * k;
     if (typeof otc !== 'undefined' && otc.isOtc) slMult += otc.spreadAtr;
     sl = isBuy ? price - atrV * slMult : price + atrV * slMult;
     tp = isBuy ? price + atrV * tpMult : price - atrV * tpMult;

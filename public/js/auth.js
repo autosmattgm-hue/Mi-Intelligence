@@ -117,7 +117,8 @@
     let status = null;
     try {
       const r = await fetch('/api/auth/google/status');
-      status = await r.json();
+      if (r.ok) status = await r.json();
+      else status = { configured: false }; // old server still running — restart to enable
     } catch { status = null; }
     googleClientId = status && status.clientId ? status.clientId : null;
     if (!googleClientId) {

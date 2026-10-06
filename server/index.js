@@ -545,9 +545,13 @@ router.post('/api/chat', async (ctx) => {
     })),
     signals: market.signals.map(s => ({
       symbol: s.symbol, asset: s.asset, action: s.action, confidence: s.confidence,
-      price: s.price, entry: s.entry, takeProfit: s.takeProfit, stopLoss: s.stopLoss,
-      riskReward: s.riskReward, trend: s.trend, rsi: s.rsi, score: s.score,
+      quality: s.quality, price: s.price, entry: s.entry, takeProfit: s.takeProfit,
+      stopLoss: s.stopLoss, riskReward: s.riskReward, trend: s.trend, rsi: s.rsi,
+      adx: s.adx, atrPct: s.atrPct, score: s.score, otc: !!s.otc, market: s.market,
+      desk: s.desk || null, factors: (s.factors || []).slice(0, 12),
+      time: s.time, tpTimerSec: s.tpTimerSec || null, sessions: s.sessions || null,
     })),
+    accuracy: null,
     paperTrading: paper.stats(market.prices),
     audience,
     tradeTiming,
@@ -559,6 +563,7 @@ router.post('/api/chat', async (ctx) => {
       imminentHigh: (calendar.imminentHigh || []).slice(0, 4).map(e => ({ title: e.title, country: e.country, time: e.time })),
     } : null,
   };
+  try { context.accuracy = accuracy.stats(); } catch { /* optional */ }
   const res = ctx.res;
 
   res.writeHead(200, {

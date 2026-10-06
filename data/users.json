@@ -526,7 +526,7 @@
     "createdAt": 1791135080790,
     "expiresAt": 1793727080790,
     "coins": 3,
-    "spent": 2,
+    "spent": 4,
     "orders": [],
     "ledger": [
       {
@@ -538,6 +538,26 @@
         "ts": 1791135130593,
         "item": "signal",
         "cost": -1
+      },
+      {
+        "ts": 1791235214674,
+        "item": "ai",
+        "cost": -1
+      },
+      {
+        "ts": 1791235218110,
+        "item": "ai_refund",
+        "cost": 1
+      },
+      {
+        "ts": 1791235269484,
+        "item": "ai",
+        "cost": -1
+      },
+      {
+        "ts": 1791235273484,
+        "item": "ai_refund",
+        "cost": 1
       }
     ]
   }
