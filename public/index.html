@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="MI — Master Intelligence. Real-time AI crypto trading: live CoinMarketCap & Binance data, high-conviction BUY/SELL signals, paper trading, risk manager and AI assistant.">
+<meta name="description" content="MI Master Intelligence is a multi-asset market-analysis workspace with live data, structured trade plans, risk controls, paper tracking, and an AI research assistant.">
 <meta name="theme-color" content="#06b6d4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="stylesheet" href="css/style.css">
-<title>MI — Master Intelligence | Advanced Trading AI Suite</title>
+<title>MI | Multi-Asset Trading Intelligence</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080c14'/%3E%3Ctext x='32' y='42' font-family='Segoe UI' font-size='26' font-weight='900' fill='%2306b6d4' text-anchor='middle'%3EMI%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -115,6 +115,23 @@
 
     <!-- ============================ OVERVIEW ============================ -->
     <section class="view active" data-view="overview">
+      <section class="desk-hero" aria-labelledby="deskHeroTitle">
+        <div class="desk-hero-copy">
+          <div class="eyebrow">MULTI-ASSET ANALYSIS · LIVE DATA · RISK FIRST</div>
+          <h1 id="deskHeroTitle">A clearer edge starts with a disciplined process.</h1>
+          <p>MI brings live market context, technical confluence, and a structured plan into one professional workspace. Signal confidence is an analytical score—not a promise of profit.</p>
+          <div class="desk-hero-actions" aria-label="Workspace shortcuts">
+            <button type="button" class="btn primary" data-view-link="signals">Open signal desk</button>
+            <button type="button" class="btn ghost" data-view-link="risk">Check risk sizing</button>
+          </div>
+        </div>
+        <dl class="market-coverage" aria-label="Market coverage">
+          <div><dt>Crypto</dt><dd>Spot market analysis</dd></div>
+          <div><dt>FX &amp; metals</dt><dd>Session-aware plans</dd></div>
+          <div><dt>Indices &amp; energy</dt><dd>Mode-dependent coverage</dd></div>
+          <div><dt>Execution</dt><dd>Manual broker confirmation</dd></div>
+        </dl>
+      </section>
       <div class="signal-tape-wrap"><div class="signal-tape" id="signalTape"></div></div>
       <div class="stats-bar" id="statsBar"><div class="stat-card">Loading live market data…</div></div>
 
@@ -182,23 +199,23 @@
 <!-- Info cards -->
       <div class="info-cards">
         <div class="info-card">
-          <div class="info-card-head">🤖 How MI works</div>
+          <div class="info-card-head">🔬 Research methodology</div>
           <div class="info-card-body">
             The MI engine pulls <strong>real market data</strong> — prices, market cap &amp; rankings from <strong>CoinMarketCap</strong>
             and <strong>OHLCV candles</strong> from Binance — then computes EMA, RSI, MACD, Bollinger Bands, ATR and volume
-            confluence on every cycle. Signals, confidence, take-profit and stop-loss levels are derived from those
-            calculations, then cross-checked by the OpenRouter AI assistant.
+            confluence on every cycle. Signals, confidence, take-profit and stop-loss levels are analytical outputs to review,
+            not instructions to execute blindly.
           </div>
         </div>
         <div class="info-card">
-          <div class="info-card-head">⚠️ Important notice</div>
+          <div class="info-card-head">🛡️ Risk standard</div>
           <div class="info-card-body">
             MI is an <strong>analytical tool, not financial advice</strong>. Markets carry risk of loss. Always do your own research
-            and use stop-losses and position sizing that fit your own risk tolerance. AI output can contain errors.
+            and use stop-losses, position sizing, and broker-side order checks that fit your own risk tolerance. AI output can contain errors.
           </div>
         </div>
         <div class="info-card">
-          <div class="info-card-head">🗂️ Data sources</div>
+          <div class="info-card-head">🗂️ Data provenance</div>
           <div class="info-card-body">
             Prices, market cap &amp; rankings — <strong>CoinMarketCap</strong>. Chart candles — <strong>Binance public market data</strong>
             (spot). Signals &amp; analysis — <strong>MI engine</strong> (on-server). AI answers — <strong>OpenRouter</strong>.
@@ -354,7 +371,7 @@
           <div class="panel-head wrap">
             <div>
               <strong>🚀 MI Trade Console</strong>
-              <span class="sub">Pick the currency you want to trade → tap TRADE → MI tells you when to place it, when to stop it, and voices the countdown to take profit.</span>
+              <span class="sub">Build a live monitoring plan, review the levels, then confirm any order yourself with your broker.</span>
             </div>
             <button class="btn ghost sm" id="tradeVoice">🎙️ Voice: ON</button>
           </div>
@@ -363,7 +380,7 @@
             <label class="ts-lbl">Asset to trade
               <select id="tradeSymbol" class="input select"></select>
             </label>
-            <button class="btn primary trade-btn" id="tradePlaceBtn">🚀 TRADE</button>
+            <button class="btn primary trade-btn" id="tradePlaceBtn">Start monitor</button>
             <button class="btn ghost" id="tradeArmBtn">🧭 Prepare plan only</button>
             <button class="btn ghost danger" id="tradeCancelBtn" hidden>✋ Cancel / Close trade</button>
           </div>
@@ -376,7 +393,7 @@
           <div class="panel-head wrap">
             <div>
               <strong>📡 Live Trade Monitor</strong>
-              <span class="sub" id="tradeMonSub">No active trade. Tap 🚀 TRADE to start monitoring.</span>
+              <span class="sub" id="tradeMonSub">No active monitoring plan. Review a setup, then start monitoring.</span>
             </div>
           </div>
           <div id="tradeMonitor" class="trade-monitor"></div>
@@ -388,14 +405,13 @@
       <div class="info-card" style="margin-top:14px">
         <div class="info-card-head">🔊 How the voice trader works</div>
         <div class="info-card-body">
-          <strong>1 · Pick &amp; trade.</strong> Choose the pair, then tap <strong>🚀 TRADE</strong>. MI reads the live
-          signal and the timing engine and tells you <strong>when to place</strong> the trade (immediately, or at the
-          next high-volatility window) and <strong>when to stop it</strong> (expiry for binary options, a time-stop for spot).
+          <strong>1 · Review the plan.</strong> Choose a pair, then tap <strong>Start monitor</strong>. MI reads the live
+          signal and the timing engine and presents a suggested entry window, invalidation level, and time horizon. It does not place an order with a broker.
           <br><strong>2 · Voice + countdown.</strong> MI speaks the plan out loud. Once you're in the trade it watches every
           price tick; if the chart starts <strong>acting suspicious</strong> (momentum flips, profit gives back, MACD turns)
           it alarms you and runs a <strong>countdown to take your profit</strong>.
-          <br><strong>3 · Sure trades.</strong> When the setup is <strong>high conviction</strong> MI marks it
-          <strong>✅ SURE</strong> and speaks the exact entry window and exit time. Toggle voice any time with the 🎙️ button in the top bar.
+          <br><strong>3 · High-conviction review.</strong> When several factors align, MI flags a setup as
+          <strong>high conviction</strong>. Re-check price, news, liquidity, and your own broker quote before entering. Toggle voice any time with the 🎙️ button in the top bar.
         </div>
       </div>
     </section>

@@ -45,6 +45,14 @@
     document.querySelectorAll('.nav-tab').forEach(tab => {
       tab.addEventListener('click', () => { showView(tab.dataset.view); if (tab.dataset.view === 'settings') fillSettings(); });
     });
+    document.querySelectorAll('[data-view-link]').forEach(link => {
+      link.addEventListener('click', () => {
+        const view = link.dataset.viewLink;
+        if (!document.querySelector('.view[data-view="' + view + '"]')) return;
+        showView(view);
+        if (view === 'settings') fillSettings();
+      });
+    });
     // Support PWA shortcuts & deep links: /?view=signals|market|ai|...
     const urlView = new URLSearchParams(window.location.search).get('view');
     if (urlView && document.querySelector('.nav-tab[data-view="' + urlView + '"]')) {

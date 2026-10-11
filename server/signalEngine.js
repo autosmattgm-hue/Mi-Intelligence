@@ -421,7 +421,7 @@ function analyzeSymbol(symbol, klines, opts) {
   const absS = Math.abs(score);
 
   // Factor agreement — how many independent signals point the same way.
-  // "Sure" signals require AGREEMENT, not just a passing score.
+  // High-conviction signals require factor agreement, not just a passing score.
   const bullCount = factors.filter(f => f.impact === 'bull').length;
   const bearCount = factors.filter(f => f.impact === 'bear').length;
   const dominant = Math.max(bullCount, bearCount);
@@ -538,11 +538,11 @@ function analyzeSymbol(symbol, klines, opts) {
       sessions: activeSessions(),
       sessionLabel: activeSessions().join(' · '),
     } : {}),
-    // Pocket Option mode: expiry, payout estimate (typical 80-94% digital-option payouts), win probability
+    // Short-term options: expiry, a planning-only payout reference, and model confidence.
     ...(mode === 'pocket' ? {
       expiry: _expForTimer,
       payout: Math.max(80, Math.min(94, Math.round(78 + atrPct * 4))),
-      winProbability: confidence,
+      modelConfidence: confidence,
       directionUp: dir === 1,
       // FX / index / metals keep their own quote precision & pip size
       ...(opts && opts.precision ? { precision: opts.precision, pipValue: (opts && opts.pip) || (mode === 'pocket' ? 1 : 0.0001) } : {}),

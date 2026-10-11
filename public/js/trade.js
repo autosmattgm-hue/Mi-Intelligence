@@ -2,11 +2,11 @@
    Flow
    ----
    1) Pick the currency/pair you want to trade (dropdown — defaults to the chart).
-   2) Tap 🚀 TRADE. MI computes a full plan from the LIVE signal engine + the
+   2) Start monitoring. MI computes a full plan from the LIVE signal engine + the
       real-data timing engine and tells you:
          • WHEN to place the trade (now, or the exact local clock time + countdown)
          • WHEN to stop / close it  (expiry for digital options, time-stop otherwise)
-         • Entry / Take-Profit / Stop-Loss and how "SURE" the setup is (conviction).
+         • Entry / Take-Profit / Stop-Loss and the setup's evidence-based conviction tier.
    3) MI then watches the chart tick-by-tick. When the trade is in profit and the
       chart starts acting suspicious (momentum flip, profit giving back, slippage
       toward the stop) it fires a VOICE alarm and runs an on-screen COUNTDOWN
@@ -26,7 +26,7 @@
     prevPrice: null,
     plan: null,          // prepared plan (armed, not placed)
     trade: null,         // active trade (placed & monitored)
-    watching: false,     // HOLD symbol — waiting for the setup to turn sure
+    watching: false,     // HOLD symbol — waiting for a directional setup
     timing: null,
     timingAt: 0,
     timingPending: false,
@@ -183,11 +183,11 @@
 
   // ------------------------------------------------ plan building
   function conviction(sig) {
-    if (!sig || !isActive(sig.action)) return { tier: 'WAIT', label: '⏳ WAIT', sure: false };
-    if (sig.quality === 'HIGH' && sig.confidence >= 78) return { tier: 'SURE', label: '✅ SURE — high conviction', sure: true };
-    if (sig.quality === 'HIGH') return { tier: 'HIGH', label: '🔥 High conviction', sure: true };
-    if (sig.quality === 'MEDIUM') return { tier: 'GOOD', label: '⚡ Good setup', sure: false };
-    return { tier: 'WEAK', label: '○ Weak / speculative', sure: false };
+    if (!sig || !isActive(sig.action)) return { tier: 'WAIT', label: '⏳ Wait for confirmation', highConviction: false };
+    if (sig.quality === 'HIGH' && sig.confidence >= 78) return { tier: 'HIGH', label: '✓ High conviction — review now', highConviction: true };
+    if (sig.quality === 'HIGH') return { tier: 'HIGH', label: '🔥 High conviction — verify entry', highConviction: true };
+    if (sig.quality === 'MEDIUM') return { tier: 'MODERATE', label: '⚡ Moderate conviction — wait for confirmation', highConviction: false };
+    return { tier: 'LOW', label: '○ Low conviction — speculative', highConviction: false };
   }
 
   function buildPlan(sig) {
@@ -225,11 +225,11 @@
       if (state.watching) {
         say('No directional edge on ' + state.plan.asset + ' right now. The best window to trade is ' +
           (state.plan.inWindow ? 'now' : state.plan.placeLabel + ', in about ' + state.plan.placeMins + ' minutes') +
-          '. I will alert you the moment the setup turns sure.');
+          '. I will alert you when a directional setup appears.');
         MI.toast('info', 'MI says: WAIT', state.plan.asset + ' has no edge yet — best window ' + state.plan.placeLabel + '.');
       } else {
         say(state.plan.asset + ' ' + actionWord(state.plan.action) + ' setup, ' + state.plan.confidence +
-          ' percent confidence. ' + (state.plan.conv.sure ? 'This one looks sure. ' : '') +
+          ' percent confidence. ' + (state.plan.conv.highConviction ? 'This is a high-conviction setup. Recheck your broker quote. ' : '') +
           'Place your trade ' + (state.plan.inWindow ? 'now' : 'at ' + state.plan.placeLabel) +
           '. Plan to exit within ' + state.plan.expMin + ' minutes, at ' + clockLabel(state.plan.placeAt + state.plan.expMin * 60000) + '.', 'alert');
       }
@@ -274,16 +274,16 @@
 
     const entryTxt = fprice(entry, sig);
     const stopClock = clockLabel(state.trade.stopAt);
-    logLine('place', '🚀 ' + actionWord(plan.action) + ' ' + plan.asset + ' @ ' + entryTxt +
-      ' · exit by ' + stopClock + ' (' + plan.expMin + 'm)');
-    MI.toast('success', 'Trade placed — monitoring live', plan.asset + ' ' + actionWord(plan.action) + ' @ ' + entryTxt +
-      ' · stop by ' + stopClock);
+    logLine('place', '📡 Monitoring plan: ' + actionWord(plan.action) + ' ' + plan.asset + ' @ ' + entryTxt +
+      ' · review by ' + stopClock + ' (' + plan.expMin + 'm)');
+    MI.toast('success', 'Monitoring plan started', plan.asset + ' ' + actionWord(plan.action) + ' @ ' + entryTxt +
+      ' · confirm any order manually with your broker.');
 
-    say('Trade placed on ' + plan.asset + '. ' + actionWord(plan.action) + ' near ' + entryTxt +
+    say('Monitoring plan started for ' + plan.asset + '. ' + actionWord(plan.action) + ' near ' + entryTxt +
       '. Take profit ' + fprice(plan.takeProfit, sig) + ', stop loss ' + fprice(plan.stopLoss, sig) +
-      '. ' + (plan.conv.sure ? 'This is a high conviction setup. ' : '') +
+      '. ' + (plan.conv.highConviction ? 'This is a high-conviction setup. Recheck your broker quote. ' : '') +
       'I will watch the chart and alarm you if it turns suspicious. Planned exit at ' + stopClock + '.',
-      plan.conv.sure ? 'success' : 'alert');
+      plan.conv.highConviction ? 'success' : 'alert');
     if (!state.timer) startTicker();
     render();
   }
@@ -308,10 +308,10 @@
     logLine(r >= 0 ? 'win' : 'loss', (r >= 0 ? '✅' : '🛑') + ' Closed ' + t.asset + ' via ' + reason +
       ' @ ' + fprice(px, t.plan) + ' · ' + (r >= 0 ? '+' : '') + r.toFixed(2) + 'R (' + (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%)');
     if (!silent) {
-      MI.toast(r >= 0 ? 'success' : 'error', 'Trade closed — ' + reason,
-        t.asset + ' closed @ ' + fprice(px, t.plan) + ' · result ' + (r >= 0 ? '+' : '') + r.toFixed(2) + 'R');
-      say(r >= 0 ? 'Trade closed. ' + (r >= 0.9 ? 'Target reached, excellent.' : 'Profit secured.') :
-        'Trade closed. Result ' + r.toFixed(1) + ' R. Stick to the plan and move on.', r >= 0 ? 'success' : 'warn');
+      MI.toast(r >= 0 ? 'success' : 'error', 'Monitoring closed — ' + reason,
+        t.asset + ' monitored @ ' + fprice(px, t.plan) + ' · result ' + (r >= 0 ? '+' : '') + r.toFixed(2) + 'R');
+      say(r >= 0 ? 'Monitoring closed. ' + (r >= 0.9 ? 'Target level reached.' : 'Plan closed.') :
+        'Monitoring closed. Result ' + r.toFixed(1) + ' R. Stick to your risk plan and move on.', r >= 0 ? 'success' : 'warn');
     }
     clearAlarm();
     state.trade = null;
@@ -514,7 +514,7 @@
       return;
     }
     const c = plan.conv;
-    const cls = c.tier === 'SURE' ? 'ready-sure' : c.tier === 'WAIT' ? 'ready-wait' : (c.tier === 'GOOD' || c.tier === 'HIGH') ? 'ready-good' : 'ready-weak';
+    const cls = c.tier === 'HIGH' ? 'ready-high' : c.tier === 'WAIT' ? 'ready-wait' : c.tier === 'MODERATE' ? 'ready-good' : 'ready-weak';
     el.className = 'trade-ready ' + cls;
     el.innerHTML =
       '<div class="rd-top"><span class="rd-verdict">' + c.label + '</span>' +
@@ -523,8 +523,8 @@
       '<div class="rd-sub">' + esc(plan.asset) + ' · ' + esc(actionWord(plan.action)) + ' · <b>' + plan.confidence + '%</b> confidence' +
       (plan.quality ? ' · ' + esc(plan.quality) + ' tier' : '') + (plan.adx != null ? ' · ADX ' + plan.adx : '') +
       (plan.atrPct != null ? ' · ATR ' + plan.atrPct + '%' : '') + '</div>' +
-      (c.tier === 'WAIT' ? '<div class="rd-note">No directional edge yet — MI will alert you (with voice) the moment the setup turns sure.</div>' : '') +
-      (c.sure ? '<div class="rd-note">High-conviction setup — MI considers this trade <b>sure</b>. Follow the schedule below.</div>' : '');
+      (c.tier === 'WAIT' ? '<div class="rd-note">No directional edge yet — MI will alert you when a directional setup appears.</div>' : '') +
+      (c.highConviction ? '<div class="rd-note">High-conviction setup — validate news, liquidity, and your broker quote before entering.</div>' : '');
   }
 
   function renderPlan() {
@@ -563,7 +563,7 @@
       '<div class="tp-cell"><span class="k">Risk / Reward</span><span class="v gold">' + (plan.rr ? '1 : ' + plan.rr : '—') + '</span></div>' +
       (plan.mode === 'pocket'
         ? '<div class="tp-cell"><span class="k">Expiry</span><span class="v gold">' + esc(plan.expiry || (plan.expMin + 'm')) + '</span></div>' +
-          '<div class="tp-cell"><span class="k">Payout (est.)</span><span class="v green">' + (plan.payout ? plan.payout + '%' : '—') + '</span></div>'
+          '<div class="tp-cell"><span class="k">Payout reference*</span><span class="v green">' + (plan.payout ? plan.payout + '%' : '—') + '</span></div>'
         : '') +
       '</div>' + progress +
       '<div class="tp-note">🔊 Voice guidance is ' + (voiceOn() ? '<b class="green">ON</b>' : '<b>OFF</b>') +
@@ -582,7 +582,7 @@
     if (!el) return;
     const t = state.trade;
     if (!t) {
-      if (sub) sub.textContent = 'No active trade. Tap 🚀 TRADE to start monitoring.';
+      if (sub) sub.textContent = 'No active monitoring plan. Review a setup, then start monitoring.';
       el.innerHTML = '<div class="empty">Place a trade and MI watches it here: live R-multiple, distance to TP/SL, a countdown to the exit-by time, and a suspicion monitor that alarms you (with voice) to bank your profit.</div>';
       return;
     }
@@ -629,7 +629,7 @@
     if (state.watching && !state.trade && sig && isActive(sig.action)) {
       state.plan = buildPlan(sig);
       state.watching = false;
-      startAlarm('entry', '🎯 SETUP TURNED SURE', sig.asset + ' now shows ' + sig.action + ' at ' + sig.confidence +
+      startAlarm('entry', '🎯 DIRECTIONAL SETUP DETECTED', sig.asset + ' now shows ' + sig.action + ' at ' + sig.confidence +
         '% confidence. Time to place your trade.', 15, 'entry',
         'Good news. ' + sig.asset + ' now shows a ' + actionWord(sig.action) + ' setup at ' + sig.confidence +
         ' percent. Time to place your trade.');

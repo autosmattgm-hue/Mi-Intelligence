@@ -51,494 +51,6 @@
   ],
   "notifications": [
     {
-      "id": "5b31319578bf",
-      "type": "signal",
-      "title": "New SELL signal — EUR/USD (86%)",
-      "body": "Sell entry near $1.15, TP $1.15, SL $1.15, R/R 1.43",
-      "meta": {
-        "symbol": "EURUSD",
-        "action": "SELL",
-        "confidence": 86
-      },
-      "ts": 1789633055132,
-      "read": false
-    },
-    {
-      "id": "588adfb8d049",
-      "type": "calendar",
-      "title": "🕐 High-impact news in the next 12h",
-      "body": "Monetary Policy Summary (GBP) at 11:00 UTC — expect volatility. Consider smaller size or waiting.",
-      "meta": {
-        "source": "calendar",
-        "time": 1789642800000
-      },
-      "ts": 1789633304793,
-      "read": false
-    },
-    {
-      "id": "6a40fc986cb5",
-      "type": "calendar",
-      "title": "🕐 High-impact news in the next 12h",
-      "body": "MPC Official Bank Rate Votes (GBP) at 11:00 UTC — expect volatility. Consider smaller size or waiting.",
-      "meta": {
-        "source": "calendar",
-        "time": 1789642800000
-      },
-      "ts": 1789633304825,
-      "read": false
-    },
-    {
-      "id": "00d26c28f519",
-      "type": "calendar",
-      "title": "🕐 High-impact news in the next 12h",
-      "body": "Official Bank Rate (GBP) at 11:00 UTC — expect volatility. Consider smaller size or waiting.",
-      "meta": {
-        "source": "calendar",
-        "time": 1789642800000
-      },
-      "ts": 1789633304840,
-      "read": false
-    },
-    {
-      "id": "0dfe67f0eb7e",
-      "type": "signal",
-      "title": "New BUY signal — BTC/USDT (97%)",
-      "body": "Buy entry near $76,524, TP $76,831, SL $76,309, R/R 1.43",
-      "meta": {
-        "symbol": "BTCUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327174,
-      "read": false
-    },
-    {
-      "id": "c47b065defc3",
-      "type": "signal",
-      "title": "New BUY signal — ETH/USDT (97%)",
-      "body": "Buy entry near $2,444, TP $2,458, SL $2,433, R/R 1.43",
-      "meta": {
-        "symbol": "ETHUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327189,
-      "read": false
-    },
-    {
-      "id": "e4f5927a430a",
-      "type": "signal",
-      "title": "New BUY signal — SOL/USDT (97%)",
-      "body": "Buy entry near $100.17, TP $100.90, SL $99.66, R/R 1.43",
-      "meta": {
-        "symbol": "SOLUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327200,
-      "read": false
-    },
-    {
-      "id": "6f01184cb703",
-      "type": "signal",
-      "title": "New BUY signal — XRP/USDT (97%)",
-      "body": "Buy entry near $1.30, TP $1.31, SL $1.29, R/R 1.43",
-      "meta": {
-        "symbol": "XRPUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327210,
-      "read": false
-    },
-    {
-      "id": "23785ba7cb6f",
-      "type": "signal",
-      "title": "New BUY signal — ADA/USDT (97%)",
-      "body": "Buy entry near $0.2000, TP $0.2000, SL $0.2000, R/R 1.43",
-      "meta": {
-        "symbol": "ADAUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327218,
-      "read": false
-    },
-    {
-      "id": "572f182170bb",
-      "type": "signal",
-      "title": "New BUY signal — DOGE/USDT (97%)",
-      "body": "Buy entry near $0.0800, TP $0.0800, SL $0.0800, R/R 1.43",
-      "meta": {
-        "symbol": "DOGEUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327228,
-      "read": false
-    },
-    {
-      "id": "179fa5cb160e",
-      "type": "signal",
-      "title": "New BUY signal — AVAX/USDT (97%)",
-      "body": "Buy entry near $7.57, TP $7.63, SL $7.53, R/R 1.43",
-      "meta": {
-        "symbol": "AVAXUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327236,
-      "read": false
-    },
-    {
-      "id": "ef3b345a9bec",
-      "type": "signal",
-      "title": "New BUY signal — LINK/USDT (97%)",
-      "body": "Buy entry near $11.21, TP $11.32, SL $11.14, R/R 1.43",
-      "meta": {
-        "symbol": "LINKUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327247,
-      "read": false
-    },
-    {
-      "id": "9ea50b1f2684",
-      "type": "signal",
-      "title": "New BUY signal — DOT/USDT (85%)",
-      "body": "Buy entry near $1.01, TP $1.02, SL $1.01, R/R 1.43",
-      "meta": {
-        "symbol": "DOTUSDT",
-        "action": "BUY",
-        "confidence": 85
-      },
-      "ts": 1789633327262,
-      "read": false
-    },
-    {
-      "id": "f2053c460880",
-      "type": "signal",
-      "title": "New BUY signal — LTC/USDT (97%)",
-      "body": "Buy entry near $52.92, TP $53.28, SL $52.67, R/R 1.43",
-      "meta": {
-        "symbol": "LTCUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327278,
-      "read": false
-    },
-    {
-      "id": "3a0bf00e6f2b",
-      "type": "signal",
-      "title": "New BUY signal — POL/USDT (97%)",
-      "body": "Buy entry near $0.1000, TP $0.1000, SL $0.1000, R/R 1.43",
-      "meta": {
-        "symbol": "POLUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789633327290,
-      "read": false
-    },
-    {
-      "id": "36c6b4a6a86f",
-      "type": "signal",
-      "title": "New BUY signal — BNB/USDT (92%)",
-      "body": "Buy entry near $725.30, TP $728.40, SL $723.13, R/R 1.43",
-      "meta": {
-        "symbol": "BNBUSDT",
-        "action": "BUY",
-        "confidence": 92
-      },
-      "ts": 1789633376950,
-      "read": false
-    },
-    {
-      "id": "89d117fc2193",
-      "type": "signal",
-      "title": "New BUY signal — USD/CHF (85%)",
-      "body": "Buy entry near $0.8253, TP $0.8263, SL $0.8246, R/R 1.43",
-      "meta": {
-        "symbol": "USDCHF",
-        "action": "BUY",
-        "confidence": 85
-      },
-      "ts": 1789635265977,
-      "read": false
-    },
-    {
-      "id": "e94aabf2d037",
-      "type": "signal",
-      "title": "New SELL signal — EUR/JPY (89%)",
-      "body": "Sell entry near $178.68, TP $178.45, SL $178.84, R/R 1.43",
-      "meta": {
-        "symbol": "EURJPY",
-        "action": "SELL",
-        "confidence": 89
-      },
-      "ts": 1789635265983,
-      "read": false
-    },
-    {
-      "id": "31eea81a8872",
-      "type": "signal",
-      "title": "New BUY signal — XAU/USD (88%)",
-      "body": "Buy entry near $4,354, TP $4,371, SL $4,341, R/R 1.43",
-      "meta": {
-        "symbol": "XAUUSD",
-        "action": "BUY",
-        "confidence": 88
-      },
-      "ts": 1789635265991,
-      "read": false
-    },
-    {
-      "id": "72e109675bf3",
-      "type": "signal",
-      "title": "New SELL signal — US500 (97%)",
-      "body": "Sell entry near $7,552, TP $7,520, SL $7,574, R/R 1.43",
-      "meta": {
-        "symbol": "US500",
-        "action": "SELL",
-        "confidence": 97
-      },
-      "ts": 1789635265998,
-      "read": false
-    },
-    {
-      "id": "db73b0288512",
-      "type": "signal",
-      "title": "New SELL signal — USTEC (97%)",
-      "body": "Sell entry near $28,945, TP $28,800, SL $29,047, R/R 1.43",
-      "meta": {
-        "symbol": "USTEC",
-        "action": "SELL",
-        "confidence": 97
-      },
-      "ts": 1789635266004,
-      "read": false
-    },
-    {
-      "id": "061a792537cd",
-      "type": "signal",
-      "title": "New SELL signal — US30 (97%)",
-      "body": "Sell entry near $51,462, TP $51,215, SL $51,635, R/R 1.43",
-      "meta": {
-        "symbol": "US30",
-        "action": "SELL",
-        "confidence": 97
-      },
-      "ts": 1789635266011,
-      "read": false
-    },
-    {
-      "id": "aad64a07a4b0",
-      "type": "signal",
-      "title": "New SELL signal — USOIL (97%)",
-      "body": "Sell entry near $101.36, TP $100.59, SL $101.90, R/R 1.43",
-      "meta": {
-        "symbol": "USOIL",
-        "action": "SELL",
-        "confidence": 97
-      },
-      "ts": 1789635266016,
-      "read": false
-    },
-    {
-      "id": "2bc5c5db42c5",
-      "type": "signal",
-      "title": "New BUY signal — USD/CAD (90%)",
-      "body": "Buy entry near $1.40, TP $1.40, SL $1.40, R/R 1.43",
-      "meta": {
-        "symbol": "USDCAD",
-        "action": "BUY",
-        "confidence": 90
-      },
-      "ts": 1789635355648,
-      "read": false
-    },
-    {
-      "id": "ae2fa13a10c9",
-      "type": "calendar",
-      "title": "🕐 High-impact news in the next 12h",
-      "body": "BOJ Policy Rate (JPY) at 02:30 UTC — expect volatility. Consider smaller size or waiting.",
-      "meta": {
-        "source": "calendar",
-        "time": 1789698600000
-      },
-      "ts": 1789692762662,
-      "read": false
-    },
-    {
-      "id": "525a974cce8d",
-      "type": "calendar",
-      "title": "🕐 High-impact news in the next 12h",
-      "body": "Monetary Policy Statement (JPY) at 02:30 UTC — expect volatility. Consider smaller size or waiting.",
-      "meta": {
-        "source": "calendar",
-        "time": 1789698600000
-      },
-      "ts": 1789692762719,
-      "read": false
-    },
-    {
-      "id": "2f3dfbf8d44e",
-      "type": "calendar",
-      "title": "🕐 High-impact news in the next 12h",
-      "body": "BOJ Press Conference (JPY) at 05:30 UTC — expect volatility. Consider smaller size or waiting.",
-      "meta": {
-        "source": "calendar",
-        "time": 1789709400000
-      },
-      "ts": 1789692762752,
-      "read": false
-    },
-    {
-      "id": "2be095802167",
-      "type": "signal",
-      "title": "New BUY signal — SOL/USDT (97%)",
-      "body": "Buy entry near $101.36, TP $102.07, SL $100.86, R/R 1.43",
-      "meta": {
-        "symbol": "SOLUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692771238,
-      "read": false
-    },
-    {
-      "id": "88c9f0642c6f",
-      "type": "signal",
-      "title": "New BUY signal — ADA/USDT (97%)",
-      "body": "Buy entry near $0.2000, TP $0.2100, SL $0.2000, R/R 1.43",
-      "meta": {
-        "symbol": "ADAUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692771247,
-      "read": false
-    },
-    {
-      "id": "dfb2ce43ad43",
-      "type": "signal",
-      "title": "New BUY signal — AVAX/USDT (97%)",
-      "body": "Buy entry near $7.64, TP $7.69, SL $7.60, R/R 1.43",
-      "meta": {
-        "symbol": "AVAXUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692771255,
-      "read": false
-    },
-    {
-      "id": "d03804dcedfd",
-      "type": "signal",
-      "title": "New BUY signal — LINK/USDT (97%)",
-      "body": "Buy entry near $11.41, TP $11.50, SL $11.35, R/R 1.43",
-      "meta": {
-        "symbol": "LINKUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692771266,
-      "read": false
-    },
-    {
-      "id": "d021e1f8c0cb",
-      "type": "signal",
-      "title": "New BUY signal — DOT/USDT (97%)",
-      "body": "Buy entry near $1.09, TP $1.11, SL $1.08, R/R 1.43",
-      "meta": {
-        "symbol": "DOTUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692771274,
-      "read": false
-    },
-    {
-      "id": "4004fa4e1882",
-      "type": "signal",
-      "title": "New BUY signal — LTC/USDT (97%)",
-      "body": "Buy entry near $54.39, TP $54.78, SL $54.12, R/R 1.43",
-      "meta": {
-        "symbol": "LTCUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692771284,
-      "read": false
-    },
-    {
-      "id": "4f69da851aab",
-      "type": "signal",
-      "title": "New BUY signal — BNB/USDT (95%)",
-      "body": "Buy entry near $737.23, TP $740.73, SL $734.78, R/R 1.43",
-      "meta": {
-        "symbol": "BNBUSDT",
-        "action": "BUY",
-        "confidence": 95
-      },
-      "ts": 1789692771293,
-      "read": false
-    },
-    {
-      "id": "591ece919550",
-      "type": "signal",
-      "title": "New BUY signal — DOGE/USDT (97%)",
-      "body": "Buy entry near $0.0800, TP $0.0800, SL $0.0800, R/R 1.43",
-      "meta": {
-        "symbol": "DOGEUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789692889319,
-      "read": false
-    },
-    {
-      "id": "58984a7a885f",
-      "type": "signal",
-      "title": "New BUY signal — BTC/USDT (87%)",
-      "body": "Buy entry near $76,620, TP $76,874, SL $76,442, R/R 1.43",
-      "meta": {
-        "symbol": "BTCUSDT",
-        "action": "BUY",
-        "confidence": 87
-      },
-      "ts": 1789693248882,
-      "read": false
-    },
-    {
-      "id": "096278af9112",
-      "type": "signal",
-      "title": "New BUY signal — ETH/USDT (88%)",
-      "body": "Buy entry near $2,450, TP $2,462, SL $2,441, R/R 1.43",
-      "meta": {
-        "symbol": "ETHUSDT",
-        "action": "BUY",
-        "confidence": 88
-      },
-      "ts": 1789693248899,
-      "read": false
-    },
-    {
-      "id": "7bf93b3fd97e",
-      "type": "signal",
-      "title": "New BUY signal — XRP/USDT (97%)",
-      "body": "Buy entry near $1.30, TP $1.31, SL $1.30, R/R 1.43",
-      "meta": {
-        "symbol": "XRPUSDT",
-        "action": "BUY",
-        "confidence": 97
-      },
-      "ts": 1789693248929,
-      "read": false
-    },
-    {
       "id": "15ad90034391",
       "type": "signal",
       "title": "New SELL signal — POL/USDT (94%)",
@@ -2642,6 +2154,500 @@
       },
       "ts": 1791234930769,
       "read": false
+    },
+    {
+      "id": "da5deed59ca8",
+      "type": "signal",
+      "title": "New BUY signal — BTC/USDT (89%)",
+      "body": "Buy entry near $83,738, TP $83,897, SL $83,579, R/R 1",
+      "meta": {
+        "symbol": "BTCUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987313,
+      "read": false
+    },
+    {
+      "id": "25357dcf45da",
+      "type": "signal",
+      "title": "New BUY signal — ETH/USDT (89%)",
+      "body": "Buy entry near $2,537, TP $2,544, SL $2,529, R/R 1",
+      "meta": {
+        "symbol": "ETHUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987325,
+      "read": false
+    },
+    {
+      "id": "fece96305e50",
+      "type": "signal",
+      "title": "New BUY signal — DOGE/USDT (89%)",
+      "body": "Buy entry near $0.0900, TP $0.0900, SL $0.0900, R/R 1",
+      "meta": {
+        "symbol": "DOGEUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987339,
+      "read": false
+    },
+    {
+      "id": "2e9d6a90255a",
+      "type": "signal",
+      "title": "New BUY signal — AVAX/USDT (89%)",
+      "body": "Buy entry near $10.95, TP $11.04, SL $10.86, R/R 1",
+      "meta": {
+        "symbol": "AVAXUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987350,
+      "read": false
+    },
+    {
+      "id": "f7a3cf40a1fb",
+      "type": "signal",
+      "title": "New BUY signal — LINK/USDT (89%)",
+      "body": "Buy entry near $13.34, TP $13.42, SL $13.25, R/R 1",
+      "meta": {
+        "symbol": "LINKUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987368,
+      "read": false
+    },
+    {
+      "id": "6870aa48ec81",
+      "type": "signal",
+      "title": "New BUY signal — DOT/USDT (88%)",
+      "body": "Buy entry near $1.26, TP $1.28, SL $1.25, R/R 1",
+      "meta": {
+        "symbol": "DOTUSDT",
+        "action": "BUY",
+        "confidence": 88
+      },
+      "ts": 1791759987386,
+      "read": false
+    },
+    {
+      "id": "51f7f1b250b0",
+      "type": "signal",
+      "title": "New BUY signal — BNB/USDT (89%)",
+      "body": "Buy entry near $754.33, TP $755.92, SL $752.74, R/R 1",
+      "meta": {
+        "symbol": "BNBUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987396,
+      "read": false
+    },
+    {
+      "id": "2e955abaf709",
+      "type": "signal",
+      "title": "New SELL signal — TRX/USDT (89%)",
+      "body": "Sell entry near $0.3300, TP $0.3300, SL $0.3300, R/R 1",
+      "meta": {
+        "symbol": "TRXUSDT",
+        "action": "SELL",
+        "confidence": 89
+      },
+      "ts": 1791759987408,
+      "read": false
+    },
+    {
+      "id": "4043d74d64a7",
+      "type": "signal",
+      "title": "New BUY signal — NEAR/USDT (89%)",
+      "body": "Buy entry near $5.84, TP $5.96, SL $5.71, R/R 1",
+      "meta": {
+        "symbol": "NEARUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987421,
+      "read": false
+    },
+    {
+      "id": "3f866fb9e896",
+      "type": "signal",
+      "title": "New BUY signal — ARB/USDT (89%)",
+      "body": "Buy entry near $0.2000, TP $0.2000, SL $0.2000, R/R 1",
+      "meta": {
+        "symbol": "ARBUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987432,
+      "read": false
+    },
+    {
+      "id": "a41374a704e3",
+      "type": "signal",
+      "title": "New BUY signal — SUI/USDT (88%)",
+      "body": "Buy entry near $1.13, TP $1.14, SL $1.12, R/R 1",
+      "meta": {
+        "symbol": "SUIUSDT",
+        "action": "BUY",
+        "confidence": 88
+      },
+      "ts": 1791759987443,
+      "read": false
+    },
+    {
+      "id": "e78712bd5eea",
+      "type": "signal",
+      "title": "New BUY signal — FIL/USDT (89%)",
+      "body": "Buy entry near $1.21, TP $1.25, SL $1.17, R/R 1",
+      "meta": {
+        "symbol": "FILUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987459,
+      "read": false
+    },
+    {
+      "id": "b91a63f4b262",
+      "type": "signal",
+      "title": "New BUY signal — ETC/USDT (89%)",
+      "body": "Buy entry near $8.49, TP $8.53, SL $8.45, R/R 1",
+      "meta": {
+        "symbol": "ETCUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987470,
+      "read": false
+    },
+    {
+      "id": "74da82af358c",
+      "type": "signal",
+      "title": "New SELL signal — ATOM/USDT (89%)",
+      "body": "Sell entry near $1.92, TP $1.89, SL $1.95, R/R 1",
+      "meta": {
+        "symbol": "ATOMUSDT",
+        "action": "SELL",
+        "confidence": 89
+      },
+      "ts": 1791759987482,
+      "read": false
+    },
+    {
+      "id": "a744eea1661f",
+      "type": "signal",
+      "title": "New BUY signal — UNI/USDT (89%)",
+      "body": "Buy entry near $7.76, TP $7.83, SL $7.69, R/R 1",
+      "meta": {
+        "symbol": "UNIUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987494,
+      "read": false
+    },
+    {
+      "id": "16d58fdd0412",
+      "type": "signal",
+      "title": "New BUY signal — PEPE/USDT (89%)",
+      "body": "Buy entry near $0.0000, TP $0.0000, SL $0.0000, R/R 1",
+      "meta": {
+        "symbol": "PEPEUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987507,
+      "read": false
+    },
+    {
+      "id": "287942688907",
+      "type": "signal",
+      "title": "New BUY signal — SHIB/USDT (89%)",
+      "body": "Buy entry near $0.0000, TP $0.0000, SL $0.0000, R/R 1",
+      "meta": {
+        "symbol": "SHIBUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987516,
+      "read": false
+    },
+    {
+      "id": "aaac072853b5",
+      "type": "signal",
+      "title": "New BUY signal — RENDER/USDT (89%)",
+      "body": "Buy entry near $2.00, TP $2.03, SL $1.97, R/R 1",
+      "meta": {
+        "symbol": "RENDERUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987527,
+      "read": false
+    },
+    {
+      "id": "bf3f297ae78a",
+      "type": "signal",
+      "title": "New BUY signal — FET/USDT (89%)",
+      "body": "Buy entry near $0.2400, TP $0.2400, SL $0.2300, R/R 1",
+      "meta": {
+        "symbol": "FETUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987539,
+      "read": false
+    },
+    {
+      "id": "5c16117a4350",
+      "type": "signal",
+      "title": "New BUY signal — SAND/USDT (89%)",
+      "body": "Buy entry near $0.0700, TP $0.0700, SL $0.0700, R/R 1",
+      "meta": {
+        "symbol": "SANDUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987549,
+      "read": false
+    },
+    {
+      "id": "071310fc47bf",
+      "type": "signal",
+      "title": "New BUY signal — MANA/USDT (89%)",
+      "body": "Buy entry near $0.1000, TP $0.1000, SL $0.1000, R/R 1",
+      "meta": {
+        "symbol": "MANAUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791759987561,
+      "read": false
+    },
+    {
+      "id": "fa7c9a93f5c4",
+      "type": "signal",
+      "title": "New BUY signal — AVAX/USDT (89%)",
+      "body": "Buy entry near $10.93, TP $11.02, SL $10.85, R/R 1",
+      "meta": {
+        "symbol": "AVAXUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566582,
+      "read": false
+    },
+    {
+      "id": "5fee170d9ba2",
+      "type": "signal",
+      "title": "New BUY signal — BNB/USDT (89%)",
+      "body": "Buy entry near $754.12, TP $755.62, SL $752.62, R/R 1",
+      "meta": {
+        "symbol": "BNBUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566603,
+      "read": false
+    },
+    {
+      "id": "5bcbcd0b4f80",
+      "type": "signal",
+      "title": "New SELL signal — TRX/USDT (89%)",
+      "body": "Sell entry near $0.3300, TP $0.3300, SL $0.3300, R/R 1",
+      "meta": {
+        "symbol": "TRXUSDT",
+        "action": "SELL",
+        "confidence": 89
+      },
+      "ts": 1791760566617,
+      "read": false
+    },
+    {
+      "id": "6d1ef9ce34ab",
+      "type": "signal",
+      "title": "New BUY signal — NEAR/USDT (89%)",
+      "body": "Buy entry near $5.84, TP $5.96, SL $5.72, R/R 1",
+      "meta": {
+        "symbol": "NEARUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566634,
+      "read": false
+    },
+    {
+      "id": "7f2c952a2ad3",
+      "type": "signal",
+      "title": "New BUY signal — ARB/USDT (89%)",
+      "body": "Buy entry near $0.2000, TP $0.2000, SL $0.2000, R/R 1",
+      "meta": {
+        "symbol": "ARBUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566647,
+      "read": false
+    },
+    {
+      "id": "fbf9bd34b69d",
+      "type": "signal",
+      "title": "New BUY signal — SUI/USDT (89%)",
+      "body": "Buy entry near $1.13, TP $1.13, SL $1.12, R/R 1",
+      "meta": {
+        "symbol": "SUIUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566661,
+      "read": false
+    },
+    {
+      "id": "611dc206a258",
+      "type": "signal",
+      "title": "New BUY signal — FIL/USDT (89%)",
+      "body": "Buy entry near $1.22, TP $1.26, SL $1.18, R/R 1",
+      "meta": {
+        "symbol": "FILUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566673,
+      "read": false
+    },
+    {
+      "id": "3353fcaa0fde",
+      "type": "signal",
+      "title": "New SELL signal — ATOM/USDT (89%)",
+      "body": "Sell entry near $1.92, TP $1.89, SL $1.94, R/R 1",
+      "meta": {
+        "symbol": "ATOMUSDT",
+        "action": "SELL",
+        "confidence": 89
+      },
+      "ts": 1791760566688,
+      "read": false
+    },
+    {
+      "id": "013098dbc05f",
+      "type": "signal",
+      "title": "New SELL signal — TIA/USDT (89%)",
+      "body": "Sell entry near $0.5700, TP $0.5600, SL $0.5900, R/R 1",
+      "meta": {
+        "symbol": "TIAUSDT",
+        "action": "SELL",
+        "confidence": 89
+      },
+      "ts": 1791760566703,
+      "read": false
+    },
+    {
+      "id": "336eb1f038fe",
+      "type": "signal",
+      "title": "New BUY signal — UNI/USDT (89%)",
+      "body": "Buy entry near $7.74, TP $7.81, SL $7.68, R/R 1",
+      "meta": {
+        "symbol": "UNIUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566716,
+      "read": false
+    },
+    {
+      "id": "e56d40873292",
+      "type": "signal",
+      "title": "New BUY signal — MANA/USDT (89%)",
+      "body": "Buy entry near $0.1000, TP $0.1000, SL $0.1000, R/R 1",
+      "meta": {
+        "symbol": "MANAUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760566736,
+      "read": false
+    },
+    {
+      "id": "e0114599ac14",
+      "type": "signal",
+      "title": "New BUY signal — BTC/USDT (89%)",
+      "body": "Buy entry near $83,702, TP $83,851, SL $83,552, R/R 1",
+      "meta": {
+        "symbol": "BTCUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760661847,
+      "read": false
+    },
+    {
+      "id": "9aecf0dcd5db",
+      "type": "signal",
+      "title": "New BUY signal — LINK/USDT (88%)",
+      "body": "Buy entry near $13.34, TP $13.42, SL $13.27, R/R 1",
+      "meta": {
+        "symbol": "LINKUSDT",
+        "action": "BUY",
+        "confidence": 88
+      },
+      "ts": 1791760661957,
+      "read": false
+    },
+    {
+      "id": "e6fb6e6a3d14",
+      "type": "signal",
+      "title": "New BUY signal — DOT/USDT (89%)",
+      "body": "Buy entry near $1.26, TP $1.27, SL $1.25, R/R 1",
+      "meta": {
+        "symbol": "DOTUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760661973,
+      "read": false
+    },
+    {
+      "id": "87853c430d6c",
+      "type": "signal",
+      "title": "New BUY signal — ETC/USDT (89%)",
+      "body": "Buy entry near $8.49, TP $8.53, SL $8.45, R/R 1",
+      "meta": {
+        "symbol": "ETCUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760662019,
+      "read": false
+    },
+    {
+      "id": "60f0c58565b3",
+      "type": "signal",
+      "title": "New BUY signal — PEPE/USDT (89%)",
+      "body": "Buy entry near $0.0000, TP $0.0000, SL $0.0000, R/R 1",
+      "meta": {
+        "symbol": "PEPEUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760662057,
+      "read": false
+    },
+    {
+      "id": "bddb46e28ea0",
+      "type": "signal",
+      "title": "New BUY signal — RENDER/USDT (89%)",
+      "body": "Buy entry near $2.00, TP $2.03, SL $1.97, R/R 1",
+      "meta": {
+        "symbol": "RENDERUSDT",
+        "action": "BUY",
+        "confidence": 89
+      },
+      "ts": 1791760662092,
+      "read": false
     }
   ],
   "pushSubscriptions": [
@@ -2665,621 +2671,6 @@
     }
   ],
   "signalHistory": [
-    {
-      "id": "SEIUSDT-1791141092303-2404",
-      "ts": 1791141092303,
-      "symbol": "SEIUSDT",
-      "asset": "SEI/USDT",
-      "action": "BUY",
-      "confidence": 80,
-      "price": 0.07,
-      "takeProfit": 0.08,
-      "stopLoss": 0.07,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 31,
-      "trend": "Sideways"
-    },
-    {
-      "id": "AVAXUSDT-1791141191709-3940",
-      "ts": 1791141191709,
-      "symbol": "AVAXUSDT",
-      "asset": "AVAX/USDT",
-      "action": "BUY",
-      "confidence": 90,
-      "price": 11.07,
-      "takeProfit": 11.13,
-      "stopLoss": 11.03,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 42,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "OPUSDT-1791141191716-4402",
-      "ts": 1791141191716,
-      "symbol": "OPUSDT",
-      "asset": "OP/USDT",
-      "action": "BUY",
-      "confidence": 91,
-      "price": 0.13,
-      "takeProfit": 0.14,
-      "stopLoss": 0.13,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 43,
-      "trend": "Sideways"
-    },
-    {
-      "id": "TIAUSDT-1791141191723-5888",
-      "ts": 1791141191723,
-      "symbol": "TIAUSDT",
-      "asset": "TIA/USDT",
-      "action": "BUY",
-      "confidence": 94,
-      "price": 0.47,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 47,
-      "trend": "Sideways"
-    },
-    {
-      "id": "PEPEUSDT-1791141191730-3982",
-      "ts": 1791141191730,
-      "symbol": "PEPEUSDT",
-      "asset": "PEPE/USDT",
-      "action": "BUY",
-      "confidence": 83,
-      "price": 0,
-      "takeProfit": 0,
-      "stopLoss": 0,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 34,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "PEPEUSDT-1791141225113-3270",
-      "ts": 1791141225113,
-      "symbol": "PEPEUSDT",
-      "asset": "PEPE/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 0,
-      "takeProfit": 0,
-      "stopLoss": 0,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 74,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "BNBUSDT-1791141325092-4905",
-      "ts": 1791141325092,
-      "symbol": "BNBUSDT",
-      "asset": "BNB/USDT",
-      "action": "BUY",
-      "confidence": 80,
-      "price": 788.98,
-      "takeProfit": 791.03,
-      "stopLoss": 787.55,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 31,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "OPUSDT-1791141325108-6654",
-      "ts": 1791141325108,
-      "symbol": "OPUSDT",
-      "asset": "OP/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 0.13,
-      "takeProfit": 0.14,
-      "stopLoss": 0.13,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 67,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "TIAUSDT-1791141325119-1409",
-      "ts": 1791141325119,
-      "symbol": "TIAUSDT",
-      "asset": "TIA/USDT",
-      "action": "BUY",
-      "confidence": 92,
-      "price": 0.47,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 44,
-      "trend": "Sideways"
-    },
-    {
-      "id": "SANDUSDT-1791141325126-7471",
-      "ts": 1791141325126,
-      "symbol": "SANDUSDT",
-      "asset": "SAND/USDT",
-      "action": "SELL",
-      "confidence": 86,
-      "price": 0.08,
-      "takeProfit": 0.07,
-      "stopLoss": 0.08,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": -38,
-      "trend": "Downtrend"
-    },
-    {
-      "id": "ETHUSDT-1791141425145-1419",
-      "ts": 1791141425145,
-      "symbol": "ETHUSDT",
-      "asset": "ETH/USDT",
-      "action": "BUY",
-      "confidence": 82,
-      "price": 2702.52,
-      "takeProfit": 2707.43,
-      "stopLoss": 2699.08,
-      "riskReward": 1.43,
-      "quality": "LOW",
-      "score": 35,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "AVAXUSDT-1791141425161-2829",
-      "ts": 1791141425161,
-      "symbol": "AVAXUSDT",
-      "asset": "AVAX/USDT",
-      "action": "BUY",
-      "confidence": 88,
-      "price": 11.07,
-      "takeProfit": 11.13,
-      "stopLoss": 11.03,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 40,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "TRXUSDT-1791141425170-1067",
-      "ts": 1791141425170,
-      "symbol": "TRXUSDT",
-      "asset": "TRX/USDT",
-      "action": "SELL",
-      "confidence": 86,
-      "price": 0.34,
-      "takeProfit": 0.34,
-      "stopLoss": 0.34,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": -38,
-      "trend": "Downtrend"
-    },
-    {
-      "id": "SEIUSDT-1791141425181-9304",
-      "ts": 1791141425181,
-      "symbol": "SEIUSDT",
-      "asset": "SEI/USDT",
-      "action": "BUY",
-      "confidence": 77,
-      "price": 0.07,
-      "takeProfit": 0.08,
-      "stopLoss": 0.07,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 28,
-      "trend": "Sideways"
-    },
-    {
-      "id": "SANDUSDT-1791141425187-8567",
-      "ts": 1791141425187,
-      "symbol": "SANDUSDT",
-      "asset": "SAND/USDT",
-      "action": "SELL",
-      "confidence": 97,
-      "price": 0.07,
-      "takeProfit": 0.07,
-      "stopLoss": 0.08,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": -61,
-      "trend": "Downtrend"
-    },
-    {
-      "id": "SOLUSDT-1791141517360-2975",
-      "ts": 1791141517360,
-      "symbol": "SOLUSDT",
-      "asset": "SOL/USDT",
-      "action": "BUY",
-      "confidence": 84,
-      "price": 121.55,
-      "takeProfit": 122.05,
-      "stopLoss": 121.2,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 35,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "TRXUSDT-1791141517368-4044",
-      "ts": 1791141517368,
-      "symbol": "TRXUSDT",
-      "asset": "TRX/USDT",
-      "action": "SELL",
-      "confidence": 91,
-      "price": 0.34,
-      "takeProfit": 0.34,
-      "stopLoss": 0.34,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": -43,
-      "trend": "Downtrend"
-    },
-    {
-      "id": "SOLUSDT-1791141656856-3223",
-      "ts": 1791141656856,
-      "symbol": "SOLUSDT",
-      "asset": "SOL/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 121.57,
-      "takeProfit": 122.07,
-      "stopLoss": 121.22,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 55,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "AVAXUSDT-1791141656863-34",
-      "ts": 1791141656863,
-      "symbol": "AVAXUSDT",
-      "asset": "AVAX/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 11.08,
-      "takeProfit": 11.13,
-      "stopLoss": 11.03,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 50,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "TIAUSDT-1791141656870-6296",
-      "ts": 1791141656870,
-      "symbol": "TIAUSDT",
-      "asset": "TIA/USDT",
-      "action": "BUY",
-      "confidence": 90,
-      "price": 0.47,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 42,
-      "trend": "Sideways"
-    },
-    {
-      "id": "ETHUSDT-1791141701795-1619",
-      "ts": 1791141701795,
-      "symbol": "ETHUSDT",
-      "asset": "ETH/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 2703.01,
-      "takeProfit": 2707.98,
-      "stopLoss": 2699.53,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 62,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "SOLUSDT-1791141701802-5364",
-      "ts": 1791141701802,
-      "symbol": "SOLUSDT",
-      "asset": "SOL/USDT",
-      "action": "BUY",
-      "confidence": 84,
-      "price": 121.55,
-      "takeProfit": 122.05,
-      "stopLoss": 121.2,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 35,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "ATOMUSDT-1791141701808-178",
-      "ts": 1791141701808,
-      "symbol": "ATOMUSDT",
-      "asset": "ATOM/USDT",
-      "action": "BUY",
-      "confidence": 91,
-      "price": 1.77,
-      "takeProfit": 1.8,
-      "stopLoss": 1.76,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 43,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "TIAUSDT-1791141701815-8373",
-      "ts": 1791141701815,
-      "symbol": "TIAUSDT",
-      "asset": "TIA/USDT",
-      "action": "BUY",
-      "confidence": 83,
-      "price": 0.48,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 34,
-      "trend": "Sideways"
-    },
-    {
-      "id": "BNBUSDT-1791141815641-7202",
-      "ts": 1791141815641,
-      "symbol": "BNBUSDT",
-      "asset": "BNB/USDT",
-      "action": "BUY",
-      "confidence": 75,
-      "price": 788.89,
-      "takeProfit": 790.82,
-      "stopLoss": 787.54,
-      "riskReward": 1.43,
-      "quality": "LOW",
-      "score": 25,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "BNBUSDT-1791141931375-6815",
-      "ts": 1791141931375,
-      "symbol": "BNBUSDT",
-      "asset": "BNB/USDT",
-      "action": "BUY",
-      "confidence": 80,
-      "price": 788.86,
-      "takeProfit": 790.8,
-      "stopLoss": 787.5,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 31,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "ETHUSDT-1791142001863-9522",
-      "ts": 1791142001863,
-      "symbol": "ETHUSDT",
-      "asset": "ETH/USDT",
-      "action": "BUY",
-      "confidence": 82,
-      "price": 2702.38,
-      "takeProfit": 2707.35,
-      "stopLoss": 2698.9,
-      "riskReward": 1.43,
-      "quality": "LOW",
-      "score": 35,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "LINKUSDT-1791142062577-540",
-      "ts": 1791142062577,
-      "symbol": "LINKUSDT",
-      "asset": "LINK/USDT",
-      "action": "BUY",
-      "confidence": 93,
-      "price": 14.17,
-      "takeProfit": 14.26,
-      "stopLoss": 14.1,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 45,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "ETHUSDT-1791142121475-8165",
-      "ts": 1791142121475,
-      "symbol": "ETHUSDT",
-      "asset": "ETH/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 2703.46,
-      "takeProfit": 2708.49,
-      "stopLoss": 2699.94,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 62,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "BNBUSDT-1791142290752-3397",
-      "ts": 1791142290752,
-      "symbol": "BNBUSDT",
-      "asset": "BNB/USDT",
-      "action": "BUY",
-      "confidence": 93,
-      "price": 789.07,
-      "takeProfit": 790.89,
-      "stopLoss": 787.8,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 45,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "SUIUSDT-1791142290762-2896",
-      "ts": 1791142290762,
-      "symbol": "SUIUSDT",
-      "asset": "SUI/USDT",
-      "action": "BUY",
-      "confidence": 93,
-      "price": 1.22,
-      "takeProfit": 1.25,
-      "stopLoss": 1.2,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 46,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "TIAUSDT-1791142290769-6448",
-      "ts": 1791142290770,
-      "symbol": "TIAUSDT",
-      "asset": "TIA/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 0.48,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 74,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "SANDUSDT-1791142290778-4115",
-      "ts": 1791142290778,
-      "symbol": "SANDUSDT",
-      "asset": "SAND/USDT",
-      "action": "SELL",
-      "confidence": 84,
-      "price": 0.07,
-      "takeProfit": 0.07,
-      "stopLoss": 0.08,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": -36,
-      "trend": "Downtrend"
-    },
-    {
-      "id": "POLUSDT-1791142402396-6744",
-      "ts": 1791142402396,
-      "symbol": "POLUSDT",
-      "asset": "POL/USDT",
-      "action": "BUY",
-      "confidence": 92,
-      "price": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 44,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "SEIUSDT-1791142402406-9228",
-      "ts": 1791142402406,
-      "symbol": "SEIUSDT",
-      "asset": "SEI/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 0.07,
-      "takeProfit": 0.07,
-      "stopLoss": 0.07,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 56,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "FILUSDT-1791142402414-9102",
-      "ts": 1791142402414,
-      "symbol": "FILUSDT",
-      "asset": "FIL/USDT",
-      "action": "BUY",
-      "confidence": 75,
-      "price": 1.06,
-      "takeProfit": 1.06,
-      "stopLoss": 1.05,
-      "riskReward": 1.43,
-      "quality": "LOW",
-      "score": 25,
-      "trend": "Sideways"
-    },
-    {
-      "id": "ATOMUSDT-1791142402423-836",
-      "ts": 1791142402423,
-      "symbol": "ATOMUSDT",
-      "asset": "ATOM/USDT",
-      "action": "BUY",
-      "confidence": 96,
-      "price": 1.77,
-      "takeProfit": 1.79,
-      "stopLoss": 1.75,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 49,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "LINKUSDT-1791142475989-9893",
-      "ts": 1791142475989,
-      "symbol": "LINKUSDT",
-      "asset": "LINK/USDT",
-      "action": "BUY",
-      "confidence": 80,
-      "price": 14.15,
-      "takeProfit": 14.24,
-      "stopLoss": 14.09,
-      "riskReward": 1.43,
-      "quality": "MEDIUM",
-      "score": 31,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "BNBUSDT-1791142475997-1974",
-      "ts": 1791142475997,
-      "symbol": "BNBUSDT",
-      "asset": "BNB/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 789.4,
-      "takeProfit": 791.27,
-      "stopLoss": 788.09,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 65,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "POLUSDT-1791142476004-618",
-      "ts": 1791142476004,
-      "symbol": "POLUSDT",
-      "asset": "POL/USDT",
-      "action": "BUY",
-      "confidence": 97,
-      "price": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 54,
-      "trend": "Uptrend"
-    },
-    {
-      "id": "POLUSDT-1791142546312-3884",
-      "ts": 1791142546312,
-      "symbol": "POLUSDT",
-      "asset": "POL/USDT",
-      "action": "BUY",
-      "confidence": 92,
-      "price": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "riskReward": 1.43,
-      "quality": "HIGH",
-      "score": 44,
-      "trend": "Uptrend"
-    },
     {
       "id": "OPUSDT-1791142546320-7093",
       "ts": 1791142546320,
@@ -10164,729 +9555,624 @@
       "quality": "HIGH",
       "score": 57,
       "trend": "Uptrend"
+    },
+    {
+      "id": "BTCUSDT-1791759984762-4189",
+      "ts": 1791759984762,
+      "symbol": "BTCUSDT",
+      "asset": "BTC/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 83738.01,
+      "takeProfit": 83896.54,
+      "stopLoss": 83579.48,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 55,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ETHUSDT-1791759984773-3833",
+      "ts": 1791759984773,
+      "symbol": "ETHUSDT",
+      "asset": "ETH/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 2536.9,
+      "takeProfit": 2544.46,
+      "stopLoss": 2529.34,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 52,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "DOGEUSDT-1791759984784-7181",
+      "ts": 1791759984784,
+      "symbol": "DOGEUSDT",
+      "asset": "DOGE/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.09,
+      "takeProfit": 0.09,
+      "stopLoss": 0.09,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 47,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "AVAXUSDT-1791759984793-6550",
+      "ts": 1791759984793,
+      "symbol": "AVAXUSDT",
+      "asset": "AVAX/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 10.95,
+      "takeProfit": 11.04,
+      "stopLoss": 10.86,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 52,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "LINKUSDT-1791759984805-1565",
+      "ts": 1791759984805,
+      "symbol": "LINKUSDT",
+      "asset": "LINK/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 13.34,
+      "takeProfit": 13.42,
+      "stopLoss": 13.25,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 52,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "DOTUSDT-1791759984821-9482",
+      "ts": 1791759984821,
+      "symbol": "DOTUSDT",
+      "asset": "DOT/USDT",
+      "action": "BUY",
+      "confidence": 88,
+      "price": 1.26,
+      "takeProfit": 1.28,
+      "stopLoss": 1.25,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 40,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "LTCUSDT-1791759984834-9439",
+      "ts": 1791759984834,
+      "symbol": "LTCUSDT",
+      "asset": "LTC/USDT",
+      "action": "BUY",
+      "confidence": 82,
+      "price": 64.51,
+      "takeProfit": 64.83,
+      "stopLoss": 64.19,
+      "riskReward": 1,
+      "quality": "MEDIUM",
+      "score": 34,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "BNBUSDT-1791759984842-1010",
+      "ts": 1791759984842,
+      "symbol": "BNBUSDT",
+      "asset": "BNB/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 754.33,
+      "takeProfit": 755.92,
+      "stopLoss": 752.74,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 85,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "TRXUSDT-1791759984855-5975",
+      "ts": 1791759984855,
+      "symbol": "TRXUSDT",
+      "asset": "TRX/USDT",
+      "action": "SELL",
+      "confidence": 89,
+      "price": 0.33,
+      "takeProfit": 0.33,
+      "stopLoss": 0.33,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": -55,
+      "trend": "Downtrend"
+    },
+    {
+      "id": "NEARUSDT-1791759984869-526",
+      "ts": 1791759984869,
+      "symbol": "NEARUSDT",
+      "asset": "NEAR/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 5.84,
+      "takeProfit": 5.96,
+      "stopLoss": 5.71,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 80,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ARBUSDT-1791759984881-2142",
+      "ts": 1791759984881,
+      "symbol": "ARBUSDT",
+      "asset": "ARB/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.2,
+      "takeProfit": 0.2,
+      "stopLoss": 0.2,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 74,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "SUIUSDT-1791759984890-4764",
+      "ts": 1791759984890,
+      "symbol": "SUIUSDT",
+      "asset": "SUI/USDT",
+      "action": "BUY",
+      "confidence": 88,
+      "price": 1.13,
+      "takeProfit": 1.14,
+      "stopLoss": 1.12,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 40,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "FILUSDT-1791759984908-1441",
+      "ts": 1791759984908,
+      "symbol": "FILUSDT",
+      "asset": "FIL/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 1.21,
+      "takeProfit": 1.25,
+      "stopLoss": 1.17,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 47,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ETCUSDT-1791759984918-3075",
+      "ts": 1791759984918,
+      "symbol": "ETCUSDT",
+      "asset": "ETC/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 8.49,
+      "takeProfit": 8.53,
+      "stopLoss": 8.45,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 50,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ATOMUSDT-1791759984931-8330",
+      "ts": 1791759984931,
+      "symbol": "ATOMUSDT",
+      "asset": "ATOM/USDT",
+      "action": "SELL",
+      "confidence": 89,
+      "price": 1.92,
+      "takeProfit": 1.89,
+      "stopLoss": 1.95,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": -53,
+      "trend": "Downtrend"
+    },
+    {
+      "id": "UNIUSDT-1791759984944-7118",
+      "ts": 1791759984944,
+      "symbol": "UNIUSDT",
+      "asset": "UNI/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 7.76,
+      "takeProfit": 7.83,
+      "stopLoss": 7.69,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 76,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "PEPEUSDT-1791759984957-3156",
+      "ts": 1791759984957,
+      "symbol": "PEPEUSDT",
+      "asset": "PEPE/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0,
+      "takeProfit": 0,
+      "stopLoss": 0,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 74,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "SHIBUSDT-1791759984966-9038",
+      "ts": 1791759984966,
+      "symbol": "SHIBUSDT",
+      "asset": "SHIB/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0,
+      "takeProfit": 0,
+      "stopLoss": 0,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 48,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "RENDERUSDT-1791759984992-2565",
+      "ts": 1791759984992,
+      "symbol": "RENDERUSDT",
+      "asset": "RENDER/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 2,
+      "takeProfit": 2.03,
+      "stopLoss": 1.97,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 57,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "FETUSDT-1791759985008-2163",
+      "ts": 1791759985008,
+      "symbol": "FETUSDT",
+      "asset": "FET/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.24,
+      "takeProfit": 0.24,
+      "stopLoss": 0.23,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 48,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "SANDUSDT-1791759985021-9016",
+      "ts": 1791759985021,
+      "symbol": "SANDUSDT",
+      "asset": "SAND/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.07,
+      "takeProfit": 0.07,
+      "stopLoss": 0.07,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 51,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "MANAUSDT-1791759985034-6705",
+      "ts": 1791759985034,
+      "symbol": "MANAUSDT",
+      "asset": "MANA/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.1,
+      "takeProfit": 0.1,
+      "stopLoss": 0.1,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 75,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "AVAXUSDT-1791760565055-286",
+      "ts": 1791760565055,
+      "symbol": "AVAXUSDT",
+      "asset": "AVAX/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 10.93,
+      "takeProfit": 11.02,
+      "stopLoss": 10.85,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 55,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "BNBUSDT-1791760565068-9789",
+      "ts": 1791760565068,
+      "symbol": "BNBUSDT",
+      "asset": "BNB/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 754.12,
+      "takeProfit": 755.62,
+      "stopLoss": 752.62,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 75,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "TRXUSDT-1791760565079-6351",
+      "ts": 1791760565079,
+      "symbol": "TRXUSDT",
+      "asset": "TRX/USDT",
+      "action": "SELL",
+      "confidence": 89,
+      "price": 0.33,
+      "takeProfit": 0.33,
+      "stopLoss": 0.33,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": -55,
+      "trend": "Downtrend"
+    },
+    {
+      "id": "NEARUSDT-1791760565094-8891",
+      "ts": 1791760565094,
+      "symbol": "NEARUSDT",
+      "asset": "NEAR/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 5.84,
+      "takeProfit": 5.96,
+      "stopLoss": 5.72,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 83,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ARBUSDT-1791760565111-2490",
+      "ts": 1791760565111,
+      "symbol": "ARBUSDT",
+      "asset": "ARB/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.2,
+      "takeProfit": 0.2,
+      "stopLoss": 0.2,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 67,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "SUIUSDT-1791760565125-6860",
+      "ts": 1791760565125,
+      "symbol": "SUIUSDT",
+      "asset": "SUI/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 1.13,
+      "takeProfit": 1.13,
+      "stopLoss": 1.12,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 60,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "FILUSDT-1791760565135-1263",
+      "ts": 1791760565135,
+      "symbol": "FILUSDT",
+      "asset": "FIL/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 1.22,
+      "takeProfit": 1.26,
+      "stopLoss": 1.18,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 45,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ATOMUSDT-1791760565145-6619",
+      "ts": 1791760565145,
+      "symbol": "ATOMUSDT",
+      "asset": "ATOM/USDT",
+      "action": "SELL",
+      "confidence": 89,
+      "price": 1.92,
+      "takeProfit": 1.89,
+      "stopLoss": 1.94,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": -53,
+      "trend": "Downtrend"
+    },
+    {
+      "id": "TIAUSDT-1791760565160-2397",
+      "ts": 1791760565160,
+      "symbol": "TIAUSDT",
+      "asset": "TIA/USDT",
+      "action": "SELL",
+      "confidence": 89,
+      "price": 0.57,
+      "takeProfit": 0.56,
+      "stopLoss": 0.59,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": -44,
+      "trend": "Downtrend"
+    },
+    {
+      "id": "UNIUSDT-1791760565173-531",
+      "ts": 1791760565173,
+      "symbol": "UNIUSDT",
+      "asset": "UNI/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 7.74,
+      "takeProfit": 7.81,
+      "stopLoss": 7.68,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 63,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "PEPEUSDT-1791760565185-6402",
+      "ts": 1791760565185,
+      "symbol": "PEPEUSDT",
+      "asset": "PEPE/USDT",
+      "action": "BUY",
+      "confidence": 82,
+      "price": 0,
+      "takeProfit": 0,
+      "stopLoss": 0,
+      "riskReward": 1,
+      "quality": "MEDIUM",
+      "score": 37,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "RENDERUSDT-1791760565198-4335",
+      "ts": 1791760565198,
+      "symbol": "RENDERUSDT",
+      "asset": "RENDER/USDT",
+      "action": "BUY",
+      "confidence": 82,
+      "price": 2,
+      "takeProfit": 2.02,
+      "stopLoss": 1.97,
+      "riskReward": 1,
+      "quality": "MEDIUM",
+      "score": 37,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "MANAUSDT-1791760565210-8029",
+      "ts": 1791760565210,
+      "symbol": "MANAUSDT",
+      "asset": "MANA/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0.1,
+      "takeProfit": 0.1,
+      "stopLoss": 0.1,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 70,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "BTCUSDT-1791760659320-422",
+      "ts": 1791760659320,
+      "symbol": "BTCUSDT",
+      "asset": "BTC/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 83701.53,
+      "takeProfit": 83851.02,
+      "stopLoss": 83552.04,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 45,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "LINKUSDT-1791760659408-5269",
+      "ts": 1791760659408,
+      "symbol": "LINKUSDT",
+      "asset": "LINK/USDT",
+      "action": "BUY",
+      "confidence": 88,
+      "price": 13.34,
+      "takeProfit": 13.42,
+      "stopLoss": 13.27,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 40,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "DOTUSDT-1791760659488-278",
+      "ts": 1791760659488,
+      "symbol": "DOTUSDT",
+      "asset": "DOT/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 1.26,
+      "takeProfit": 1.27,
+      "stopLoss": 1.25,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 49,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "ETCUSDT-1791760659510-3965",
+      "ts": 1791760659510,
+      "symbol": "ETCUSDT",
+      "asset": "ETC/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 8.49,
+      "takeProfit": 8.53,
+      "stopLoss": 8.45,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 42,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "PEPEUSDT-1791760659593-9477",
+      "ts": 1791760659593,
+      "symbol": "PEPEUSDT",
+      "asset": "PEPE/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 0,
+      "takeProfit": 0,
+      "stopLoss": 0,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 52,
+      "trend": "Uptrend"
+    },
+    {
+      "id": "RENDERUSDT-1791760659618-2903",
+      "ts": 1791760659618,
+      "symbol": "RENDERUSDT",
+      "asset": "RENDER/USDT",
+      "action": "BUY",
+      "confidence": 89,
+      "price": 2,
+      "takeProfit": 2.03,
+      "stopLoss": 1.97,
+      "riskReward": 1,
+      "quality": "HIGH",
+      "score": 55,
+      "trend": "Uptrend"
     }
   ],
   "signalAccuracy": [
-    {
-      "id": "ADAUSDT-1791150612292-8828",
-      "symbol": "ADAUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.25,
-      "takeProfit": 0.26,
-      "stopLoss": 0.25,
-      "rr": 1.43,
-      "ts": 1791150612292,
-      "expiresAt": 1791172212292,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "DOGEUSDT-1791150612292-2055",
-      "symbol": "DOGEUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150612292,
-      "expiresAt": 1791172212292,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.0970795877952388,
-      "closedAt": 1791150614865
-    },
-    {
-      "id": "LINKUSDT-1791150612292-4371",
-      "symbol": "LINKUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 14.22,
-      "takeProfit": 14.3,
-      "stopLoss": 14.16,
-      "rr": 1.43,
-      "ts": 1791150612292,
-      "expiresAt": 1791172212292,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "BNBUSDT-1791150612293-8938",
-      "symbol": "BNBUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 794.11,
-      "takeProfit": 796.46,
-      "stopLoss": 792.47,
-      "rr": 1.43,
-      "ts": 1791150612293,
-      "expiresAt": 1791172212293,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "POLUSDT-1791150612293-4739",
-      "symbol": "POLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "rr": 1.43,
-      "ts": 1791150612293,
-      "expiresAt": 1791172212293,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.1098845489276288,
-      "closedAt": 1791150614865
-    },
-    {
-      "id": "ARBUSDT-1791150612293-4338",
-      "symbol": "ARBUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.2,
-      "takeProfit": 0.21,
-      "stopLoss": 0.2,
-      "rr": 1.43,
-      "ts": 1791150612293,
-      "expiresAt": 1791172212293,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "ETCUSDT-1791150612293-1309",
-      "symbol": "ETCUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 8.94,
-      "takeProfit": 8.99,
-      "stopLoss": 8.91,
-      "rr": 1.43,
-      "ts": 1791150612293,
-      "expiresAt": 1791172212293,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "TIAUSDT-1791150612293-7936",
-      "symbol": "TIAUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.48,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "rr": 1.43,
-      "ts": 1791150612293,
-      "expiresAt": 1791172212293,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "FETUSDT-1791150612294-4168",
-      "symbol": "FETUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 84,
-      "quality": "MEDIUM",
-      "entry": 0.25,
-      "takeProfit": 0.26,
-      "stopLoss": 0.25,
-      "rr": 1.43,
-      "ts": 1791150612294,
-      "expiresAt": 1791172212294,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "MANAUSDT-1791150612295-8047",
-      "symbol": "MANAUSDT",
-      "action": "SELL",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150612295,
-      "expiresAt": 1791172212295,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.103,
-      "closedAt": 1791151538415
-    },
-    {
-      "id": "DOGEUSDT-1791150619446-4957",
-      "symbol": "DOGEUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150619446,
-      "expiresAt": 1791172219446,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.0970795877952388,
-      "closedAt": 1791150621186
-    },
-    {
-      "id": "POLUSDT-1791150619446-5600",
-      "symbol": "POLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "rr": 1.43,
-      "ts": 1791150619446,
-      "expiresAt": 1791172219446,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.1098845489276288,
-      "closedAt": 1791150621186
-    },
-    {
-      "id": "DOGEUSDT-1791150779468-2333",
-      "symbol": "DOGEUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150779468,
-      "expiresAt": 1791172379468,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.09711034026553907,
-      "closedAt": 1791150781207
-    },
-    {
-      "id": "POLUSDT-1791150779468-1950",
-      "symbol": "POLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "rr": 1.43,
-      "ts": 1791150779468,
-      "expiresAt": 1791172379468,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.10997676917426938,
-      "closedAt": 1791150781207
-    },
-    {
-      "id": "FILUSDT-1791150779468-3412",
-      "symbol": "FILUSDT",
-      "action": "SELL",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 1.05,
-      "takeProfit": 1.04,
-      "stopLoss": 1.06,
-      "rr": 1.43,
-      "ts": 1791150779468,
-      "expiresAt": 1791172379468,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "UNIUSDT-1791150779468-5919",
-      "symbol": "UNIUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 9.05,
-      "takeProfit": 9.11,
-      "stopLoss": 9.01,
-      "rr": 1.43,
-      "ts": 1791150779468,
-      "expiresAt": 1791172379468,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "DOGEUSDT-1791150785259-7212",
-      "symbol": "DOGEUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150785259,
-      "expiresAt": 1791172385259,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.09711034026553907,
-      "closedAt": 1791150786561
-    },
-    {
-      "id": "POLUSDT-1791150785259-3748",
-      "symbol": "POLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "rr": 1.43,
-      "ts": 1791150785259,
-      "expiresAt": 1791172385259,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.10997676917426938,
-      "closedAt": 1791150786561
-    },
-    {
-      "id": "BTCUSDT-1791150875677-5769",
-      "symbol": "BTCUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 85959.99,
-      "takeProfit": 86179.23,
-      "stopLoss": 85806.52,
-      "rr": 1.43,
-      "ts": 1791150875677,
-      "expiresAt": 1791172475677,
-      "status": "closed",
-      "result": "win",
-      "exitPrice": 86185.60212709733,
-      "closedAt": 1791151604469
-    },
-    {
-      "id": "ETHUSDT-1791150875678-31",
-      "symbol": "ETHUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 2706.4,
-      "takeProfit": 2712.5,
-      "stopLoss": 2702.13,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 2701.970535864671,
-      "closedAt": 1791151231178
-    },
-    {
-      "id": "SOLUSDT-1791150875678-6919",
-      "symbol": "SOLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 121.5,
-      "takeProfit": 121.98,
-      "stopLoss": 121.16,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "win",
-      "exitPrice": 122.00665906505029,
-      "closedAt": 1791152453365
-    },
-    {
-      "id": "XRPUSDT-1791150875678-9730",
-      "symbol": "XRPUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 1.51,
-      "takeProfit": 1.52,
-      "stopLoss": 1.51,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 1.5096425496442563,
-      "closedAt": 1791151231178
-    },
-    {
-      "id": "ADAUSDT-1791150875678-6152",
-      "symbol": "ADAUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.25,
-      "takeProfit": 0.26,
-      "stopLoss": 0.25,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "DOGEUSDT-1791150875678-2307",
-      "symbol": "DOGEUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.09735388832953487,
-      "closedAt": 1791150877411
-    },
-    {
-      "id": "LINKUSDT-1791150875678-7735",
-      "symbol": "LINKUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 14.22,
-      "takeProfit": 14.3,
-      "stopLoss": 14.16,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "LTCUSDT-1791150875678-7638",
-      "symbol": "LTCUSDT",
-      "action": "SELL",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 70.32,
-      "takeProfit": 69.75,
-      "stopLoss": 70.72,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 70.73667320140335,
-      "closedAt": 1791152453365
-    },
-    {
-      "id": "BNBUSDT-1791150875678-2352",
-      "symbol": "BNBUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 793.77,
-      "takeProfit": 796.12,
-      "stopLoss": 792.13,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "win",
-      "exitPrice": 796.1546810217139,
-      "closedAt": 1791152575931
-    },
-    {
-      "id": "POLUSDT-1791150875678-2469",
-      "symbol": "POLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.10990407869589529,
-      "closedAt": 1791150877411
-    },
-    {
-      "id": "APTUSDT-1791150875678-6764",
-      "symbol": "APTUSDT",
-      "action": "SELL",
-      "mode": "crypto",
-      "confidence": 74,
-      "quality": "LOW",
-      "entry": 0.8,
-      "takeProfit": 0.79,
-      "stopLoss": 0.81,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "ARBUSDT-1791150875678-8619",
-      "symbol": "ARBUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.2,
-      "takeProfit": 0.21,
-      "stopLoss": 0.2,
-      "rr": 1.43,
-      "ts": 1791150875678,
-      "expiresAt": 1791172475678,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "ETCUSDT-1791150875679-2640",
-      "symbol": "ETCUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 8.96,
-      "takeProfit": 9.01,
-      "stopLoss": 8.92,
-      "rr": 1.43,
-      "ts": 1791150875679,
-      "expiresAt": 1791172475679,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "TIAUSDT-1791150875679-6113",
-      "symbol": "TIAUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 86,
-      "quality": "MEDIUM",
-      "entry": 0.48,
-      "takeProfit": 0.48,
-      "stopLoss": 0.47,
-      "rr": 1.43,
-      "ts": 1791150875679,
-      "expiresAt": 1791172475679,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "FETUSDT-1791150875679-1851",
-      "symbol": "FETUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 84,
-      "quality": "MEDIUM",
-      "entry": 0.25,
-      "takeProfit": 0.26,
-      "stopLoss": 0.24,
-      "rr": 1.43,
-      "ts": 1791150875679,
-      "expiresAt": 1791172475679,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
-    {
-      "id": "MANAUSDT-1791150875679-2888",
-      "symbol": "MANAUSDT",
-      "action": "SELL",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150875679,
-      "expiresAt": 1791172475679,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.103,
-      "closedAt": 1791151538415
-    },
-    {
-      "id": "DOGEUSDT-1791150883331-7318",
-      "symbol": "DOGEUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.1,
-      "takeProfit": 0.1,
-      "stopLoss": 0.1,
-      "rr": 1.43,
-      "ts": 1791150883331,
-      "expiresAt": 1791172483331,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.0971610797672116,
-      "closedAt": 1791150890979
-    },
-    {
-      "id": "POLUSDT-1791150883331-6398",
-      "symbol": "POLUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.11,
-      "takeProfit": 0.11,
-      "stopLoss": 0.11,
-      "rr": 1.43,
-      "ts": 1791150883331,
-      "expiresAt": 1791172483331,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 0.1099106983943613,
-      "closedAt": 1791150890979
-    },
-    {
-      "id": "BTCUSDT-1791151135801-5232",
-      "symbol": "BTCUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 85886.87,
-      "takeProfit": 86112.69,
-      "stopLoss": 85728.79,
-      "rr": 1.43,
-      "ts": 1791151135801,
-      "expiresAt": 1791172735801,
-      "status": "closed",
-      "result": "win",
-      "exitPrice": 86171.23338100051,
-      "closedAt": 1791151533030
-    },
-    {
-      "id": "ETHUSDT-1791151135801-941",
-      "symbol": "ETHUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 2704.33,
-      "takeProfit": 2710.56,
-      "stopLoss": 2699.97,
-      "rr": 1.43,
-      "ts": 1791151135801,
-      "expiresAt": 1791172735801,
-      "status": "closed",
-      "result": "win",
-      "exitPrice": 2714.5677084349177,
-      "closedAt": 1791151533030
-    },
-    {
-      "id": "XRPUSDT-1791151135801-2178",
-      "symbol": "XRPUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 1.51,
-      "takeProfit": 1.52,
-      "stopLoss": 1.51,
-      "rr": 1.43,
-      "ts": 1791151135801,
-      "expiresAt": 1791172735801,
-      "status": "closed",
-      "result": "loss",
-      "exitPrice": 1.5096425496442563,
-      "closedAt": 1791151231178
-    },
-    {
-      "id": "ADAUSDT-1791151135801-9582",
-      "symbol": "ADAUSDT",
-      "action": "BUY",
-      "mode": "crypto",
-      "confidence": 97,
-      "quality": "HIGH",
-      "entry": 0.25,
-      "takeProfit": 0.26,
-      "stopLoss": 0.25,
-      "rr": 1.43,
-      "ts": 1791151135801,
-      "expiresAt": 1791172735801,
-      "status": "expired",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": 1791233886601
-    },
     {
       "id": "DOGEUSDT-1791151135801-9217",
       "symbol": "DOGEUSDT",
@@ -11674,10 +10960,10 @@
       "rr": 1.43,
       "ts": 1791151593621,
       "expiresAt": 1791173193621,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "BTCUSDT-1791151599899-6820",
@@ -12232,10 +11518,10 @@
       "rr": 1.43,
       "ts": 1791151844216,
       "expiresAt": 1791173444216,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "ETHUSDT-1791151925153-6537",
@@ -12664,10 +11950,10 @@
       "rr": 1.43,
       "ts": 1791152038538,
       "expiresAt": 1791173638538,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "DOGEUSDT-1791152048648-1225",
@@ -14626,10 +13912,10 @@
       "rr": 1.43,
       "ts": 1791152807490,
       "expiresAt": 1791174407490,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "ADAUSDT-1791152819347-3055",
@@ -15166,10 +14452,10 @@
       "rr": 1.43,
       "ts": 1791153060981,
       "expiresAt": 1791174660981,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "ADAUSDT-1791153071588-7175",
@@ -15796,10 +15082,10 @@
       "rr": 1.43,
       "ts": 1791153299013,
       "expiresAt": 1791174899013,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "BTCUSDT-1791233941445-4741",
@@ -15886,10 +15172,10 @@
       "rr": 1.43,
       "ts": 1791233941446,
       "expiresAt": 1791255541446,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.25182175473281854,
+      "closedAt": 1791759933737
     },
     {
       "id": "DOGEUSDT-1791233941446-7395",
@@ -15976,10 +15262,10 @@
       "rr": 1.43,
       "ts": 1791233941446,
       "expiresAt": 1791255541446,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 64.42549697041363,
+      "closedAt": 1791759933737
     },
     {
       "id": "BNBUSDT-1791233941446-7781",
@@ -16030,10 +15316,10 @@
       "rr": 1.43,
       "ts": 1791233941446,
       "expiresAt": 1791255541446,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791233941446-9472",
@@ -16084,10 +15370,10 @@
       "rr": 1.43,
       "ts": 1791233941446,
       "expiresAt": 1791255541446,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "SUIUSDT-1791233941447-8856",
@@ -16102,10 +15388,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791233941447-3868",
@@ -16120,10 +15406,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2142121115889446,
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791233941447-3610",
@@ -16138,10 +15424,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791233941447-5675",
@@ -16156,10 +15442,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791233941447-3249",
@@ -16174,10 +15460,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791233941447-8753",
@@ -16192,10 +15478,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791233941447-4843",
@@ -16210,10 +15496,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "FETUSDT-1791233941447-9864",
@@ -16228,10 +15514,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.23867813422960762,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791233941447-8874",
@@ -16246,10 +15532,10 @@
       "rr": 1.43,
       "ts": 1791233941447,
       "expiresAt": 1791255541447,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "NEARUSDT-1791233943389-3385",
@@ -16264,10 +15550,10 @@
       "rr": 1.43,
       "ts": 1791233943389,
       "expiresAt": 1791255543389,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "ETHUSDT-1791233992258-4081",
@@ -16282,10 +15568,10 @@
       "rr": 1.43,
       "ts": 1791233992258,
       "expiresAt": 1791255592258,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 2535.1760650537644,
+      "closedAt": 1791759933737
     },
     {
       "id": "SOLUSDT-1791233992258-2361",
@@ -16300,10 +15586,10 @@
       "rr": 1.43,
       "ts": 1791233992258,
       "expiresAt": 1791255592258,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "DOGEUSDT-1791233992258-8300",
@@ -16336,10 +15622,10 @@
       "rr": 1.43,
       "ts": 1791233992258,
       "expiresAt": 1791255592258,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "DOTUSDT-1791233992258-2312",
@@ -16354,10 +15640,10 @@
       "rr": 1.43,
       "ts": 1791233992258,
       "expiresAt": 1791255592258,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791233992258-750",
@@ -16498,10 +15784,10 @@
       "rr": 1.43,
       "ts": 1791234035817,
       "expiresAt": 1791255635817,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "BNBUSDT-1791234116805-3945",
@@ -16516,10 +15802,10 @@
       "rr": 1.43,
       "ts": 1791234116805,
       "expiresAt": 1791255716805,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234116805-9135",
@@ -16606,10 +15892,10 @@
       "rr": 1.43,
       "ts": 1791234165412,
       "expiresAt": 1791255765412,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 64.42549697041363,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234165412-89",
@@ -16642,10 +15928,10 @@
       "rr": 1.43,
       "ts": 1791234165412,
       "expiresAt": 1791255765412,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791234165412-9709",
@@ -16660,10 +15946,10 @@
       "rr": 1.43,
       "ts": 1791234165412,
       "expiresAt": 1791255765412,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791234165413-9798",
@@ -16714,10 +16000,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 7.752815176895797,
+      "closedAt": 1791759933737
     },
     {
       "id": "SUIUSDT-1791234165416-2991",
@@ -16732,10 +16018,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791234165416-4143",
@@ -16750,10 +16036,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2142121115889446,
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791234165416-7516",
@@ -16768,10 +16054,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791234165416-4349",
@@ -16786,10 +16072,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791234165416-3990",
@@ -16804,10 +16090,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791234165416-1278",
@@ -16822,10 +16108,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791234165416-7960",
@@ -16840,10 +16126,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "FETUSDT-1791234165416-2520",
@@ -16858,10 +16144,10 @@
       "rr": 1.43,
       "ts": 1791234165416,
       "expiresAt": 1791255765416,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.23867813422960762,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791234165417-1540",
@@ -16876,10 +16162,10 @@
       "rr": 1.43,
       "ts": 1791234165417,
       "expiresAt": 1791255765417,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "SOLUSDT-1791234238929-1934",
@@ -16894,10 +16180,10 @@
       "rr": 1.43,
       "ts": 1791234238929,
       "expiresAt": 1791255838929,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234238929-9732",
@@ -16930,10 +16216,10 @@
       "rr": 1.43,
       "ts": 1791234238929,
       "expiresAt": 1791255838929,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2598734565984855,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234238929-4304",
@@ -17002,10 +16288,10 @@
       "rr": 1.43,
       "ts": 1791234238929,
       "expiresAt": 1791255838929,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234296293-7476",
@@ -17092,10 +16378,10 @@
       "rr": 1.43,
       "ts": 1791234361177,
       "expiresAt": 1791255961177,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 2535.1760650537644,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234361177-7101",
@@ -17128,10 +16414,10 @@
       "rr": 1.43,
       "ts": 1791234361177,
       "expiresAt": 1791255961177,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 64.42549697041363,
+      "closedAt": 1791759933737
     },
     {
       "id": "BNBUSDT-1791234361178-3192",
@@ -17146,10 +16432,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234361178-7598",
@@ -17182,10 +16468,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791234361178-3767",
@@ -17200,10 +16486,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791234361178-2387",
@@ -17254,10 +16540,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791234361178-7615",
@@ -17272,10 +16558,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2142121115889446,
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791234361178-874",
@@ -17290,10 +16576,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791234361178-5022",
@@ -17308,10 +16594,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791234361178-6911",
@@ -17326,10 +16612,10 @@
       "rr": 1.43,
       "ts": 1791234361178,
       "expiresAt": 1791255961178,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791234361179-9397",
@@ -17344,10 +16630,10 @@
       "rr": 1.43,
       "ts": 1791234361179,
       "expiresAt": 1791255961179,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791234361179-7277",
@@ -17362,10 +16648,10 @@
       "rr": 1.43,
       "ts": 1791234361179,
       "expiresAt": 1791255961179,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791234361179-5754",
@@ -17380,10 +16666,10 @@
       "rr": 1.43,
       "ts": 1791234361179,
       "expiresAt": 1791255961179,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "ADAUSDT-1791234402218-7094",
@@ -17470,10 +16756,10 @@
       "rr": 1.43,
       "ts": 1791234483410,
       "expiresAt": 1791256083410,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234483410-7179",
@@ -17506,10 +16792,10 @@
       "rr": 1.43,
       "ts": 1791234483410,
       "expiresAt": 1791256083410,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2598734565984855,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234483410-6206",
@@ -17578,10 +16864,10 @@
       "rr": 1.43,
       "ts": 1791234483410,
       "expiresAt": 1791256083410,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234533088-8196",
@@ -17614,10 +16900,10 @@
       "rr": 1.43,
       "ts": 1791234533088,
       "expiresAt": 1791256133088,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234533088-4895",
@@ -17686,10 +16972,10 @@
       "rr": 1.43,
       "ts": 1791234584738,
       "expiresAt": 1791256184738,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 2535.1760650537644,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234584739-1344",
@@ -17722,10 +17008,10 @@
       "rr": 1.43,
       "ts": 1791234584739,
       "expiresAt": 1791256184739,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 64.42549697041363,
+      "closedAt": 1791759933737
     },
     {
       "id": "BNBUSDT-1791234584739-6294",
@@ -17740,10 +17026,10 @@
       "rr": 1.43,
       "ts": 1791234584739,
       "expiresAt": 1791256184739,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234584739-7422",
@@ -17776,10 +17062,10 @@
       "rr": 1.43,
       "ts": 1791234584739,
       "expiresAt": 1791256184739,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791234584739-6677",
@@ -17794,10 +17080,10 @@
       "rr": 1.43,
       "ts": 1791234584739,
       "expiresAt": 1791256184739,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791234584739-5658",
@@ -17848,10 +17134,10 @@
       "rr": 1.43,
       "ts": 1791234584739,
       "expiresAt": 1791256184739,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791234584740-1090",
@@ -17866,10 +17152,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791234584740-4471",
@@ -17884,10 +17170,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791234584740-2771",
@@ -17902,10 +17188,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791234584740-9236",
@@ -17920,10 +17206,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791234584740-8695",
@@ -17938,10 +17224,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791234584740-4728",
@@ -17956,10 +17242,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791234584740-7809",
@@ -17974,10 +17260,10 @@
       "rr": 1.43,
       "ts": 1791234584740,
       "expiresAt": 1791256184740,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "ADAUSDT-1791234643553-5783",
@@ -18064,10 +17350,10 @@
       "rr": 1.43,
       "ts": 1791234695888,
       "expiresAt": 1791256295888,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234695888-8054",
@@ -18100,10 +17386,10 @@
       "rr": 1.43,
       "ts": 1791234695889,
       "expiresAt": 1791256295889,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2598734565984855,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234695889-6164",
@@ -18172,10 +17458,10 @@
       "rr": 1.43,
       "ts": 1791234695889,
       "expiresAt": 1791256295889,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791234695889-4228",
@@ -18190,10 +17476,10 @@
       "rr": 1.43,
       "ts": 1791234695889,
       "expiresAt": 1791256295889,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234779075-4112",
@@ -18226,10 +17512,10 @@
       "rr": 1.43,
       "ts": 1791234779075,
       "expiresAt": 1791256379075,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 64.42549697041363,
+      "closedAt": 1791759933737
     },
     {
       "id": "BNBUSDT-1791234779075-4437",
@@ -18244,10 +17530,10 @@
       "rr": 1.43,
       "ts": 1791234779075,
       "expiresAt": 1791256379075,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234779075-761",
@@ -18280,10 +17566,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791234779076-2834",
@@ -18298,10 +17584,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791234779076-4730",
@@ -18352,10 +17638,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791234779076-3246",
@@ -18370,10 +17656,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791234779076-9190",
@@ -18388,10 +17674,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791234779076-6107",
@@ -18406,10 +17692,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791234779076-1537",
@@ -18424,10 +17710,10 @@
       "rr": 1.43,
       "ts": 1791234779076,
       "expiresAt": 1791256379076,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791234779077-4104",
@@ -18442,10 +17728,10 @@
       "rr": 1.43,
       "ts": 1791234779077,
       "expiresAt": 1791256379077,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791234779077-3829",
@@ -18460,10 +17746,10 @@
       "rr": 1.43,
       "ts": 1791234779077,
       "expiresAt": 1791256379077,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791234779077-6468",
@@ -18478,10 +17764,10 @@
       "rr": 1.43,
       "ts": 1791234779077,
       "expiresAt": 1791256379077,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "ADAUSDT-1791234829020-9327",
@@ -18568,10 +17854,10 @@
       "rr": 1.43,
       "ts": 1791234929312,
       "expiresAt": 1791256529312,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791234929312-6055",
@@ -18604,10 +17890,10 @@
       "rr": 1.43,
       "ts": 1791234929312,
       "expiresAt": 1791256529312,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2598734565984855,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791234929312-4009",
@@ -18676,10 +17962,10 @@
       "rr": 1.43,
       "ts": 1791234929313,
       "expiresAt": 1791256529313,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791234929313-8716",
@@ -18730,10 +18016,10 @@
       "rr": 1.43,
       "ts": 1791235015229,
       "expiresAt": 1791256615229,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235015229-6922",
@@ -18766,10 +18052,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791235015230-67",
@@ -18784,10 +18070,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791235015230-2187",
@@ -18838,10 +18124,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 7.752815176895797,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791235015230-6805",
@@ -18874,10 +18160,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791235015230-4971",
@@ -18892,10 +18178,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791235015230-8173",
@@ -18910,10 +18196,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791235015230-3241",
@@ -18928,10 +18214,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791235015230-5129",
@@ -18946,10 +18232,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791235015230-1708",
@@ -18964,10 +18250,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791235015230-8010",
@@ -18982,10 +18268,10 @@
       "rr": 1.43,
       "ts": 1791235015230,
       "expiresAt": 1791256615230,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520274
     },
     {
       "id": "POLUSDT-1791235067835-6621",
@@ -19072,10 +18358,10 @@
       "rr": 1.43,
       "ts": 1791235174354,
       "expiresAt": 1791256774354,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235174355-4276",
@@ -19108,10 +18394,10 @@
       "rr": 1.43,
       "ts": 1791235174355,
       "expiresAt": 1791256774355,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2598734565984855,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235174355-4926",
@@ -19180,10 +18466,10 @@
       "rr": 1.43,
       "ts": 1791235174355,
       "expiresAt": 1791256774355,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791235174355-8947",
@@ -19324,10 +18610,10 @@
       "rr": 1.43,
       "ts": 1791235250153,
       "expiresAt": 1791256850153,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 10.928628856024336,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235250153-5543",
@@ -19360,10 +18646,10 @@
       "rr": 1.43,
       "ts": 1791235250153,
       "expiresAt": 1791256850153,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791235250153-3713",
@@ -19378,10 +18664,10 @@
       "rr": 1.43,
       "ts": 1791235250153,
       "expiresAt": 1791256850153,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791235250153-1907",
@@ -19432,10 +18718,10 @@
       "rr": 1.43,
       "ts": 1791235250153,
       "expiresAt": 1791256850153,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 7.752815176895797,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791235250153-6975",
@@ -19468,10 +18754,10 @@
       "rr": 1.43,
       "ts": 1791235250153,
       "expiresAt": 1791256850153,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791235250154-3422",
@@ -19486,10 +18772,10 @@
       "rr": 1.43,
       "ts": 1791235250154,
       "expiresAt": 1791256850154,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791235250154-9545",
@@ -19504,10 +18790,10 @@
       "rr": 1.43,
       "ts": 1791235250154,
       "expiresAt": 1791256850154,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791235250154-3828",
@@ -19522,10 +18808,10 @@
       "rr": 1.43,
       "ts": 1791235250154,
       "expiresAt": 1791256850154,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791235250154-538",
@@ -19540,10 +18826,10 @@
       "rr": 1.43,
       "ts": 1791235250154,
       "expiresAt": 1791256850154,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791235250154-4789",
@@ -19558,10 +18844,10 @@
       "rr": 1.43,
       "ts": 1791235250154,
       "expiresAt": 1791256850154,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520275
     },
     {
       "id": "ADAUSDT-1791235320254-8276",
@@ -19648,10 +18934,10 @@
       "rr": 1.43,
       "ts": 1791235320254,
       "expiresAt": 1791256920254,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "SOLUSDT-1791235382103-6471",
@@ -19666,10 +18952,10 @@
       "rr": 1.43,
       "ts": 1791235382103,
       "expiresAt": 1791256982103,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235382103-8909",
@@ -19702,10 +18988,10 @@
       "rr": 1.43,
       "ts": 1791235382103,
       "expiresAt": 1791256982103,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235382103-3483",
@@ -19774,10 +19060,10 @@
       "rr": 1.43,
       "ts": 1791235382104,
       "expiresAt": 1791256982104,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "FETUSDT-1791235382104-940",
@@ -19792,10 +19078,10 @@
       "rr": 1.43,
       "ts": 1791235382104,
       "expiresAt": 1791256982104,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.23867813422960762,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235473119-2368",
@@ -19846,10 +19132,10 @@
       "rr": 1.43,
       "ts": 1791235473119,
       "expiresAt": 1791257073119,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791235473120-6558",
@@ -19864,10 +19150,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791235473120-4297",
@@ -19918,10 +19204,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 7.752815176895797,
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791235473120-5010",
@@ -19936,10 +19222,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791235473120-8923",
@@ -19954,10 +19240,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791235473120-4345",
@@ -19972,10 +19258,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791235473120-9291",
@@ -19990,10 +19276,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791235473120-9363",
@@ -20008,10 +19294,10 @@
       "rr": 1.43,
       "ts": 1791235473120,
       "expiresAt": 1791257073120,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791235473121-9108",
@@ -20026,10 +19312,10 @@
       "rr": 1.43,
       "ts": 1791235473121,
       "expiresAt": 1791257073121,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520275
     },
     {
       "id": "ADAUSDT-1791235491968-8582",
@@ -20134,10 +19420,10 @@
       "rr": 1.43,
       "ts": 1791235561089,
       "expiresAt": 1791257161089,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235561089-9762",
@@ -20206,10 +19492,10 @@
       "rr": 1.43,
       "ts": 1791235561090,
       "expiresAt": 1791257161090,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791235561090-4088",
@@ -20242,10 +19528,10 @@
       "rr": 1.43,
       "ts": 1791235624220,
       "expiresAt": 1791257224220,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235624221-8734",
@@ -20278,10 +19564,10 @@
       "rr": 1.43,
       "ts": 1791235624221,
       "expiresAt": 1791257224221,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.2598734565984855,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235624221-9729",
@@ -20350,10 +19636,10 @@
       "rr": 1.43,
       "ts": 1791235624221,
       "expiresAt": 1791257224221,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "FETUSDT-1791235624222-4863",
@@ -20368,10 +19654,10 @@
       "rr": 1.43,
       "ts": 1791235624222,
       "expiresAt": 1791257224222,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.23867813422960762,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235686744-6830",
@@ -20422,10 +19708,10 @@
       "rr": 1.43,
       "ts": 1791235686744,
       "expiresAt": 1791257286744,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 5.8155765436399784,
+      "closedAt": 1791759933737
     },
     {
       "id": "APTUSDT-1791235686745-6127",
@@ -20440,10 +19726,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.9045943434344261,
+      "closedAt": 1791759933737
     },
     {
       "id": "ARBUSDT-1791235686745-3211",
@@ -20494,10 +19780,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 7.752815176895797,
+      "closedAt": 1791759933737
     },
     {
       "id": "FILUSDT-1791235686745-9983",
@@ -20512,10 +19798,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "ETCUSDT-1791235686745-9606",
@@ -20530,10 +19816,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 8.484877948911148,
+      "closedAt": 1791759933737
     },
     {
       "id": "ATOMUSDT-1791235686745-9513",
@@ -20548,10 +19834,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 1.9172495412009085,
+      "closedAt": 1791759933737
     },
     {
       "id": "TIAUSDT-1791235686745-219",
@@ -20566,10 +19852,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.5776004336083358,
+      "closedAt": 1791759933737
     },
     {
       "id": "UNIUSDT-1791235686745-1554",
@@ -20584,10 +19870,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 7.760951339619929,
+      "closedAt": 1791759933737
     },
     {
       "id": "RENDERUSDT-1791235686745-5109",
@@ -20602,10 +19888,10 @@
       "rr": 1.43,
       "ts": 1791235686745,
       "expiresAt": 1791257286745,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.9991864296951791,
+      "closedAt": 1791759933737
     },
     {
       "id": "MANAUSDT-1791235686746-5797",
@@ -20620,10 +19906,10 @@
       "rr": 1.43,
       "ts": 1791235686746,
       "expiresAt": 1791257286746,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520275
     },
     {
       "id": "ADAUSDT-1791235735638-2762",
@@ -20656,10 +19942,10 @@
       "rr": 1.43,
       "ts": 1791235735638,
       "expiresAt": 1791257335638,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 64.42549697041363,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235735639-6274",
@@ -20728,10 +20014,10 @@
       "rr": 1.43,
       "ts": 1791235836497,
       "expiresAt": 1791257436497,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 111.0791386382967,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235836497-5900",
@@ -20764,10 +20050,10 @@
       "rr": 1.43,
       "ts": 1791235836497,
       "expiresAt": 1791257436497,
-      "status": "open",
+      "status": "expired",
       "result": null,
       "exitPrice": null,
-      "closedAt": null
+      "closedAt": 1791759933737
     },
     {
       "id": "BNBUSDT-1791235836497-8367",
@@ -20782,10 +20068,10 @@
       "rr": 1.43,
       "ts": 1791235836497,
       "expiresAt": 1791257436497,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759933737
     },
     {
       "id": "POLUSDT-1791235836497-8960",
@@ -20854,10 +20140,10 @@
       "rr": 1.43,
       "ts": 1791235836498,
       "expiresAt": 1791257436498,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 1.1246177231509662,
+      "closedAt": 1791759933737
     },
     {
       "id": "SEIUSDT-1791235836498-8629",
@@ -20872,10 +20158,10 @@
       "rr": 1.43,
       "ts": 1791235836498,
       "expiresAt": 1791257436498,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06979446446602748,
+      "closedAt": 1791759933737
     },
     {
       "id": "FETUSDT-1791235836498-3250",
@@ -20890,10 +20176,10 @@
       "rr": 1.43,
       "ts": 1791235836498,
       "expiresAt": 1791257436498,
-      "status": "open",
-      "result": null,
-      "exitPrice": null,
-      "closedAt": null
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.23867813422960762,
+      "closedAt": 1791759933737
     },
     {
       "id": "ADAUSDT-1791235843676-1522",
@@ -20966,44 +20252,776 @@
       "result": "win",
       "exitPrice": 0.1403881071574444,
       "closedAt": 1791235845485
+    },
+    {
+      "id": "BTCUSDT-1791759985035-2670",
+      "symbol": "BTCUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 83738.01,
+      "takeProfit": 83896.54,
+      "stopLoss": 83579.48,
+      "rr": 1,
+      "ts": 1791759985035,
+      "expiresAt": 1791781585035,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "ETHUSDT-1791759985036-2385",
+      "symbol": "ETHUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 2536.9,
+      "takeProfit": 2544.46,
+      "stopLoss": 2529.34,
+      "rr": 1,
+      "ts": 1791759985036,
+      "expiresAt": 1791781585036,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "DOGEUSDT-1791759985036-664",
+      "symbol": "DOGEUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.09,
+      "takeProfit": 0.09,
+      "stopLoss": 0.09,
+      "rr": 1,
+      "ts": 1791759985036,
+      "expiresAt": 1791781585036,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.08658548184691053,
+      "closedAt": 1791759993369
+    },
+    {
+      "id": "AVAXUSDT-1791759985036-7468",
+      "symbol": "AVAXUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 10.95,
+      "takeProfit": 11.04,
+      "stopLoss": 10.86,
+      "rr": 1,
+      "ts": 1791759985036,
+      "expiresAt": 1791781585036,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "LINKUSDT-1791759985036-5716",
+      "symbol": "LINKUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 13.34,
+      "takeProfit": 13.42,
+      "stopLoss": 13.25,
+      "rr": 1,
+      "ts": 1791759985036,
+      "expiresAt": 1791781585036,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "DOTUSDT-1791759985037-7124",
+      "symbol": "DOTUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 88,
+      "quality": "HIGH",
+      "entry": 1.26,
+      "takeProfit": 1.28,
+      "stopLoss": 1.25,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "LTCUSDT-1791759985037-4090",
+      "symbol": "LTCUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 82,
+      "quality": "MEDIUM",
+      "entry": 64.51,
+      "takeProfit": 64.83,
+      "stopLoss": 64.19,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "BNBUSDT-1791759985037-9368",
+      "symbol": "BNBUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 754.33,
+      "takeProfit": 755.92,
+      "stopLoss": 752.74,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 752.6578208706376,
+      "closedAt": 1791759993369
+    },
+    {
+      "id": "TRXUSDT-1791759985037-8352",
+      "symbol": "TRXUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.33,
+      "takeProfit": 0.33,
+      "stopLoss": 0.33,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.32996937865087195,
+      "closedAt": 1791759993369
+    },
+    {
+      "id": "NEARUSDT-1791759985037-1283",
+      "symbol": "NEARUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 5.84,
+      "takeProfit": 5.96,
+      "stopLoss": 5.71,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "ARBUSDT-1791759985037-8786",
+      "symbol": "ARBUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.2,
+      "takeProfit": 0.2,
+      "stopLoss": 0.2,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.1993837169434944,
+      "closedAt": 1791759993369
+    },
+    {
+      "id": "SUIUSDT-1791759985037-5994",
+      "symbol": "SUIUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 88,
+      "quality": "HIGH",
+      "entry": 1.13,
+      "takeProfit": 1.14,
+      "stopLoss": 1.12,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "FILUSDT-1791759985037-1169",
+      "symbol": "FILUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 1.21,
+      "takeProfit": 1.25,
+      "stopLoss": 1.17,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "ETCUSDT-1791759985037-1668",
+      "symbol": "ETCUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 8.49,
+      "takeProfit": 8.53,
+      "stopLoss": 8.45,
+      "rr": 1,
+      "ts": 1791759985037,
+      "expiresAt": 1791781585037,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "ATOMUSDT-1791759985038-8956",
+      "symbol": "ATOMUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 1.92,
+      "takeProfit": 1.89,
+      "stopLoss": 1.95,
+      "rr": 1,
+      "ts": 1791759985038,
+      "expiresAt": 1791781585038,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "UNIUSDT-1791759985038-8751",
+      "symbol": "UNIUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 7.76,
+      "takeProfit": 7.83,
+      "stopLoss": 7.69,
+      "rr": 1,
+      "ts": 1791759985038,
+      "expiresAt": 1791781585038,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "RENDERUSDT-1791759985038-2991",
+      "symbol": "RENDERUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 2,
+      "takeProfit": 2.03,
+      "stopLoss": 1.97,
+      "rr": 1,
+      "ts": 1791759985038,
+      "expiresAt": 1791781585038,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "FETUSDT-1791759985038-1740",
+      "symbol": "FETUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.24,
+      "takeProfit": 0.24,
+      "stopLoss": 0.23,
+      "rr": 1,
+      "ts": 1791759985038,
+      "expiresAt": 1791781585038,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "SANDUSDT-1791759985038-1367",
+      "symbol": "SANDUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.07,
+      "takeProfit": 0.07,
+      "stopLoss": 0.07,
+      "rr": 1,
+      "ts": 1791759985038,
+      "expiresAt": 1791781585038,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.06579,
+      "closedAt": 1791760520275
+    },
+    {
+      "id": "MANAUSDT-1791759985038-1493",
+      "symbol": "MANAUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.1,
+      "takeProfit": 0.1,
+      "stopLoss": 0.1,
+      "rr": 1,
+      "ts": 1791759985038,
+      "expiresAt": 1791781585038,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.0971,
+      "closedAt": 1791760520275
+    },
+    {
+      "id": "AVAXUSDT-1791760565213-8816",
+      "symbol": "AVAXUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 10.93,
+      "takeProfit": 11.02,
+      "stopLoss": 10.85,
+      "rr": 1,
+      "ts": 1791760565213,
+      "expiresAt": 1791782165213,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "BNBUSDT-1791760565214-3010",
+      "symbol": "BNBUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 754.12,
+      "takeProfit": 755.62,
+      "stopLoss": 752.62,
+      "rr": 1,
+      "ts": 1791760565214,
+      "expiresAt": 1791782165214,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "TRXUSDT-1791760565214-3353",
+      "symbol": "TRXUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.33,
+      "takeProfit": 0.33,
+      "stopLoss": 0.33,
+      "rr": 1,
+      "ts": 1791760565214,
+      "expiresAt": 1791782165214,
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.32995801106586925,
+      "closedAt": 1791760570066
+    },
+    {
+      "id": "NEARUSDT-1791760565214-628",
+      "symbol": "NEARUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 5.84,
+      "takeProfit": 5.96,
+      "stopLoss": 5.72,
+      "rr": 1,
+      "ts": 1791760565214,
+      "expiresAt": 1791782165214,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "ARBUSDT-1791760565214-3764",
+      "symbol": "ARBUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.2,
+      "takeProfit": 0.2,
+      "stopLoss": 0.2,
+      "rr": 1,
+      "ts": 1791760565214,
+      "expiresAt": 1791782165214,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.19907356703207177,
+      "closedAt": 1791760570066
+    },
+    {
+      "id": "SUIUSDT-1791760565215-6727",
+      "symbol": "SUIUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 1.13,
+      "takeProfit": 1.13,
+      "stopLoss": 1.12,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "FILUSDT-1791760565215-6277",
+      "symbol": "FILUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 1.22,
+      "takeProfit": 1.26,
+      "stopLoss": 1.18,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "ATOMUSDT-1791760565215-4532",
+      "symbol": "ATOMUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 1.92,
+      "takeProfit": 1.89,
+      "stopLoss": 1.94,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "TIAUSDT-1791760565215-4874",
+      "symbol": "TIAUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.57,
+      "takeProfit": 0.56,
+      "stopLoss": 0.59,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "UNIUSDT-1791760565215-5446",
+      "symbol": "UNIUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 7.74,
+      "takeProfit": 7.81,
+      "stopLoss": 7.68,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "RENDERUSDT-1791760565215-6706",
+      "symbol": "RENDERUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 82,
+      "quality": "MEDIUM",
+      "entry": 2,
+      "takeProfit": 2.02,
+      "stopLoss": 1.97,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "MANAUSDT-1791760565215-8017",
+      "symbol": "MANAUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.1,
+      "takeProfit": 0.1,
+      "stopLoss": 0.1,
+      "rr": 1,
+      "ts": 1791760565215,
+      "expiresAt": 1791782165215,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "TRXUSDT-1791760570159-2321",
+      "symbol": "TRXUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.33,
+      "takeProfit": 0.33,
+      "stopLoss": 0.33,
+      "rr": 1,
+      "ts": 1791760570159,
+      "expiresAt": 1791782170159,
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.32995801106586925,
+      "closedAt": 1791760580073
+    },
+    {
+      "id": "ARBUSDT-1791760570159-3302",
+      "symbol": "ARBUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.2,
+      "takeProfit": 0.2,
+      "stopLoss": 0.2,
+      "rr": 1,
+      "ts": 1791760570159,
+      "expiresAt": 1791782170159,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.19907356703207177,
+      "closedAt": 1791760580073
+    },
+    {
+      "id": "BTCUSDT-1791760659619-319",
+      "symbol": "BTCUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 83701.53,
+      "takeProfit": 83851.02,
+      "stopLoss": 83552.04,
+      "rr": 1,
+      "ts": 1791760659619,
+      "expiresAt": 1791782259619,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "LINKUSDT-1791760659619-8671",
+      "symbol": "LINKUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 88,
+      "quality": "HIGH",
+      "entry": 13.34,
+      "takeProfit": 13.42,
+      "stopLoss": 13.27,
+      "rr": 1,
+      "ts": 1791760659619,
+      "expiresAt": 1791782259619,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "DOTUSDT-1791760659619-3750",
+      "symbol": "DOTUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 1.26,
+      "takeProfit": 1.27,
+      "stopLoss": 1.25,
+      "rr": 1,
+      "ts": 1791760659619,
+      "expiresAt": 1791782259619,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
+    },
+    {
+      "id": "TRXUSDT-1791760659619-5273",
+      "symbol": "TRXUSDT",
+      "action": "SELL",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.33,
+      "takeProfit": 0.33,
+      "stopLoss": 0.33,
+      "rr": 1,
+      "ts": 1791760659619,
+      "expiresAt": 1791782259619,
+      "status": "closed",
+      "result": "win",
+      "exitPrice": 0.32995073242566514,
+      "closedAt": 1791760665353
+    },
+    {
+      "id": "ARBUSDT-1791760659620-7917",
+      "symbol": "ARBUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 0.2,
+      "takeProfit": 0.2,
+      "stopLoss": 0.2,
+      "rr": 1,
+      "ts": 1791760659620,
+      "expiresAt": 1791782259620,
+      "status": "closed",
+      "result": "loss",
+      "exitPrice": 0.19907356703207177,
+      "closedAt": 1791760665353
+    },
+    {
+      "id": "ETCUSDT-1791760659620-3471",
+      "symbol": "ETCUSDT",
+      "action": "BUY",
+      "mode": "crypto",
+      "confidence": 89,
+      "quality": "HIGH",
+      "entry": 8.49,
+      "takeProfit": 8.53,
+      "stopLoss": 8.45,
+      "rr": 1,
+      "ts": 1791760659620,
+      "expiresAt": 1791782259620,
+      "status": "open",
+      "result": null,
+      "exitPrice": null,
+      "closedAt": null
     }
   ],
   "paperPositions": [
     {
-      "id": "yb00ewmuvrhqad",
+      "id": "72x29jmv4fmyx7",
+      "symbol": "BTCUSDT",
+      "side": "BUY",
+      "entry": 83738.01,
+      "takeProfit": 83896.54,
+      "stopLoss": 83579.48,
+      "qty": 0.011942008175259958,
+      "openedAt": 1791759987574,
+      "confidence": 89,
+      "rr": 1
+    },
+    {
+      "id": "e9mpodmv4fmyx8",
+      "symbol": "ETHUSDT",
+      "side": "BUY",
+      "entry": 2536.9,
+      "takeProfit": 2544.46,
+      "stopLoss": 2529.34,
+      "qty": 0.3941818755173637,
+      "openedAt": 1791759987574,
+      "confidence": 89,
+      "rr": 1
+    },
+    {
+      "id": "ktrlwpmv4fmyx8",
+      "symbol": "AVAXUSDT",
+      "side": "BUY",
+      "entry": 10.95,
+      "takeProfit": 11.04,
+      "stopLoss": 10.86,
+      "qty": 91.32420091324201,
+      "openedAt": 1791759987574,
+      "confidence": 89,
+      "rr": 1
+    },
+    {
+      "id": "f3o8wwmv4fzby7",
       "symbol": "BNBUSDT",
-      "side": "SELL",
-      "entry": 786.57,
-      "takeProfit": 784.14,
-      "stopLoss": 788.27,
-      "qty": 1.2713426649884942,
-      "openedAt": 1791235708499,
-      "confidence": 83,
-      "rr": 1.43
-    },
-    {
-      "id": "feu3tsmuvrhqad",
-      "symbol": "APTUSDT",
       "side": "BUY",
-      "entry": 0.85,
-      "takeProfit": 0.87,
-      "stopLoss": 0.84,
-      "qty": 1176.4705882352941,
-      "openedAt": 1791235708499,
-      "confidence": 97,
-      "rr": 1.43
-    },
-    {
-      "id": "37gv69muvrhqae",
-      "symbol": "INJUSDT",
-      "side": "BUY",
-      "entry": 7.64,
-      "takeProfit": 7.73,
-      "stopLoss": 7.58,
-      "qty": 130.89005235602096,
-      "openedAt": 1791235708499,
-      "confidence": 97,
-      "rr": 1.43
+      "entry": 754.12,
+      "takeProfit": 755.62,
+      "stopLoss": 752.62,
+      "qty": 1.3260489046836048,
+      "openedAt": 1791760566758,
+      "confidence": 89,
+      "rr": 1
     }
   ],
   "paperHistory": [
@@ -23358,6 +23376,62 @@
       "rr": 1.43,
       "openedAt": 1791235708499,
       "closedAt": 1791235713501
+    },
+    {
+      "id": "yb00ewmuvrhqad",
+      "symbol": "BNBUSDT",
+      "side": "SELL",
+      "entry": 786.57,
+      "exit": 752.66,
+      "qty": 1.271343,
+      "pnl": 41.2,
+      "pnlPct": 4.12,
+      "reason": "TIME",
+      "rr": 1.43,
+      "openedAt": 1791235708499,
+      "closedAt": 1791759987574
+    },
+    {
+      "id": "feu3tsmuvrhqad",
+      "symbol": "APTUSDT",
+      "side": "BUY",
+      "entry": 0.85,
+      "exit": 0.9,
+      "qty": 1176.470588,
+      "pnl": 62.1,
+      "pnlPct": 6.21,
+      "reason": "TIME",
+      "rr": 1.43,
+      "openedAt": 1791235708499,
+      "closedAt": 1791759987574
+    },
+    {
+      "id": "37gv69muvrhqae",
+      "symbol": "INJUSDT",
+      "side": "BUY",
+      "entry": 7.64,
+      "exit": 7.75,
+      "qty": 130.890052,
+      "pnl": 12.74,
+      "pnlPct": 1.27,
+      "reason": "TIME",
+      "rr": 1.43,
+      "openedAt": 1791235708499,
+      "closedAt": 1791759987574
+    },
+    {
+      "id": "747idxmv4fmyx8",
+      "symbol": "DOGEUSDT",
+      "side": "BUY",
+      "entry": 0.09,
+      "exit": 0.09,
+      "qty": 11111.111111,
+      "pnl": -2,
+      "pnlPct": -0.2,
+      "reason": "SL",
+      "rr": 1,
+      "openedAt": 1791759987574,
+      "closedAt": 1791760566758
     }
   ],
   "settings": {}

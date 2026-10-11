@@ -373,7 +373,7 @@
       '<div class="signal-price"><div class="label">Live price</div><div class="val">' + fmtPrice(sig.price, sig) + '</div>' +
       '<div class="lvl">S ' + fmtPrice(sig.support, sig) + ' · R ' + fmtPrice(sig.resistance, sig) + '</div></div>' +
       '</div>' +
-      '<div class="conf"><span class="conf-label">' + (sig.mode === 'pocket' ? 'Win Probability' : 'MI Confidence') + '</span>' +
+      '<div class="conf"><span class="conf-label">Model confidence</span>' +
       '<div class="conf-bar"><div class="conf-fill ' + cls + '" style="width:' + sig.confidence + '%"></div></div>' +
       '<span class="conf-pct">' + sig.confidence + '%</span></div>' +
       '<div class="tp-row">' + fmtTpCountdown(sig) + '</div>' +
@@ -385,7 +385,7 @@
       '<div class="sig-item"><div class="k">Risk / Reward</div><div class="v gold">' + (sig.riskReward ? '1 : ' + sig.riskReward : '—') + '</div></div>' +
       (sig.mode === 'pocket'
         ? '<div class="sig-item"><div class="k">Expiry</div><div class="v gold">' + esc(sig.expiry || '5m') + '</div></div>' +
-          '<div class="sig-item"><div class="k">Payout (est.)</div><div class="v green">' + (sig.payout ? sig.payout + '%' : '—') + '</div></div>'
+          '<div class="sig-item"><div class="k">Payout reference*</div><div class="v green">' + (sig.payout ? sig.payout + '%' : '—') + '</div></div>'
         : '') +
       (sig.mode === 'forex'
         ? '<div class="sig-item"><div class="k">TP / SL (pips)</div><div class="v">' + (sig.tpPips != null ? sig.tpPips : '—') + ' / ' + (sig.slPips != null ? sig.slPips : '—') + '</div></div>' +
@@ -545,10 +545,9 @@
 
     if (sig.mode === 'pocket') {
       const up = sig.action === 'CALL';
-      const justify = sig.confidence >= (sig.payout || 80);
       steps = [
         'Buy the <b>' + sideWord + '</b> binary option expiring in <b>' + esc(sig.expiry || '5m') + '</b> — it wins if <b>' + esc(sig.asset) + '</b> closes ' + (up ? '<b class="buy-text">ABOVE</b>' : '<b class="sell-text">BELOW</b>') + ' the strike near <b>' + entry + '</b>.',
-        'Payout ≈ <b>' + (sig.payout || '—') + '%</b> vs <b>' + sig.confidence + '%</b> win probability — a play only when probability comfortably beats the payout (' + (justify ? '<b class="buy-text">justified ✅</b>' : '<b class="sell-text">not justified ❌ — skip</b>') + ').',
+        'Model confidence: <b>' + sig.confidence + '%</b>. Payout reference: <b>' + (sig.payout || '—') + '%</b>. These are not comparable probabilities and neither predicts a result; verify the current payout, strike, and terms directly with your broker.',
         'Keep the stake small: reference risk ≤ <b>$' + riskUsd + '</b>. One strong read is not a system — protect your bankroll.',
       ];
     } else {
@@ -563,7 +562,7 @@
           'ADX <b>' + (sig.adx != null ? (sig.adx >= 22 ? 'strong — act promptly' : 'developing — keep size modest') : '—') + '</b>.',
       ];
     }
-    steps.push('⚠ Analytical guidance, not financial advice — manage your own risk.');
+    steps.push('⚠ Analytical guidance, not financial advice — manage your own risk. *Payout references must be verified with your broker before entry.');
 
     return '<div class="playbook">' +
       '<div class="pb-title">🎯 What to do now — <span class="' + (isBuyAction(sig.action) ? 'buy-text' : 'sell-text') + '">' + sideWord + '</span></div>' +
