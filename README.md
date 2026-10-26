@@ -81,6 +81,7 @@ Want to show MI to someone on another device / share a link? Double-click **`LIV
 | `MI_PASSWORD` | `Admin2026` | Password for the **login page** (change in `.env` or Vercel env vars) |
 | `OPENROUTER_API_KEY` | *(empty)* | AI assistant key (get one at https://openrouter.ai/keys) |
 | `AI_MODEL` | `openai/gpt-4o-mini` | Which OpenRouter model powers MI |
+| `AI_MAX_TOKENS` | `1200` | Maximum response length reserved per OpenRouter request; lower it if the account has limited credit |
 | `CMC_API_KEY` | *(empty)* | Optional CoinMarketCap Pro key (https://coinmarketcap.com/api/). Leave empty for the keyless public API. When set, authenticated quotes/ohlcv endpoints are enabled. |
 | `MI_CONTACT_EMAIL` | `mi@localhost` | Contact used in the Web Push VAPID JWT (`sub`) |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | *(auto)* | Optional explicit Web Push keys (base64url public / PEM private). If unset, MI generates and stores them in `data/vapid.json` on first use. |

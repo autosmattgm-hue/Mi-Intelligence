@@ -1,6 +1,7 @@
 # MI — stop the trading server on Windows
 $ErrorActionPreference = 'SilentlyContinue'
-Set-Location 'f:\Mi Trading'
+$projectRoot = $PSScriptRoot
+Set-Location $projectRoot
 
 if (Test-Path '.server.pid') {
   $pidFile = Get-Content '.server.pid'
