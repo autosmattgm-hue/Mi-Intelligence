@@ -7,6 +7,19 @@
 
 const { Readable } = require('node:stream');
 
+// Keep a useful answer length without reserving more OpenRouter credit than a
+// low-balance account can afford. Operators can raise this in .env when their
+// provider balance allows it; the bounds prevent accidental zero/huge values.
+const DEFAULT_MAX_OUTPUT_TOKENS = 768;
+const MIN_MAX_OUTPUT_TOKENS = 256;
+const MAX_MAX_OUTPUT_TOKENS = 4096;
+
+function maxOutputTokens() {
+  const configured = Number.parseInt(process.env.AI_MAX_TOKENS || '', 10);
+  if (!Number.isFinite(configured)) return DEFAULT_MAX_OUTPUT_TOKENS;
+  return Math.min(MAX_MAX_OUTPUT_TOKENS, Math.max(MIN_MAX_OUTPUT_TOKENS, configured));
+}
+
 const AUDIENCE = {
   beginner: `The user is a BEGINNER trader.
 - Explain every term you use in plain language (e.g. RSI, EMA, stop-loss, take-profit, position size, leverage).
@@ -98,7 +111,8 @@ function buildMessages(messages, images) {
 }
 
 // Returns a Node.js readable stream of OpenAI-compatible SSE events.
-// Hardened: retries once on 429/5xx + empty-stream fallback error.
+// Hardened: retries once on transient errors and lowers the completion
+// reservation when a low-credit OpenRouter account returns HTTP 402.
 async function streamChat({ messages, context, model, apiKey, title, images, retries }) {
   const body = {
     model,
@@ -108,7 +122,7 @@ async function streamChat({ messages, context, model, apiKey, title, images, ret
       { role: 'system', content: buildSystemPrompt(context) },
       ...buildMessages(messages, images),
     ],
-    max_tokens: 2200,
+    max_tokens: maxOutputTokens(),
   };
 
   const attempt = retries == null ? 1 : retries;
@@ -119,6 +133,17 @@ async function streamChat({ messages, context, model, apiKey, title, images, ret
     } catch (e) {
       lastErr = e;
       const msg = String((e && e.message) || '');
+      // A 402 here commonly means the requested output reservation is larger
+      // than the account's remaining credit. A shorter analyst answer is still
+      // useful, so retry once at a safe compact size. This cannot bypass an
+      // account with no usable credit; that remains a provider billing issue.
+      if (/OpenRouter API 402/i.test(msg) && body.max_tokens > MIN_MAX_OUTPUT_TOKENS) {
+        const reduced = Math.max(MIN_MAX_OUTPUT_TOKENS, Math.min(768, Math.floor(body.max_tokens / 2)));
+        if (reduced < body.max_tokens) {
+          body.max_tokens = reduced;
+          continue;
+        }
+      }
       const retryable = /429|500|502|503|504|timeout|timed out|network|fetch failed/i.test(msg);
       if (!retryable || i === attempt) throw e;
       await new Promise(r => setTimeout(r, 1200 * (i + 1)));
