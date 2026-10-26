@@ -377,6 +377,7 @@
       const raw = String(err.message || 'AI error');
       let friendly = raw;
       if (/503|not configured|API key/i.test(raw)) friendly = '🔑 AI key missing — add OPENROUTER_API_KEY to .env and restart the server. Your coin was refunded.';
+      else if (/402|credit|can only afford|max_tokens/i.test(raw)) friendly = '💳 OpenRouter needs more credit for this response. MI now uses a 1,200-token limit after restart; add credit or lower AI_MAX_TOKENS in .env if this continues. Your coin was refunded.';
       else if (/429|rate|quota|insufficient/i.test(raw)) friendly = '⏳ AI is rate-limited right now — wait 30s and retry. Your coin was refunded. Tip: use "calc SYMBOL balance risk%" for instant math (free).';
       else if (/timeout|timed out|network|fetch failed|502|503|504/i.test(raw)) friendly = '📡 AI timed out — connection hiccup. Retry once; your coin was refunded. Tip: "calc SYMBOL balance risk%" works offline and free.';
       else if (/401|403/i.test(raw)) friendly = '🔐 AI auth failed — check the OpenRouter key. Your coin was refunded.';
